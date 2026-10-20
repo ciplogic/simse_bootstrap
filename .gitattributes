@@ -1,0 +1,3 @@
+# The published amalgamation is byte-exact. Never let git rewrite its line endings:
+# the Simse bootstrap check compares it against the compiler's output with `fc /b`.
+*.cpp -text
