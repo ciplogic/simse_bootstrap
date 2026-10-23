@@ -68591,7 +68591,9 @@ void ns13_bpCollectDecls(ns3_AstXmlNode* module, Dictionary<Str, Bool>* types, D
 }
 // src/parser/BorrowParams.kt
 Bool ns13_bpBuiltinType(Str* name) {
-    Str* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7;
+    Str* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7,
+        * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base14,
+        * _sm_base15, * _sm_base16;
     Span<Char> _sm_expr1;
     Bool _sm_expr2;
     _sm_base1 = name;
@@ -68621,6 +68623,42 @@ Bool ns13_bpBuiltinType(Str* name) {
     _sm_base7 = name;
     _sm_expr1 = simse_spanOfStr(_sm_base7);
     _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[1050]);
+    if (_sm_expr2) goto L1;
+    _sm_base8 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base8);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[1112]);
+    if (_sm_expr2) goto L1;
+    _sm_base9 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base9);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[1046]);
+    if (_sm_expr2) goto L1;
+    _sm_base10 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base10);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[974]);
+    if (_sm_expr2) goto L1;
+    _sm_base11 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base11);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[975]);
+    if (_sm_expr2) goto L1;
+    _sm_base12 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base12);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[976]);
+    if (_sm_expr2) goto L1;
+    _sm_base13 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base13);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[829]);
+    if (_sm_expr2) goto L1;
+    _sm_base14 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base14);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[830]);
+    if (_sm_expr2) goto L1;
+    _sm_base15 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base15);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[1043]);
+    if (_sm_expr2) goto L1;
+    _sm_base16 = name;
+    _sm_expr1 = simse_spanOfStr(_sm_base16);
+    _sm_expr2 = equals(simse_addressOf(_sm_expr1), __sm_stringTable[1040]);
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
