@@ -2878,8 +2878,8 @@ Bool advance(ns12_Str_splitIter_yieldable_StrView* self) {
         _sm_base27, _sm_base28, _sm_base29, _sm_base31, _sm_expr1, _sm_expr5, _sm_expr9;
     Span<Char> _sm_base9, _sm_base13, _sm_base17, _sm_base22, _sm_base25;
     Str* _sm_base10, * _sm_base11;
-    Span<Char>* _sm_base12, * _sm_base14, * _sm_base15, * _sm_base21, * _sm_base24, * _sm_base26,
-        * _sm_base30, * _sm_base32, * _sm_expr3;
+    Span<Char>* _sm_base12, * _sm_base14, * _sm_base15, * _sm_base21, * _sm_base26, * _sm_base30,
+        * _sm_base32, * _sm_expr3;
     _sm_base2 = self->branch;
     _sm_base1 = _sm_base2 == -1;
     if (_sm_base1) goto LYend;
@@ -2931,8 +2931,7 @@ Bool advance(ns12_Str_splitIter_yieldable_StrView* self) {
     if (_sm_expr2) goto L5;
     goto L6;
     L5:;
-    _sm_base24 = simse_addressOf(self->rest);
-    _sm_expr3 = _sm_base24;
+    _sm_expr3 = _sm_base21;
     self->current = _sm_expr3;
     self->branch = 2;
     return true;
@@ -3146,7 +3145,7 @@ Bool advance(ns21_XmlNode_elements_yieldable* self) {
     Bool _sm_base1, _sm_base3, _sm_expr2;
     Int _sm_base2, _sm_base4, _sm_base7, _sm_base11, _sm_base16, _sm_base17, _sm_expr1;
     Array<ns21_XmlNode>* _sm_base5, * _sm_base9;
-    ns21_XmlNode* _sm_base6, * _sm_base10, * _sm_base14, * _sm_base15, * _sm_expr5;
+    ns21_XmlNode* _sm_base6, * _sm_base10, * _sm_base14, * _sm_expr5;
     ns21_XmlNode _sm_base8;
     Str* _sm_base12, * _sm_base13;
     Span<Char> _sm_expr3;
@@ -3177,8 +3176,7 @@ Bool advance(ns21_XmlNode_elements_yieldable* self) {
     if (_sm_expr2) goto L3;
     goto LY1;
     L3:;
-    _sm_base15 = simse_addressOf(self->child);
-    _sm_expr5 = _sm_base15;
+    _sm_expr5 = _sm_base14;
     self->current = _sm_expr5;
     self->branch = 1;
     return true;
@@ -3880,10 +3878,13 @@ Bool ns11_ilPromoteRefs(ns11_IlBody* il, ns18_SemFacts* facts, Dictionary<Str, B
 Bool ns11_ilPromoteRefsUnit(ns11_IlUnit* unit, ns18_SemFacts* facts, Dictionary<Str, Bool>* fresh);
 Bool ns11_ilReuseExprOp(ns11_IlOpKind kind);
 Bool ns11_ilReuseCallOp(ns11_IlOpKind kind);
+Bool ns11_ilReusePureCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure, ns11_IlOp* op);
 Bool ns11_ilReuseAddrOp(ns11_IlOpKind kind);
 Bool ns11_ilReuseExprHas(ns11_IlBody* il);
+void ns11_ilReuseLabelFacts(ns11_IlBody* il, Dictionary<Int, Int>* first, Dictionary<Int, Bool>* loops);
+void ns11_ilReuseRegionDrop(Dictionary<Str, Int>* firstDst, Dictionary<Str, Int>* firstAt, Int after);
 void ns11_ilReuseExprKey(Str* _sm_out, ns11_IlOp* op, List<Int>* lastWrite);
-Bool ns11_ilReuseExprs(ns11_IlBody* il);
+Bool ns11_ilReuseExprs(ns11_IlBody* il, Dictionary<Str, Bool>* pure);
 Bool ns11_ilReuseCall(Dictionary<Str, Bool>* pure, Str* name);
 Int ns11_ilReuseDst(ns11_IlOp* op);
 Bool ns11_ilReuseIsCallLike(ns11_IlOpKind kind);
@@ -7214,7 +7215,7 @@ void ns5_gzCrcTable(List<ns20_UInt32>* _sm_out) {
 }
 // modules/gzip/api.kt
 Int ns5_readBits(ns5_GzBitReader* self, Int count) {
-    List<Int>* _sm_base1, * _sm_base2;
+    List<Int>* _sm_base1;
     Int _sm_base3, value, i, _sm_expr2, at, byteAt, _sm_expr3, _sm_expr7, bit, _sm_expr8;
     Bool _sm_expr1;
     value = 0;
@@ -7234,8 +7235,7 @@ Int ns5_readBits(ns5_GzBitReader* self, Int count) {
     self->error = true;
     return value;
     L4:;
-    _sm_base2 = simse_addressOf(self->bytes);
-    _sm_expr2 = (*_sm_base2)[byteAt];
+    _sm_expr2 = (*_sm_base1)[byteAt];
     _sm_expr3 = at & 7;
     _sm_expr7 = _sm_expr2 >> _sm_expr3;
     bit = _sm_expr7 & 1;
@@ -7257,7 +7257,7 @@ Int ns5_readBit(ns5_GzBitReader* self) {
 }
 // modules/gzip/api.kt
 Int ns5_readByte(ns5_GzBitReader* self) {
-    List<Int>* _sm_base1, * _sm_base3;
+    List<Int>* _sm_base1;
     Int _sm_base2, _sm_expr1, _sm_expr2, byteAt;
     Bool _sm_expr3;
     _sm_expr1 = self->bitPos;
@@ -7283,8 +7283,7 @@ Int ns5_readByte(ns5_GzBitReader* self) {
     _sm_expr1 = self->bitPos;
     _sm_base2 = _sm_expr1 + 8;
     self->bitPos = _sm_base2;
-    _sm_base3 = simse_addressOf(self->bytes);
-    _sm_expr2 = (*_sm_base3)[byteAt];
+    _sm_expr2 = (*_sm_base1)[byteAt];
     return _sm_expr2;
 }
 // modules/gzip/api.kt
@@ -9411,7 +9410,7 @@ Int ns9_size(ns9_JsonNode* self) {
 // modules/jsonnode/jsonnode.kt
 ns9_JsonNode ns9_at(ns9_JsonNode* self, Int index) {
     ns9_SmJsonNodeTypes _sm_base1;
-    List<Ref<ns9_JsonNode>>* _sm_base2, * _sm_base3;
+    List<Ref<ns9_JsonNode>>* _sm_base2;
     Bool _sm_expr1;
     Int _sm_expr3;
     Ref<ns9_JsonNode> handle;
@@ -9431,8 +9430,7 @@ ns9_JsonNode ns9_at(ns9_JsonNode* self, Int index) {
     if (_sm_expr1) goto L1;
     goto L2;
     L1:;
-    _sm_base3 = simse_addressOf(self->Items);
-    handle = (*_sm_base3)[index];
+    handle = (*_sm_base2)[index];
     _sm_expr5 = (handle).get();
     return *(_sm_expr5);
     L2:;
@@ -9728,10 +9726,10 @@ void ns9_write(ns9_JsonWriter* self, ns9_JsonNode node) {
         * _sm_base11, * _sm_base15, * _sm_base16, * _sm_base18, * _sm_base20, * _sm_base21, * _sm_base26;
     Float64 _sm_base4;
     Str _sm_base8, _sm_base22, _sm_expr8;
-    List<Ref<ns9_JsonNode>>* _sm_base10, * _sm_base12;
+    List<Ref<ns9_JsonNode>>* _sm_base10;
     ns9_JsonNode* _sm_base13, * _sm_base24;
     ns9_JsonNode _sm_base14, _sm_base25;
-    List<Ref<ns9_JsonMember>>* _sm_base17, * _sm_base19;
+    List<Ref<ns9_JsonMember>>* _sm_base17;
     ns9_SmJsonNodeTypes _sm_expr1;
     Bool _sm_expr2;
     Int i, _sm_expr13, _sm_i_2;
@@ -9805,8 +9803,7 @@ void ns9_write(ns9_JsonWriter* self, ns9_JsonNode node) {
     _sm_base11 = simse_addressOf(self->out);
     simse_str_append((*_sm_base11), ',');
     L21:;
-    _sm_base12 = simse_addressOf(node.Items);
-    handle = (*_sm_base12)[i];
+    handle = (*_sm_base10)[i];
     _sm_base13 = (handle).get();
     _sm_base14 = *(_sm_base13);
     ns9_write(self, _sm_base14);
@@ -9837,8 +9834,7 @@ void ns9_write(ns9_JsonWriter* self, ns9_JsonNode node) {
     _sm_base18 = simse_addressOf(self->out);
     simse_str_append((*_sm_base18), ',');
     L28:;
-    _sm_base19 = simse_addressOf(node.Members);
-    member = (*_sm_base19)[_sm_i_2];
+    member = (*_sm_base17)[_sm_i_2];
     _sm_base21 = simse_addressOf(self->out);
     _sm_base20 = _sm_base21;
     _sm_base22 = member->key;
@@ -9941,7 +9937,7 @@ void ns9_failChar(Res<Char>* _sm_out, ns9_JsonReader* self, Str* message) {
 }
 // modules/jsonnode/jsonnode.kt
 void ns9_skipSpace(ns9_JsonReader* self) {
-    Str* _sm_base1, * _sm_base2;
+    Str* _sm_base1;
     Int _sm_base3, _sm_base4, _sm_expr1, _sm_expr2;
     Bool _sm_expr3, _sm_expr6;
     Char ch;
@@ -9952,8 +9948,7 @@ void ns9_skipSpace(ns9_JsonReader* self) {
     _sm_expr3 = _sm_expr1 < _sm_expr2;
     if (!(_sm_expr3)) goto L2;
     _sm_expr1 = self->at;
-    _sm_base2 = simse_addressOf(self->text);
-    ch = (*_sm_base2)[_sm_expr1];
+    ch = (*_sm_base1)[_sm_expr1];
     _sm_expr3 = isSpace(simse_addressOf(ch));
     _sm_expr6 = !_sm_expr3;
     if (_sm_expr6) goto L2;
@@ -9965,7 +9960,7 @@ void ns9_skipSpace(ns9_JsonReader* self) {
 }
 // modules/jsonnode/jsonnode.kt
 Bool ns9_consume(ns9_JsonReader* self, Str word) {
-    Str* _sm_base1, * _sm_base2;
+    Str* _sm_base1;
     Int _sm_base3, _sm_base4, _sm_expr1, _sm_expr2, _sm_expr3, _sm_expr4;
     Bool _sm_expr5;
     Str _sm_expr7;
@@ -9980,9 +9975,8 @@ Bool ns9_consume(ns9_JsonReader* self, Str word) {
     L1:;
     return false;
     L2:;
-    _sm_base2 = simse_addressOf(self->text);
     _sm_base3 = self->at;
-    _sm_expr7 = substr(_sm_base2, _sm_base3, _sm_expr2);
+    _sm_expr7 = substr(_sm_base1, _sm_base3, _sm_expr2);
     _sm_expr5 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr7))), simse_spanOfStr(simse_addressOf(word)));
     if (_sm_expr5) goto L3;
     goto L4;
@@ -9996,7 +9990,7 @@ Bool ns9_consume(ns9_JsonReader* self, Str word) {
 }
 // modules/jsonnode/jsonnode.kt
 void ns9_parseValue(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
-    Str* _sm_base1, * _sm_base2, * _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7;
+    Str* _sm_base1, * _sm_base2, * _sm_base5, * _sm_base6, * _sm_base7;
     Str _sm_base3, text;
     Int _sm_expr1, _sm_expr2;
     Bool _sm_expr3, _sm_expr12;
@@ -10019,8 +10013,7 @@ void ns9_parseValue(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     return;
     L2:;
     _sm_expr1 = self->at;
-    _sm_base4 = simse_addressOf(self->text);
-    ch = (*_sm_base4)[_sm_expr1];
+    ch = (*_sm_base1)[_sm_expr1];
     _sm_expr3 = ch == '{';
     if (_sm_expr3) goto L3;
     goto L4;
@@ -10120,7 +10113,7 @@ void ns9_parseLiteral(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
 // modules/jsonnode/jsonnode.kt
 void ns9_parseNumber(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     Char* __sm_catP;
-    Str* _sm_base1, * _sm_base2, * _sm_base5, * _sm_base7, * _sm_base10;
+    Str* _sm_base1, * _sm_base5, * _sm_base10;
     Int _sm_base3, _sm_base4, start, _sm_expr1, _sm_expr2, _sm_expr15;
     Str _sm_base6, token, _sm_expr18;
     Bool _sm_expr3, _sm_expr17;
@@ -10137,8 +10130,7 @@ void ns9_parseNumber(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     _sm_expr3 = _sm_expr1 < _sm_expr2;
     if (!(_sm_expr3)) goto L2;
     _sm_expr1 = self->at;
-    _sm_base2 = simse_addressOf(self->text);
-    ch = (*_sm_base2)[_sm_expr1];
+    ch = (*_sm_base1)[_sm_expr1];
     _sm_expr3 = isDigit(simse_addressOf(ch));
     if (_sm_expr3) goto L3;
     _sm_expr3 = ch == '-';
@@ -10171,8 +10163,7 @@ void ns9_parseNumber(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     L12:;
     _sm_expr1 = self->at;
     _sm_expr15 = _sm_expr1 - start;
-    _sm_base7 = simse_addressOf(self->text);
-    token = substr(_sm_base7, start, _sm_expr15);
+    token = substr(_sm_base1, start, _sm_expr15);
     value = simse_str_toFloat(token);
     _sm_expr3 = simse_optHasValue(simse_addressOf(value));
     _sm_expr17 = !_sm_expr3;
@@ -10200,8 +10191,7 @@ void ns9_parseNumber(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
 // modules/jsonnode/jsonnode.kt
 void ns9_parseString(Res<Str>* _sm_out, ns9_JsonReader* self) {
     Int _sm_base1, _sm_base2, _sm_base5, _sm_base6, _sm_base9, _sm_base10, _sm_expr1, _sm_expr2;
-    Str* _sm_base3, * _sm_base4, * _sm_base7, * _sm_base8, * _sm_base11, * _sm_base12, * _sm_base13,
-        * _sm_base15;
+    Str* _sm_base3, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base15;
     Str _sm_base14, _sm_base16, out;
     Bool _sm_expr3, _sm_expr22;
     Char ch, esc, decoded;
@@ -10218,8 +10208,7 @@ void ns9_parseString(Res<Str>* _sm_out, ns9_JsonReader* self) {
     _sm_expr3 = _sm_expr1 < _sm_expr2;
     if (!(_sm_expr3)) goto L2;
     _sm_expr1 = self->at;
-    _sm_base4 = simse_addressOf(self->text);
-    ch = (*_sm_base4)[_sm_expr1];
+    ch = (*_sm_base3)[_sm_expr1];
     _sm_base5 = self->at;
     _sm_base6 = _sm_base5 + 1;
     self->at = _sm_base6;
@@ -10239,13 +10228,11 @@ void ns9_parseString(Res<Str>* _sm_out, ns9_JsonReader* self) {
     goto L1;
     L6:;
     _sm_expr1 = self->at;
-    _sm_base7 = simse_addressOf(self->text);
-    _sm_expr2 = simse_lenOf((*_sm_base7));
+    _sm_expr2 = simse_lenOf((*_sm_base3));
     _sm_expr3 = _sm_expr1 >= _sm_expr2;
     if (_sm_expr3) goto L2;
     _sm_expr1 = self->at;
-    _sm_base8 = simse_addressOf(self->text);
-    esc = (*_sm_base8)[_sm_expr1];
+    esc = (*_sm_base3)[_sm_expr1];
     _sm_base9 = self->at;
     _sm_base10 = _sm_base9 + 1;
     self->at = _sm_base10;
@@ -10403,7 +10390,7 @@ void ns9_parseUnicodeEscape(Res<Char>* _sm_out, ns9_JsonReader* self) {
 // modules/jsonnode/jsonnode.kt
 void ns9_parseArray(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     Int _sm_base1, _sm_base2, _sm_base5, _sm_base6, _sm_base12, _sm_base13, _sm_expr1, _sm_expr2;
-    Str* _sm_base3, * _sm_base4, * _sm_base8, * _sm_base9, * _sm_base11, * _sm_base15;
+    Str* _sm_base3, * _sm_base8, * _sm_base9, * _sm_base15;
     List<Ref<ns9_JsonNode>>* _sm_base7, * _sm_base14;
     Str _sm_base10, _sm_base16;
     List<Ref<ns9_JsonNode>> items;
@@ -10425,8 +10412,7 @@ void ns9_parseArray(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     goto L2;
     L3:;
     _sm_expr1 = self->at;
-    _sm_base4 = simse_addressOf(self->text);
-    _sm_expr5 = (*_sm_base4)[_sm_expr1];
+    _sm_expr5 = (*_sm_base3)[_sm_expr1];
     _sm_expr3 = _sm_expr5 == ']';
     if (_sm_expr3) goto L1;
     goto L2;
@@ -10468,8 +10454,7 @@ void ns9_parseArray(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     return;
     L9:;
     _sm_expr1 = self->at;
-    _sm_base11 = simse_addressOf(self->text);
-    ch = (*_sm_base11)[_sm_expr1];
+    ch = (*_sm_base8)[_sm_expr1];
     _sm_base12 = self->at;
     _sm_base13 = _sm_base12 + 1;
     self->at = _sm_base13;
@@ -10507,8 +10492,8 @@ void ns9_arrayNode(ns9_JsonNode* _sm_out, ns9_JsonReader* self, List<Ref<ns9_Jso
 void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     Int _sm_base1, _sm_base2, _sm_base5, _sm_base6, _sm_base18, _sm_base19, _sm_base24, _sm_base25,
         _sm_expr1, _sm_expr2;
-    Str* _sm_base3, * _sm_base4, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base12, * _sm_base13,
-        * _sm_base14, * _sm_base15, * _sm_base16, * _sm_base20, * _sm_base21, * _sm_base23, * _sm_base27;
+    Str* _sm_base3, * _sm_base8, * _sm_base10, * _sm_base12, * _sm_base13, * _sm_base16, * _sm_base21,
+        * _sm_base27;
     List<Ref<ns9_JsonMember>>* _sm_base7, * _sm_base26;
     Str _sm_base11, _sm_base17, _sm_base22, _sm_base28, key;
     List<Ref<ns9_JsonMember>> members;
@@ -10532,8 +10517,7 @@ void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     goto L2;
     L3:;
     _sm_expr1 = self->at;
-    _sm_base4 = simse_addressOf(self->text);
-    _sm_expr5 = (*_sm_base4)[_sm_expr1];
+    _sm_expr5 = (*_sm_base3)[_sm_expr1];
     _sm_expr3 = _sm_expr5 == '}';
     if (_sm_expr3) goto L1;
     goto L2;
@@ -10554,8 +10538,7 @@ void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     _sm_expr3 = _sm_expr1 >= _sm_expr2;
     if (_sm_expr3) goto L6;
     _sm_expr1 = self->at;
-    _sm_base9 = simse_addressOf(self->text);
-    _sm_expr5 = (*_sm_base9)[_sm_expr1];
+    _sm_expr5 = (*_sm_base8)[_sm_expr1];
     _sm_expr3 = _sm_expr5 != '"';
     if (_sm_expr3) goto L6;
     goto L7;
@@ -10582,13 +10565,11 @@ void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     key = _sm_prop1.Value;
     ns9_skipSpace(self);
     _sm_expr1 = self->at;
-    _sm_base14 = simse_addressOf(self->text);
-    _sm_expr2 = simse_lenOf((*_sm_base14));
+    _sm_expr2 = simse_lenOf((*_sm_base8));
     _sm_expr3 = _sm_expr1 >= _sm_expr2;
     if (_sm_expr3) goto L11;
     _sm_expr1 = self->at;
-    _sm_base15 = simse_addressOf(self->text);
-    _sm_expr5 = (*_sm_base15)[_sm_expr1];
+    _sm_expr5 = (*_sm_base8)[_sm_expr1];
     _sm_expr3 = _sm_expr5 != ':';
     if (_sm_expr3) goto L11;
     goto L12;
@@ -10618,8 +10599,7 @@ void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     simse_list_append(members, _sm_expr29);
     ns9_skipSpace(self);
     _sm_expr1 = self->at;
-    _sm_base20 = simse_addressOf(self->text);
-    _sm_expr2 = simse_lenOf((*_sm_base20));
+    _sm_expr2 = simse_lenOf((*_sm_base8));
     _sm_expr3 = _sm_expr1 >= _sm_expr2;
     if (_sm_expr3) goto L16;
     goto L17;
@@ -10631,8 +10611,7 @@ void ns9_parseObject(Res<ns9_JsonNode>* _sm_out, ns9_JsonReader* self) {
     return;
     L17:;
     _sm_expr1 = self->at;
-    _sm_base23 = simse_addressOf(self->text);
-    ch = (*_sm_base23)[_sm_expr1];
+    ch = (*_sm_base8)[_sm_expr1];
     _sm_base24 = self->at;
     _sm_base25 = _sm_base24 + 1;
     self->at = _sm_base25;
@@ -12765,7 +12744,7 @@ void ns21_xmlUpTo(Str* _sm_out, ns21_XmlParser* p, Str end) {
 }
 // modules/xml/parse.kt
 Bool ns21_xmlHas(ns21_XmlParser* p, Str* prefix) {
-    Str* _sm_base1, * _sm_base2;
+    Str* _sm_base1;
     Int _sm_base3, _sm_expr1, _sm_expr2, _sm_expr3, _sm_expr4;
     Str _sm_base4, _sm_expr7;
     Bool _sm_expr5;
@@ -12780,17 +12759,16 @@ Bool ns21_xmlHas(ns21_XmlParser* p, Str* prefix) {
     L1:;
     return false;
     L2:;
-    _sm_base2 = simse_addressOf(p->text);
     _sm_base3 = p->at;
-    _sm_expr7 = substr(_sm_base2, _sm_base3, _sm_expr2);
+    _sm_expr7 = substr(_sm_base1, _sm_base3, _sm_expr2);
     _sm_base4 = *(prefix);
     _sm_expr5 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr7))), simse_spanOfStr(simse_addressOf(_sm_base4)));
     return _sm_expr5;
 }
 // modules/xml/query.kt
 Opt<Str> ns21_attribute(ns21_XmlNode* self, Str name) {
-    List<ns21_Attribute>* _sm_base1, * _sm_base3, * _sm_base6;
-    ns21_Attribute* _sm_base2, * _sm_base5;
+    List<ns21_Attribute>* _sm_base1;
+    ns21_Attribute* _sm_base2;
     Str _sm_base4, _sm_expr3;
     Int i, _sm_expr1;
     Bool _sm_expr2;
@@ -12801,16 +12779,13 @@ Opt<Str> ns21_attribute(ns21_XmlNode* self, Str name) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(self->attributes);
-    _sm_base2 = simse_addressOf((*_sm_base3)[i]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
     _sm_expr3 = _sm_base2->name;
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr3))), simse_spanOfStr(simse_addressOf(name)));
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base6 = simse_addressOf(self->attributes);
-    _sm_base5 = simse_addressOf((*_sm_base6)[i]);
-    _sm_base4 = _sm_base5->value;
+    _sm_base4 = _sm_base2->value;
     _sm_expr5 = simse_optSome<Str>(_sm_base4);
     return _sm_expr5;
     L4:;
@@ -12840,7 +12815,7 @@ void ns21_attributeOr(Str* _sm_out, ns21_XmlNode* self, Str* name, Str* fallback
 }
 // modules/xml/query.kt
 Opt<ns21_XmlNode> ns21_child(ns21_XmlNode* self, Str name) {
-    Array<ns21_XmlNode>* _sm_base1, * _sm_base3, * _sm_base5;
+    Array<ns21_XmlNode>* _sm_base1;
     ns21_XmlNode* _sm_base2;
     ns21_XmlNode _sm_base4;
     Int i, _sm_expr1;
@@ -12853,15 +12828,13 @@ Opt<ns21_XmlNode> ns21_child(ns21_XmlNode* self, Str name) {
     _sm_expr1 = simse_array_count((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(self->Children);
-    _sm_base2 = simse_addressOf((*_sm_base3)[i]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
     _sm_expr3 = _sm_base2->name;
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr3))), simse_spanOfStr(simse_addressOf(name)));
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base5 = simse_addressOf(self->Children);
-    _sm_base4 = (*_sm_base5)[i];
+    _sm_base4 = (*_sm_base1)[i];
     _sm_expr5 = simse_optSome<ns21_XmlNode>(_sm_base4);
     return _sm_expr5;
     L4:;
@@ -12873,11 +12846,11 @@ Opt<ns21_XmlNode> ns21_child(ns21_XmlNode* self, Str name) {
 }
 // modules/xml/query.kt
 void ns21_textOf(Str* _sm_out, ns21_XmlNode* self) {
-    Array<ns21_XmlNode>* _sm_base1, * _sm_base5, * _sm_base8, * _sm_base14, * _sm_base19;
+    Array<ns21_XmlNode>* _sm_base1, * _sm_base8;
     Str* _sm_base2, * _sm_base3, * _sm_base9, * _sm_base10;
-    ns21_XmlNode* _sm_base4, * _sm_base7, * _sm_base13, * _sm_base18;
-    List<ns21_Attribute>* _sm_base6, * _sm_base12, * _sm_base17;
-    ns21_Attribute* _sm_base11, * _sm_base16;
+    ns21_XmlNode* _sm_base4, * _sm_base7;
+    List<ns21_Attribute>* _sm_base6;
+    ns21_Attribute* _sm_base11;
     Str _sm_base15, out;
     Int i, _sm_expr1, a;
     Bool _sm_expr2;
@@ -12889,8 +12862,7 @@ void ns21_textOf(Str* _sm_out, ns21_XmlNode* self) {
     _sm_expr1 = simse_array_count((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base5 = simse_addressOf(self->Children);
-    _sm_base4 = simse_addressOf((*_sm_base5)[i]);
+    _sm_base4 = simse_addressOf((*_sm_base1)[i]);
     _sm_base3 = simse_addressOf(_sm_base4->name);
     _sm_base2 = _sm_base3;
     _sm_expr3 = simse_spanOfStr(_sm_base2);
@@ -12906,10 +12878,7 @@ void ns21_textOf(Str* _sm_out, ns21_XmlNode* self) {
     _sm_expr1 = simse_lenOf((*_sm_base6));
     _sm_expr2 = a < _sm_expr1;
     if (!(_sm_expr2)) goto L6;
-    _sm_base14 = simse_addressOf(self->Children);
-    _sm_base13 = simse_addressOf((*_sm_base14)[i]);
-    _sm_base12 = simse_addressOf(_sm_base13->attributes);
-    _sm_base11 = simse_addressOf((*_sm_base12)[a]);
+    _sm_base11 = simse_addressOf((*_sm_base6)[a]);
     _sm_base10 = simse_addressOf(_sm_base11->name);
     _sm_base9 = _sm_base10;
     _sm_expr3 = simse_spanOfStr(_sm_base9);
@@ -12917,11 +12886,7 @@ void ns21_textOf(Str* _sm_out, ns21_XmlNode* self) {
     if (_sm_expr2) goto L7;
     goto L8;
     L7:;
-    _sm_base19 = simse_addressOf(self->Children);
-    _sm_base18 = simse_addressOf((*_sm_base19)[i]);
-    _sm_base17 = simse_addressOf(_sm_base18->attributes);
-    _sm_base16 = simse_addressOf((*_sm_base17)[a]);
-    _sm_base15 = _sm_base16->value;
+    _sm_base15 = _sm_base11->value;
     simse_str_appendStr(out, _sm_base15);
     L8:;
     a = a + 1;
@@ -12954,7 +12919,7 @@ void ns21_textValue(Str* _sm_out, ns21_XmlNode* self) {
 }
 // modules/xml/query.kt
 void ns21_elementList(List<ns21_XmlNode>* _sm_out, ns21_XmlNode* self) {
-    Array<ns21_XmlNode>* _sm_base1, * _sm_base5, * _sm_base7;
+    Array<ns21_XmlNode>* _sm_base1;
     Str* _sm_base2, * _sm_base3;
     ns21_XmlNode* _sm_base4;
     ns21_XmlNode _sm_base6;
@@ -12969,8 +12934,7 @@ void ns21_elementList(List<ns21_XmlNode>* _sm_out, ns21_XmlNode* self) {
     _sm_expr1 = simse_array_count((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base5 = simse_addressOf(self->Children);
-    _sm_base4 = simse_addressOf((*_sm_base5)[i]);
+    _sm_base4 = simse_addressOf((*_sm_base1)[i]);
     _sm_base3 = simse_addressOf(_sm_base4->name);
     _sm_base2 = _sm_base3;
     _sm_expr3 = simse_spanOfStr(_sm_base2);
@@ -12978,8 +12942,7 @@ void ns21_elementList(List<ns21_XmlNode>* _sm_out, ns21_XmlNode* self) {
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base7 = simse_addressOf(self->Children);
-    _sm_base6 = (*_sm_base7)[i];
+    _sm_base6 = (*_sm_base1)[i];
     simse_list_append(out, _sm_base6);
     L4:;
     i = i + 1;
@@ -13000,7 +12963,7 @@ void ns21_descendants(List<ns21_XmlNode>* _sm_out, ns21_XmlNode* self, Str name)
 }
 // modules/xml/query.kt
 void ns21_xmlDescendantsInto(ns21_XmlNode node, Str name, List<ns21_XmlNode>* out) {
-    Array<ns21_XmlNode>* _sm_base1, * _sm_base2;
+    Array<ns21_XmlNode>* _sm_base1;
     Str* _sm_base3, * _sm_base4;
     Int i, _sm_expr1;
     Bool _sm_expr2;
@@ -13013,8 +12976,7 @@ void ns21_xmlDescendantsInto(ns21_XmlNode node, Str name, List<ns21_XmlNode>* ou
     _sm_expr1 = simse_array_count((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base2 = simse_addressOf(node.Children);
-    child = (*_sm_base2)[i];
+    child = (*_sm_base1)[i];
     _sm_base4 = simse_addressOf(child.name);
     _sm_base3 = _sm_base4;
     _sm_expr3 = simse_spanOfStr(_sm_base3);
@@ -13112,11 +13074,11 @@ void ns21_xmlWritePretty(Str* _sm_out, ns21_XmlNode node) {
 void ns21_xmlWriteLevel(Str* _sm_out, ns21_XmlNode node, Str indent, Int depth) {
     Str _sm_base1, _sm_base5, _sm_base15, _sm_base16, _sm_base22, pad, out, _sm_expr4, _sm_expr9,
         _sm_expr15, _sm_expr20, _sm_expr21, _sm_expr23;
-    List<ns21_Attribute>* _sm_base2, * _sm_base4;
+    List<ns21_Attribute>* _sm_base2;
     ns21_Attribute* _sm_base3, * attribute;
     Str* _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12, * _sm_base14, * _sm_base19, * _sm_base20,
         * _sm_base21;
-    Array<ns21_XmlNode>* _sm_base8, * _sm_base10, * _sm_base17, * _sm_base18;
+    Array<ns21_XmlNode>* _sm_base8, * _sm_base17;
     ns21_XmlNode* _sm_base9, * child;
     List<Str>* _sm_base13;
     Int i, a, _sm_expr2, elements, c, t, k, _sm_expr22;
@@ -13145,8 +13107,7 @@ void ns21_xmlWriteLevel(Str* _sm_out, ns21_XmlNode node, Str indent, Int depth) 
     _sm_expr2 = simse_lenOf((*_sm_base2));
     _sm_expr1 = a < _sm_expr2;
     if (!(_sm_expr1)) goto L4;
-    _sm_base4 = simse_addressOf(node.attributes);
-    _sm_base3 = simse_addressOf((*_sm_base4)[a]);
+    _sm_base3 = simse_addressOf((*_sm_base2)[a]);
     attribute = _sm_base3;
     simse_str_append(out, ' ');
     _sm_base5 = attribute->name;
@@ -13168,8 +13129,7 @@ void ns21_xmlWriteLevel(Str* _sm_out, ns21_XmlNode node, Str indent, Int depth) 
     _sm_expr2 = simse_array_count((*_sm_base8));
     _sm_expr1 = c < _sm_expr2;
     if (!(_sm_expr1)) goto L6;
-    _sm_base10 = simse_addressOf(node.Children);
-    _sm_base9 = simse_addressOf((*_sm_base10)[c]);
+    _sm_base9 = simse_addressOf((*_sm_base8)[c]);
     child = _sm_base9;
     _sm_base12 = simse_addressOf(child->name);
     _sm_base11 = _sm_base12;
@@ -13229,8 +13189,7 @@ void ns21_xmlWriteLevel(Str* _sm_out, ns21_XmlNode node, Str indent, Int depth) 
     _sm_expr2 = simse_array_count((*_sm_base17));
     _sm_expr1 = k < _sm_expr2;
     if (!(_sm_expr1)) goto L17;
-    _sm_base18 = simse_addressOf(node.Children);
-    _sm_child_2 = (*_sm_base18)[k];
+    _sm_child_2 = (*_sm_base17)[k];
     _sm_base20 = simse_addressOf(_sm_child_2.name);
     _sm_base19 = _sm_base20;
     _sm_expr7 = simse_spanOfStr(_sm_base19);
@@ -14168,7 +14127,7 @@ void ns1_exprInner(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e, ns3_AstXm
         * _sm_base106, * _sm_base107, * _sm_base112, * _sm_base120, * _sm_base133, * _sm_base134,
         * _sm_base137, * _sm_base138, * _sm_base140, * _sm_base141, * _sm_expr7, * _sm_expr10, * _sm_expr50;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base8, * _sm_base70, * _sm_base127, * _sm_base128,
-        * _sm_base130, * _sm_base135, * _sm_base136;
+        * _sm_base130, * _sm_base135;
     Dictionary<Str, ns1_CgStatic>* _sm_base9;
     Dictionary<Str, Str>* _sm_base18, * _sm_base125;
     ns3_AstNodeKind _sm_base23, _sm_base34, _sm_base35, _sm_base52, _sm_base53, _sm_base57, _sm_base62,
@@ -14907,8 +14866,7 @@ void ns1_exprInner(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e, ns3_AstXm
     if (_sm_expr2) goto L117;
     goto L120;
     L117:;
-    _sm_base136 = simse_addressOf(self->types);
-    _sm_base135 = _sm_base136;
+    _sm_base135 = _sm_base128;
     _sm_base137 = &haveName;
     _sm_base138 = &expectedName;
     _sm_expr2 = ns18_semDerivesFromName(_sm_base135, _sm_base137, _sm_base138);
@@ -15138,11 +15096,11 @@ Str ns1_call(ns1_Emitter* self, ns3_AstXmlNode* e) {
         * _sm_base161, * _sm_base162, * _sm_base163, * _sm_base164, * _sm_base165, * _sm_base166,
         * _sm_base169, * _sm_base172, * _sm_base176, * _sm_base177, * _sm_base178, * _sm_base180,
         * _sm_base183, * _sm_base189, * _sm_base207, * _sm_base216, * _sm_base218, * _sm_base219,
-        * _sm_base220, * _sm_base221, * _sm_base223, * _sm_base224, * _sm_base230, * _sm_base237,
-        * _sm_base239, * _sm_base243, * _sm_base245, * _sm_base246, * _sm_base250, * _sm_base253,
-        * _sm_base254, * _sm_base256, * _sm_base261, * _sm_base267, * _sm_base269, * _sm_base270,
-        * _sm_base271, * _sm_base280, * _sm_base282, * _sm_base287, * _sm_base289, * _sm_base293,
-        * _sm_expr54, * _sm_expr99, * _sm_expr108, * _sm_expr116, * extSymbolText, * symbolText;
+        * _sm_base220, * _sm_base221, * _sm_base223, * _sm_base230, * _sm_base237, * _sm_base239,
+        * _sm_base243, * _sm_base245, * _sm_base246, * _sm_base250, * _sm_base253, * _sm_base254,
+        * _sm_base256, * _sm_base261, * _sm_base267, * _sm_base269, * _sm_base270, * _sm_base271,
+        * _sm_base280, * _sm_base282, * _sm_base287, * _sm_base289, * _sm_base293, * _sm_expr54,
+        * _sm_expr99, * _sm_expr108, * _sm_expr116, * extSymbolText, * symbolText;
     Dictionary<Str, Str>* _sm_base9, * _sm_base87;
     Dictionary<Str, Bool>* _sm_base10, * _sm_base11, * _sm_base88, * _sm_base93, * _sm_base124,
         * _sm_base131, * _sm_base167, * _sm_base233, * _sm_base260, * _sm_base276;
@@ -15162,8 +15120,8 @@ Str ns1_call(ns1_Emitter* self, ns3_AstXmlNode* e) {
         selfText2, machineText, _sm_expr188, all, qualifyText5, explicitText, _sm_expr195, _sm_all_2,
         protocolText, bareParam, _sm_expr202, _sm_expr203, memberAccessText, cgJoinText7, _sm_receiver_2,
         _sm_all_3, _sm_expr208, qualifyText6, _sm_expr214, _sm_all_4, memberAccessText2, cgJoinText8;
-    List<ns3_AstNodeAttribute>* _sm_base33, * _sm_base35, * _sm_base37;
-    ns3_AstNodeAttribute* _sm_base34, * _sm_base36;
+    List<ns3_AstNodeAttribute>* _sm_base33;
+    ns3_AstNodeAttribute* _sm_base34;
     List<Str> _sm_base81, _sm_base85, args, valueArgs, _sm_args_2, _sm_args_3, _sm_expr187, fixedArgs;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base153;
     ns1_CgFn* _sm_base208, * _sm_base262, * fn, * caller;
@@ -15307,17 +15265,14 @@ Str ns1_call(ns1_Emitter* self, ns3_AstXmlNode* e) {
     _sm_expr18 = simse_lenOf((*_sm_base33));
     _sm_expr2 = pi < _sm_expr18;
     if (!(_sm_expr2)) goto L16;
-    _sm_base35 = simse_addressOf(e->attributes);
-    _sm_base34 = simse_addressOf((*_sm_base35)[pi]);
+    _sm_base34 = simse_addressOf((*_sm_base33)[pi]);
     _sm_expr20 = _sm_base34->name;
     _sm_expr21 = ns3_AstNodeAttributeKind::Package;
     _sm_expr2 = _sm_expr20 == _sm_expr21;
     if (_sm_expr2) goto L17;
     goto L18;
     L17:;
-    _sm_base37 = simse_addressOf(e->attributes);
-    _sm_base36 = simse_addressOf((*_sm_base37)[pi]);
-    callPackage = _sm_base36->value;
+    callPackage = _sm_base34->value;
     L18:;
     pi = pi + 1;
     goto L15;
@@ -16073,8 +16028,7 @@ Str ns1_call(ns1_Emitter* self, ns3_AstXmlNode* e) {
     if (_sm_expr2) goto L127;
     goto L128;
     L127:;
-    _sm_base224 = simse_addressOf(fn->name);
-    _sm_base223 = _sm_base224;
+    _sm_base223 = _sm_base221;
     _sm_base225 = &explicitArgs;
     ns1_typeArgsString(&explicitText, self, _sm_base223, _sm_base225);
     _sm_expr13.resize(4 + qualifyText5.size() + explicitText.size() + all.size());
@@ -16891,9 +16845,9 @@ void ns1_addFunction(ns1_Emitter* self, ns3_AstXmlNode* decl, ns3_AstXmlNode* re
     ns3_AstNodeKind _sm_base9;
     ns3_AstXmlNode _sm_base10, _sm_base11;
     List<Str> _sm_base13;
-    Dictionary<Str, List<Int>>* _sm_base16, * _sm_base18;
+    Dictionary<Str, List<Int>>* _sm_base16;
     Dictionary<Str, Bool>* _sm_base19, * _sm_base23, * _sm_base24, * _sm_base25;
-    Dictionary<Str, Str>* _sm_base20, * _sm_base21;
+    Dictionary<Str, Str>* _sm_base20;
     Str* _sm_expr1, * _sm_expr2, * _sm_expr3;
     Bool isNative, isPure, _sm_expr4, _sm_expr9, _sm_expr13;
     Int index, _sm_expr5, _sm_expr6, _sm_expr7;
@@ -16938,8 +16892,7 @@ void ns1_addFunction(ns1_Emitter* self, ns3_AstXmlNode* decl, ns3_AstXmlNode* re
     L2:;
     fresh = List<Int>();
     simse_list_append(fresh, index);
-    _sm_base18 = simse_addressOf(self->functionsByName);
-    simse_dict_insert((*_sm_base18), name, fresh);
+    simse_dict_insert((*_sm_base16), name, fresh);
     L3:;
     _sm_expr9 = !isNative;
     if (_sm_expr9) goto L4;
@@ -16951,9 +16904,8 @@ void ns1_addFunction(ns1_Emitter* self, ns3_AstXmlNode* decl, ns3_AstXmlNode* re
     _sm_base20 = simse_addressOf(self->functionPackages);
     _sm_expr9 = simse_dict_has((*_sm_base20), name);
     if (_sm_expr9) goto L7;
-    _sm_base21 = simse_addressOf(self->functionPackages);
     _sm_base22 = *(packageName);
-    simse_dict_insert((*_sm_base21), name, _sm_base22);
+    simse_dict_insert((*_sm_base20), name, _sm_base22);
     L7:;
     _sm_expr9 = ns2_xmlIsEmpty(receiver);
     _sm_expr13 = !_sm_expr9;
@@ -16978,7 +16930,7 @@ void ns1_addFunction(ns1_Emitter* self, ns3_AstXmlNode* decl, ns3_AstXmlNode* re
 }
 // src/codegen/CgCore.kt
 void ns1_addNativeExt(ns1_Emitter* self, Str* name, ns1_CgNativeExt* ext) {
-    Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base1, * _sm_base6;
+    Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base1;
     Str _sm_base2, _sm_base7;
     ns1_CgNativeExt _sm_base4, _sm_base5;
     List<ns1_CgNativeExt>* existing;
@@ -16998,9 +16950,8 @@ void ns1_addNativeExt(ns1_Emitter* self, Str* name, ns1_CgNativeExt* ext) {
     fresh = List<ns1_CgNativeExt>();
     _sm_base5 = *(ext);
     simse_list_append(fresh, _sm_base5);
-    _sm_base6 = simse_addressOf(self->nativeExtensions);
     _sm_base7 = *(name);
-    simse_dict_insert((*_sm_base6), _sm_base7, fresh);
+    simse_dict_insert((*_sm_base1), _sm_base7, fresh);
     L3:;
 }
 // src/codegen/CgCore.kt
@@ -17526,7 +17477,7 @@ Bool ns1_sretEligible(ns1_Emitter* self, ns1_CgFn* fn) {
     ns3_AstXmlNode* _sm_base1, * decl, * returnNode;
     ns3_AstNodeAttributeKind _sm_base2, _sm_base4, _sm_base6;
     Str _sm_base3, _sm_base5, _sm_base7, _sm_base12;
-    Str* _sm_base8, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_expr4;
+    Str* _sm_base8, * _sm_base9, * _sm_base11, * _sm_expr4;
     ns3_AstNodeKind _sm_base13, _sm_base14;
     Bool _sm_expr1;
     Span<Char> _sm_expr10;
@@ -17573,10 +17524,9 @@ Bool ns1_sretEligible(ns1_Emitter* self, ns1_CgFn* fn) {
     _sm_expr10 = simse_spanOfStr(_sm_base8);
     _sm_expr1 = equals(simse_addressOf(_sm_expr10), __sm_stringTable[1274]);
     if (_sm_expr1) goto L10;
-    _sm_base10 = simse_addressOf(fn->name);
     _sm_base12 = __sm_stringTable[989];
     _sm_base11 = &_sm_base12;
-    _sm_expr1 = endsWith(_sm_base10, _sm_base11);
+    _sm_expr1 = endsWith(_sm_base9, _sm_base11);
     if (_sm_expr1) goto L10;
     goto L11;
     L10:;
@@ -17682,7 +17632,7 @@ Bool ns1_freshHandleEligible(ns1_Emitter* self, ns1_CgFn* fn) {
         * _sm_base24, * _sm_base27, * decl, * returnNode, * inner, * innerDecl, * member, * body;
     ns3_AstNodeAttributeKind _sm_base4, _sm_base6, _sm_base8, _sm_base21, _sm_base25, _sm_base30;
     Str _sm_base5, _sm_base7, _sm_base9, _sm_base14, _sm_base26, _sm_base31, innerName;
-    Str* _sm_base10, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_expr6;
+    Str* _sm_base10, * _sm_base11, * _sm_base13, * _sm_expr6;
     ns3_AstNodeKind _sm_base15, _sm_base16, _sm_base18, _sm_base28, _sm_base32, _sm_expr24, _sm_expr25;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base22;
     List<ns3_AstXmlNode>* _sm_base29;
@@ -17741,10 +17691,9 @@ Bool ns1_freshHandleEligible(ns1_Emitter* self, ns1_CgFn* fn) {
     _sm_expr12 = simse_spanOfStr(_sm_base10);
     _sm_expr1 = equals(simse_addressOf(_sm_expr12), __sm_stringTable[1274]);
     if (_sm_expr1) goto L11;
-    _sm_base12 = simse_addressOf(fn->name);
     _sm_base14 = __sm_stringTable[989];
     _sm_base13 = &_sm_base14;
-    _sm_expr1 = endsWith(_sm_base12, _sm_base13);
+    _sm_expr1 = endsWith(_sm_base11, _sm_base13);
     if (_sm_expr1) goto L11;
     goto L12;
     L11:;
@@ -18295,7 +18244,7 @@ void ns1_fillFacts(ns1_Emitter* self, ns18_SemFacts* facts) {
     ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base37, * _sm_base38, * node;
     Str* _sm_base16, * _sm_base17, * _sm_base18, * _sm_base19, * _sm_base21, * _sm_base22;
     Bool _sm_base20, _sm_expr2;
-    Dictionary<Str, List<Int>>* _sm_base24, * _sm_base27;
+    Dictionary<Str, List<Int>>* _sm_base24;
     Str _sm_base25, _sm_base28, typeName, enumTypeName, extensionName, staticName;
     Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base29, * _sm_base31;
     List<Str> _sm_base32, typeNames, enumTypeNames, extensionNames, staticNames;
@@ -18386,9 +18335,8 @@ void ns1_fillFacts(ns1_Emitter* self, ns18_SemFacts* facts) {
     L8:;
     fresh = List<Int>();
     simse_list_append(fresh, index);
-    _sm_base27 = simse_addressOf(facts->functionsByName);
     _sm_base28 = fn->name;
-    simse_dict_insert((*_sm_base27), _sm_base28, fresh);
+    simse_dict_insert((*_sm_base24), _sm_base28, fresh);
     goto L5;
     L6:;
     _sm_base29 = simse_addressOf(self->nativeExtensions);
@@ -18595,7 +18543,7 @@ Str ns1_typeName(ns1_Emitter* self, Str* name, ns3_AstXmlNode* posNode) {
     Char* __sm_catP;
     Dictionary<Str, Bool>* _sm_base1;
     Str _sm_base2, _sm_base4, _sm_base7, _sm_base11, packageName, _sm_expr9, _sm_expr11;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base3, * _sm_base6;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base3;
     Str* _sm_base5, * _sm_base9, * _sm_base13;
     Span<Char> _sm_expr1;
     Bool _sm_expr2;
@@ -18630,9 +18578,8 @@ Str ns1_typeName(ns1_Emitter* self, Str* name, ns3_AstXmlNode* posNode) {
     L7:;
     return *(name);
     L8:;
-    _sm_base6 = simse_addressOf(self->types);
     _sm_base7 = *(name);
-    decl = simse_dict_getPtr((*_sm_base6), _sm_base7);
+    decl = simse_dict_getPtr((*_sm_base3), _sm_base7);
     _sm_expr2 = decl != nullptr;
     if (_sm_expr2) goto L11;
     goto L10;
@@ -19040,7 +18987,7 @@ void ns1_emitFunctions(ns1_Emitter* self, Bool prototypeOnly, ns18_SemFacts* fac
 }
 // src/codegen/CgEmitFn.kt
 void ns1_beginScope(ns1_Emitter* self, ns1_CgFn* fn, ns1_NameKind selfK, ns3_AstXmlNode* selfTypePtr) {
-    Dictionary<Str, ns1_NameKind>* _sm_base1, * _sm_base5, * _sm_base12;
+    Dictionary<Str, ns1_NameKind>* _sm_base1, * _sm_base12;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base2, * _sm_base15;
     ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base6, * _sm_base7, * param, * paramType;
     ns3_AstNodeKind _sm_base8, _sm_base10;
@@ -19067,8 +19014,7 @@ void ns1_beginScope(ns1_Emitter* self, ns1_CgFn* fn, ns1_NameKind selfK, ns3_Ast
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base5 = simse_addressOf(self->nameKinds);
-    simse_dict_insert((*_sm_base5), __sm_stringTable[1280], selfK);
+    simse_dict_insert((*_sm_base1), __sm_stringTable[1280], selfK);
     L2:;
     _sm_base7 = simse_addressOf(fn->decl);
     _sm_base6 = _sm_base7;
@@ -19566,10 +19512,9 @@ void ns1_cgReservedNames(List<Str>* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* 
 // src/codegen/CgEmitFn.kt
 void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_SemFacts* facts) {
     Char* __sm_catP;
-    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base6, * _sm_base7, * _sm_base16, * _sm_base17,
-        * _sm_base26, * _sm_base27, * _sm_base42, * _sm_base43, * _sm_base44, * _sm_base45, * _sm_base46,
-        * _sm_base76, * _sm_base80, * _sm_base81, * _sm_base82, * _sm_base109, * _sm_base110, * decl,
-        * returnNode, * param, * paramType, * _sm_expr74;
+    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base6, * _sm_base7, * _sm_base16, * _sm_base26,
+        * _sm_base42, * _sm_base44, * _sm_base46, * _sm_base76, * _sm_base80, * _sm_base81, * _sm_base82,
+        * _sm_base109, * _sm_base110, * decl, * returnNode, * param, * paramType, * _sm_expr74;
     ns3_AstNodeAttributeKind _sm_base4, _sm_base50, _sm_base54, _sm_base56, _sm_base83;
     Str _sm_base5, _sm_base11, _sm_base13, _sm_base22, _sm_base34, _sm_base55, _sm_base65, _sm_base67,
         _sm_base70, _sm_base95, _sm_base105, _sm_base117, _sm_base122, _sm_expr9, _sm_expr24, _sm_expr25,
@@ -19579,11 +19524,10 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
         _sm_expr72, fnNameDiag, _sm_expr73, headLowerDiag, _sm_expr77, headInferDiag, _sm_expr83, _sm_expr87,
         headFinalDiag, _sm_expr89, opsDiag, _sm_expr93, _sm_expr94, _sm_expr100;
     Str* _sm_base8, * _sm_base9, * _sm_base12, * _sm_base18, * _sm_base19, * _sm_base21, * _sm_base29,
-        * _sm_base30, * _sm_base31, * _sm_base33, * _sm_base37, * _sm_base38, * _sm_base39, * _sm_base40,
-        * _sm_base53, * _sm_base59, * _sm_base60, * _sm_base61, * _sm_base62, * _sm_base64, * _sm_base69,
-        * _sm_base74, * _sm_base75, * _sm_base77, * _sm_base79, * _sm_base94, * _sm_base104, * _sm_base115,
-        * _sm_base116, * _sm_base121, * _sm_base126, * _sm_base127, * _sm_base138, * _sm_base139,
-        * _sm_expr2, * oneParam;
+        * _sm_base30, * _sm_base31, * _sm_base33, * _sm_base37, * _sm_base39, * _sm_base40, * _sm_base53,
+        * _sm_base59, * _sm_base60, * _sm_base61, * _sm_base62, * _sm_base64, * _sm_base69, * _sm_base74,
+        * _sm_base75, * _sm_base77, * _sm_base79, * _sm_base94, * _sm_base104, * _sm_base115, * _sm_base116,
+        * _sm_base121, * _sm_base126, * _sm_base127, * _sm_base138, * _sm_base139, * _sm_expr2, * oneParam;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base10, * _sm_base103, * _sm_base123, * _sm_base134,
         * _sm_base135;
     ns3_AstNodeKind _sm_base20, _sm_base28, _sm_base49, _sm_base91, _sm_base92;
@@ -19672,8 +19616,7 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
     ns1_emitTask(self, fn, decl, prototypeOnly, facts);
     return;
     L9:;
-    _sm_base17 = simse_addressOf(fn->receiver);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base7;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base16);
     _sm_expr10 = _sm_expr1;
     if (!(_sm_expr10)) goto _sm_sc1;
@@ -19718,8 +19661,7 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
     _sm_base23 = _sm_base24;
     ns1_setActiveTypeParams(self, _sm_base23);
     ns1_setActiveConstraints(self, decl);
-    _sm_base27 = simse_addressOf(fn->receiver);
-    _sm_base26 = _sm_base27;
+    _sm_base26 = _sm_base7;
     _sm_base25 = ns18_semMachineReceiver(_sm_base26);
     self->machineIter = _sm_base25;
     ns1_fnTemplateParams(&tmplParams, self, fn);
@@ -19806,8 +19748,7 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
     _sm_expr1 = !yielding;
     _sm_expr33 = _sm_expr1;
     if (!(_sm_expr33)) goto _sm_sc4;
-    _sm_base38 = simse_addressOf(fn->packageName);
-    _sm_base37 = _sm_base38;
+    _sm_base37 = _sm_base30;
     _sm_base40 = simse_addressOf(fn->name);
     _sm_base39 = _sm_base40;
     ns1_qualify(&_sm_expr36, self, _sm_base37, _sm_base39);
@@ -19826,19 +19767,17 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
     hasSelf = false;
     selfK = ns1_NameKind::Value;
     ns2_xmlEmptyNode(&selfTypePtr);
-    _sm_base43 = simse_addressOf(fn->receiver);
-    _sm_base42 = _sm_base43;
+    _sm_base42 = _sm_base7;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base42);
     _sm_expr20 = !_sm_expr1;
     if (_sm_expr20) goto L34;
     goto L37;
     L34:;
-    _sm_base45 = simse_addressOf(fn->receiver);
-    _sm_base44 = _sm_base45;
+    _sm_base44 = _sm_base7;
     ns1_receiverParam(&_sm_expr40, self, _sm_base44);
     simse_list_append(params, _sm_expr40);
     hasSelf = true;
-    _sm_base46 = _sm_base45;
+    _sm_base46 = _sm_base7;
     ns1_kindOf(&selfK, self, _sm_base46);
     selfTypePtr = fn->receiver;
     _sm_expr1 = self->failed;
@@ -19931,8 +19870,8 @@ void ns1_emitFunction(ns1_Emitter* self, ns1_CgFn* fn, Bool prototypeOnly, ns18_
     _sm_base65 = __sm_stringTable[1376];
     _sm_base64 = &_sm_base65;
     {
-        Str _sm_sret484;
-        ns1_cgJoin(&_sm_sret484, _sm_base63, _sm_base64);
+        Str _sm_sret474;
+        ns1_cgJoin(&_sm_sret474, _sm_base63, _sm_base64);
     }
     outParams = params;
     if (sretThis) goto L54;
@@ -20480,16 +20419,15 @@ void ns1_emitFreshTwin(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, ns
 void ns1_emitDeducedCallableOverload(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Str ret, Str fnName, Bool prototypeOnly) {
     Char* __sm_catP;
     Int __sm_catAt;
-    List<Str>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base31, * _sm_base33, * _sm_base34,
-        * _sm_base37, * _sm_base42;
+    List<Str>* _sm_base1, * _sm_base2, * _sm_base31, * _sm_base33, * _sm_base34, * _sm_base37,
+        * _sm_base42;
     Str _sm_base4, _sm_base8, _sm_base21, _sm_base26, _sm_base32, _sm_base36, _sm_base39, _sm_base44,
         _sm_expr15, cbName, _sm_expr19, name, _sm_expr31, _sm_expr32, typeText2, _sm_expr35, tmpl,
         cgJoinText, cgJoinText2, _sm_expr38, callee, explicitText, _sm_expr41, _sm_expr44, _sm_expr45;
     ns3_AstNodeKind _sm_base5, _sm_base13, _sm_base28;
     List<ns3_AstXmlNode>* _sm_base6, * _sm_base14;
     ns3_AstNodeAttributeKind _sm_base7, _sm_base15;
-    ns3_AstXmlNode* _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12, * param, * _sm_param_2,
-        * paramType;
+    ns3_AstXmlNode* _sm_base9, * _sm_base10, * _sm_base11, * param, * _sm_param_2, * paramType;
     Str* _sm_base16, * _sm_base19, * _sm_base23, * _sm_base35, * _sm_base38, * _sm_base43, * _sm_base49,
         * typeParam, * _sm_expr11, * cbName2, * typeText, * cbName3;
     List<ns1_CgCallableArg>* _sm_base17;
@@ -20524,8 +20462,7 @@ void ns1_emitDeducedCallableOverload(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXml
     return;
     L5:;
     taken = List<Str>();
-    _sm_base3 = simse_addressOf(fn->templateParams);
-    _sm_base2 = _sm_base3;
+    _sm_base2 = _sm_base1;
     _sm_expr6 = simse_spanOf(_sm_base2);
     _sm_for12 = iter(simse_addressOf(_sm_expr6));
     L6:;
@@ -20587,8 +20524,7 @@ void ns1_emitDeducedCallableOverload(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXml
     if (_sm_expr18) goto L14;
     goto L17;
     L14:;
-    _sm_base12 = simse_addressOf(fn->receiver);
-    _sm_base11 = _sm_base12;
+    _sm_base11 = _sm_base10;
     ns1_receiverParam(&_sm_expr19, self, _sm_base11);
     simse_list_append(params, _sm_expr19);
     simse_list_append(args, __sm_stringTable[1280]);
@@ -20919,8 +20855,7 @@ void ns1_emitUninit(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, ns18_
     Str _sm_base5, _sm_base18, className, _sm_expr6, _sm_expr7, emittedName, qualified, cgJoinText3,
         dtorSignature, tmpl, _sm_expr12, _sm_expr23;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base6, * _sm_base46, * _sm_base52;
-    List<Str>* _sm_base14, * _sm_base15, * _sm_base16, * _sm_base23, * _sm_base24, * _sm_base25,
-        * _sm_base50;
+    List<Str>* _sm_base14, * _sm_base15, * _sm_base23, * _sm_base25, * _sm_base50;
     Dictionary<Str, ns1_NameKind> _sm_base30, savedKinds;
     Dictionary<Str, ns3_AstXmlNode> _sm_base31, savedTypes, _sm_expr21, inferred;
     ns1_NameKind _sm_base32, savedSelfKind;
@@ -20999,8 +20934,7 @@ void ns1_emitUninit(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, ns18_
     if (_sm_expr1) goto L9;
     goto L10;
     L9:;
-    _sm_base16 = simse_addressOf(fn->templateParams);
-    _sm_base15 = _sm_base16;
+    _sm_base15 = _sm_base14;
     _sm_base18 = __sm_stringTable[1376];
     _sm_base17 = &_sm_base18;
     ns1_cgJoin(&cgJoinText3, _sm_base15, _sm_base17);
@@ -21023,10 +20957,9 @@ void ns1_emitUninit(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, ns18_
     std::memcpy(__sm_catP, emittedName.data(), emittedName.size());
     __sm_catP = __sm_catP + emittedName.size();
     std::memcpy(__sm_catP, "()", 2);
-    _sm_base24 = simse_addressOf(fn->templateParams);
-    _sm_base23 = _sm_base24;
+    _sm_base23 = _sm_base14;
     ns1_setActiveTypeParams(self, _sm_base23);
-    _sm_base25 = _sm_base24;
+    _sm_base25 = _sm_base14;
     ns1_templateClause(&tmpl, self, _sm_base25);
     ns1_sourceComment(self, decl);
     _sm_base27 = &tmpl;
@@ -21307,7 +21240,7 @@ void ns1_emitStatics(ns1_Emitter* self) {
     Char* __sm_catP;
     List<ns1_CgStatic>* _sm_base1, * _sm_base2;
     Str _sm_base3, storage, typeText, _sm_expr7;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base12, * _sm_base13, * typeNode;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base12, * typeNode;
     ns3_AstNodeKind _sm_base6;
     ns3_AstNodeAttributeKind _sm_base9;
     Str* _sm_base10, * _sm_base11, * _sm_expr5;
@@ -21349,8 +21282,7 @@ void ns1_emitStatics(ns1_Emitter* self) {
     L6:;
     return;
     L7:;
-    _sm_base13 = simse_addressOf(entry->decl);
-    _sm_base12 = _sm_base13;
+    _sm_base12 = _sm_base5;
     ns1_sourceComment(self, _sm_base12);
     typeText = ns1_type(self, typeNode);
     _sm_expr7.resize(4 + typeText.size() + storage.size());
@@ -21375,7 +21307,7 @@ Bool ns1_staticReached(ns1_Emitter* self, ns1_CgStatic* entry) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2;
     ns3_AstNodeAttributeKind _sm_base3;
     Str* _sm_base4;
-    Dictionary<Str, Bool>* _sm_base5, * _sm_base6;
+    Dictionary<Str, Bool>* _sm_base5;
     Str name;
     Span<Char> _sm_expr1;
     Bool _sm_expr2, _sm_expr3;
@@ -21393,8 +21325,7 @@ Bool ns1_staticReached(ns1_Emitter* self, ns1_CgStatic* entry) {
     _sm_expr2 = simse_dict_has((*_sm_base5), __sm_stringTable[552]);
     _sm_expr3 = _sm_expr2;
     if (_sm_expr3) goto _sm_sc1;
-    _sm_base6 = simse_addressOf(self->referencedNames);
-    _sm_expr2 = simse_dict_has((*_sm_base6), __sm_stringTable[551]);
+    _sm_expr2 = simse_dict_has((*_sm_base5), __sm_stringTable[551]);
     _sm_expr3 = _sm_expr2;
     _sm_sc1:;
     return _sm_expr3;
@@ -21459,7 +21390,7 @@ void ns1_emitStaticInit(ns1_Emitter* self) {
     Char* __sm_catP;
     List<Str>* _sm_base1;
     List<ns1_CgStatic>* _sm_base2, * _sm_base3;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base9, * _sm_base13, * init, * _sm_expr11;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base13, * init, * _sm_expr11;
     ns3_AstNodeKind _sm_base6, _sm_base15;
     Str _sm_base7, storage, exprText, _sm_expr12;
     ns3_AstNodeAttributeKind _sm_base10;
@@ -21510,14 +21441,13 @@ void ns1_emitStaticInit(ns1_Emitter* self) {
     if (_sm_expr1) goto L5;
     _sm_base7 = entry->file;
     self->curFile = _sm_base7;
-    _sm_base9 = simse_addressOf(entry->decl);
-    _sm_base8 = _sm_base9;
+    _sm_base8 = _sm_base5;
     _sm_base10 = ns3_AstNodeAttributeKind::Name;
     _sm_expr10 = ns2_xmlAttr(_sm_base8, _sm_base10);
     _sm_base12 = simse_addressOf(entry->packageName);
     _sm_base11 = _sm_base12;
     ns1_qualify(&storage, self, _sm_base11, _sm_expr10);
-    _sm_base13 = _sm_base9;
+    _sm_base13 = _sm_base5;
     _sm_base15 = ns3_AstNodeKind::Type;
     _sm_expr11 = ns2_xmlChildPtr(_sm_base13, _sm_base15);
     exprText = ns1_expr(self, init, 0, _sm_expr11);
@@ -21781,7 +21711,7 @@ void ns1_emitTypes(ns1_Emitter* self, Dictionary<Str, Bool>* emitted) {
 void ns1_emitTypeByName(ns1_Emitter* self, Str* name, Dictionary<Str, Str>* files, Dictionary<Str, Bool>* prel, Dictionary<Str, Bool>* emitted, Dictionary<Str, Bool>* defined) {
     Str _sm_base1, _sm_base2, _sm_base4, _sm_base6, _sm_base8, _sm_base9, _sm_base10, _sm_base11,
         _sm_base17, _sm_base19, _sm_base22, _sm_base25, _sm_expr18;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base5, * _sm_base13, * _sm_base14;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base5, * _sm_base13;
     List<Str>* _sm_base12, * _sm_base23;
     List<ns3_AstXmlNode>* _sm_base15;
     ns3_AstNodeKind _sm_base16, _sm_base24, _sm_expr6, _sm_expr7;
@@ -21850,8 +21780,7 @@ void ns1_emitTypeByName(ns1_Emitter* self, Str* name, Dictionary<Str, Str>* file
     ns2_xmlTypeParamNames(&_sm_expr9, decl);
     _sm_base12 = &_sm_expr9;
     ns1_setActiveTypeParams(self, _sm_base12);
-    _sm_base14 = simse_addressOf(self->types);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base5;
     ns18_semAllFields(&_sm_expr10, _sm_base13, decl);
     _sm_base15 = &_sm_expr10;
     _sm_expr11 = simse_spanOf(_sm_base15);
@@ -23411,7 +23340,7 @@ Bool ns1_unionArmManaged(ns1_Emitter* self, ns3_AstXmlNode* typeNode) {
     ns3_AstNodeAttributeKind _sm_base4, _sm_base10;
     Str* _sm_base5, * _sm_base6, * _sm_base11;
     ns3_AstNodeKind _sm_base8, _sm_base14, _sm_base19, _sm_expr25, _sm_expr26;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base12, * _sm_base15, * _sm_base16;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base12, * _sm_base15;
     List<ns3_AstXmlNode>* _sm_base18;
     Int guard, _sm_expr19;
     ns3_AstXmlNode current;
@@ -23550,8 +23479,7 @@ Bool ns1_unionArmManaged(ns1_Emitter* self, ns3_AstXmlNode* typeNode) {
     L33:;
     _sm_expr1 = ns1_typeIsRaw(self, decl);
     if (_sm_expr1) goto L32;
-    _sm_base16 = simse_addressOf(self->types);
-    _sm_base15 = _sm_base16;
+    _sm_base15 = _sm_base12;
     _sm_base17 = decl;
     ns18_semAllFields(&_sm_expr35, _sm_base15, _sm_base17);
     _sm_base18 = &_sm_expr35;
@@ -23839,8 +23767,8 @@ void ns1_emitNativeDeclarations(ns1_Emitter* self) {
         _sm_expr16, mapped, name, _sm_expr24, _sm_expr25, tmpl, cgJoinText2, _sm_expr29;
     ns3_AstXmlNode* _sm_base5, * _sm_base14, * _sm_base16, * _sm_base18, * _sm_base32, * _sm_base33,
         * returnNode, * param, * paramType;
-    Str* _sm_base7, * _sm_base8, * _sm_base10, * _sm_base15, * _sm_base25, * _sm_base27, * _sm_base35,
-        * _sm_base36, * _sm_base38, * nativeInfoSymbolText, * nativeInfoSymbolText2;
+    Str* _sm_base7, * _sm_base8, * _sm_base15, * _sm_base25, * _sm_base27, * _sm_base35, * _sm_base36,
+        * _sm_base38, * nativeInfoSymbolText, * nativeInfoSymbolText2;
     ns3_AstNodeKind _sm_base17, _sm_base19, _sm_base21;
     List<ns3_AstXmlNode>* _sm_base20;
     ns3_AstNodeAttributeKind _sm_base22, _sm_base26;
@@ -23885,8 +23813,7 @@ void ns1_emitNativeDeclarations(ns1_Emitter* self) {
     if (_sm_expr3) goto L5;
     goto L6;
     L5:;
-    _sm_base10 = simse_addressOf(nativeInfo->symbol);
-    nativeInfoSymbolText = _sm_base10;
+    nativeInfoSymbolText = _sm_base7;
     _sm_base12 = *(nativeInfoSymbolText);
     _sm_expr9.resize(56 + _sm_base12.size());
     __sm_catP = simse_str_data(&_sm_expr9);
@@ -24449,7 +24376,7 @@ void ns1_collectResourceLiterals(ns1_Emitter* self) {
 // src/codegen/CgEmitType.kt
 void ns1_emitResourceTable(ns1_Emitter* self) {
     Char* __sm_catP;
-    List<Str>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base8;
+    List<Str>* _sm_base1, * _sm_base2, * _sm_base8;
     ns1_StringTable* _sm_base4;
     List<Int>* _sm_base5;
     Int _sm_expr1, _sm_expr5, _sm_expr8;
@@ -24468,8 +24395,7 @@ void ns1_emitResourceTable(ns1_Emitter* self) {
     return;
     L2:;
     indices = List<Int>();
-    _sm_base3 = simse_addressOf(self->resourceStored);
-    _sm_base2 = _sm_base3;
+    _sm_base2 = _sm_base1;
     _sm_expr3 = simse_spanOf(_sm_base2);
     _sm_for36 = iter(simse_addressOf(_sm_expr3));
     L3:;
@@ -24512,7 +24438,7 @@ void ns1_emitResourceTable(ns1_Emitter* self) {
 void ns1_emitStringTable(ns1_Emitter* self) {
     Char* __sm_catP;
     Int __sm_catC0;
-    ns1_StringTable* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base11;
+    ns1_StringTable* _sm_base1, * _sm_base3, * _sm_base11;
     Str* _sm_base4;
     List<Int>* _sm_base5, * _sm_base6, * _sm_base7, * _sm_base8, * _sm_base12, * _sm_base15;
     Int _sm_expr1, count, total, previousStart, previousLength, i, length, start, _sm_expr5, _sm_expr6,
@@ -24531,8 +24457,7 @@ void ns1_emitStringTable(ns1_Emitter* self) {
     L1:;
     return;
     L2:;
-    _sm_base2 = simse_addressOf(self->literals);
-    count = ns1_count(_sm_base2);
+    count = ns1_count(_sm_base1);
     starts = List<Int>();
     lengths = List<Int>();
     total = 0;
@@ -24904,13 +24829,12 @@ void ns1_collectInitByValueTypes(ns1_Emitter* self) {
 void ns1_collectProgramNames(ns1_Emitter* self) {
     List<ns1_CgInput>* _sm_base1, * _sm_base2;
     ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base27, * _sm_base28, * _sm_base31, * _sm_base32,
-        * _sm_base39, * _sm_base40, * _sm_base43, * _sm_base44, * _sm_base54, * _sm_base55, * _sm_base58,
-        * _sm_base59, * _sm_base62, * _sm_base63, * _sm_base68, * _sm_base69, * _sm_base72, * _sm_base73,
-        * _sm_base76, * _sm_base77, * _sm_base78, * _sm_base79, * _sm_base81, * _sm_expr49, * param,
-        * _sm_expr52;
+        * _sm_base39, * _sm_base40, * _sm_base43, * _sm_base54, * _sm_base55, * _sm_base58, * _sm_base59,
+        * _sm_base62, * _sm_base68, * _sm_base72, * _sm_base76, * _sm_base77, * _sm_base78, * _sm_base81,
+        * _sm_expr49, * param, * _sm_expr52;
     Dictionary<Str, Bool>* _sm_base5, * _sm_base6, * _sm_base8, * _sm_base9, * _sm_base12, * _sm_base13,
-        * _sm_base15, * _sm_base19, * _sm_base20, * _sm_base34, * _sm_base35, * _sm_base49, * _sm_base51,
-        * _sm_base56, * _sm_base57, * _sm_base65, * _sm_base66, * _sm_base86, * _sm_base87;
+        * _sm_base34, * _sm_base35, * _sm_base49, * _sm_base56, * _sm_base57, * _sm_base65, * _sm_base66,
+        * _sm_base86, * _sm_base87;
     List<Str>* _sm_base7;
     List<ns1_CgFn>* _sm_base25, * _sm_base26, * _sm_base37, * _sm_base38, * _sm_base52, * _sm_base53;
     ns3_AstNodeAttributeKind _sm_base29, _sm_base41, _sm_base45, _sm_base60, _sm_base64, _sm_base70,
@@ -24986,23 +24910,20 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     if (_sm_expr2) goto L11;
     goto L12;
     L11:;
-    _sm_base15 = simse_addressOf(self->referencedNames);
-    simse_dict_insert((*_sm_base15), __sm_stringTable[636], true);
-    simse_dict_insert((*_sm_base15), __sm_stringTable[530], true);
-    simse_dict_insert((*_sm_base15), __sm_stringTable[679], true);
-    simse_dict_insert((*_sm_base15), __sm_stringTable[678], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[636], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[530], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[679], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[678], true);
     L12:;
-    _sm_base19 = simse_addressOf(self->referencedTypes);
-    _sm_expr2 = simse_dict_has((*_sm_base19), __sm_stringTable[1322]);
+    _sm_expr2 = simse_dict_has((*_sm_base13), __sm_stringTable[1322]);
     if (_sm_expr2) goto L13;
     goto L14;
     L13:;
-    _sm_base20 = simse_addressOf(self->referencedNames);
-    simse_dict_insert((*_sm_base20), __sm_stringTable[638], true);
-    simse_dict_insert((*_sm_base20), __sm_stringTable[532], true);
-    simse_dict_insert((*_sm_base20), __sm_stringTable[637], true);
-    simse_dict_insert((*_sm_base20), __sm_stringTable[764], true);
-    simse_dict_insert((*_sm_base20), __sm_stringTable[720], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[638], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[532], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[637], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[764], true);
+    simse_dict_insert((*_sm_base12), __sm_stringTable[720], true);
     L14:;
     _sm_base26 = simse_addressOf(self->functions);
     _sm_base25 = _sm_base26;
@@ -25067,8 +24988,7 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     _sm_base42 = *(_sm_expr14);
     _sm_expr2 = (!equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_base42))), __sm_stringTable[1351]));
     if (_sm_expr2) goto L25;
-    _sm_base44 = simse_addressOf(_sm_fn_2->decl);
-    _sm_base43 = _sm_base44;
+    _sm_base43 = _sm_base40;
     _sm_base45 = ns3_AstNodeAttributeKind::GeneratorArgs;
     genArgs = *(ns2_xmlAttr(_sm_base43, _sm_base45));
     _sm_base46 = &genArgs;
@@ -25083,8 +25003,7 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     _sm_base50 = _sm_fn_2->name;
     _sm_expr2 = simse_dict_has((*_sm_base49), _sm_base50);
     if (_sm_expr2) goto L34;
-    _sm_base51 = simse_addressOf(self->referencedNames);
-    _sm_expr2 = simse_dict_has((*_sm_base51), symbol);
+    _sm_expr2 = simse_dict_has((*_sm_base49), symbol);
     if (_sm_expr2) goto L34;
     goto L25;
     L34:;
@@ -25131,8 +25050,7 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     if (_sm_expr2) goto L47;
     goto L48;
     L47:;
-    _sm_base63 = simse_addressOf(_sm_fn_3->decl);
-    _sm_base62 = _sm_base63;
+    _sm_base62 = _sm_base59;
     _sm_base64 = ns3_AstNodeAttributeKind::NativeSymbol;
     _sm_expr40 = ns2_xmlAttr(_sm_base62, _sm_base64);
     ns3_sourceGenUnquote(&_sm_expr41, _sm_expr40);
@@ -25148,8 +25066,7 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     if (_sm_expr2) goto L50;
     goto L55;
     L50:;
-    _sm_base69 = simse_addressOf(_sm_fn_3->decl);
-    _sm_base68 = _sm_base69;
+    _sm_base68 = _sm_base59;
     _sm_base70 = ns3_AstNodeAttributeKind::Generator;
     _sm_expr14 = ns2_xmlAttr(_sm_base68, _sm_base70);
     _sm_base71 = *(_sm_expr14);
@@ -25157,8 +25074,7 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     if (_sm_expr2) goto L52;
     goto L55;
     L52:;
-    _sm_base73 = simse_addressOf(_sm_fn_3->decl);
-    _sm_base72 = _sm_base73;
+    _sm_base72 = _sm_base59;
     _sm_base74 = ns3_AstNodeAttributeKind::GeneratorArgs;
     _sm_expr45 = ns2_xmlAttr(_sm_base72, _sm_base74);
     ns1_cgGeneratorArg(&_sm_section_2, _sm_expr45, 0);
@@ -25175,12 +25091,11 @@ void ns1_collectProgramNames(ns1_Emitter* self) {
     _sm_base77 = simse_addressOf(_sm_fn_3->receiver);
     _sm_base76 = _sm_base77;
     ns1_collectTypeNames(self, _sm_base76);
-    _sm_base79 = simse_addressOf(_sm_fn_3->decl);
-    _sm_base78 = _sm_base79;
+    _sm_base78 = _sm_base59;
     _sm_base80 = ns3_AstNodeKind::ReturnType;
     _sm_expr49 = ns2_xmlChildPtr(_sm_base78, _sm_base80);
     ns1_collectTypeNames(self, _sm_expr49);
-    _sm_base81 = _sm_base79;
+    _sm_base81 = _sm_base59;
     _sm_base83 = ns3_AstNodeKind::Param;
     ns2_xmlChildren(&params, _sm_base81, _sm_base83);
     _sm_base84 = &params;
@@ -25325,8 +25240,7 @@ void ns1_cgSubtypeText(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e, ns3_A
     Char* __sm_catP;
     Dictionary<Str, Str>* _sm_base1;
     ns3_AstNodeKind _sm_base2, _sm_base3, _sm_base9, _sm_base19;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base4, * _sm_base5, * _sm_base10, * _sm_base11, * _sm_base14,
-        * _sm_base15;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base4, * _sm_base5, * _sm_base10, * _sm_base14;
     ns3_AstXmlNode* _sm_base6, * _sm_base8, * _sm_base12, * _sm_base18, * _sm_base20, * _sm_base25,
         * _sm_base28, * _sm_base35, * _sm_base38, * valueSource, * operand, * _sm_operand_2;
     Str* _sm_base7, * _sm_base13, * _sm_base16, * _sm_base17, * _sm_base36, * _sm_base37, * _sm_expr38;
@@ -25427,16 +25341,14 @@ void ns1_cgSubtypeText(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e, ns3_A
     valueSource = operand;
     ns1_inferType(&valueType, self, operand);
     L18:;
-    _sm_base11 = simse_addressOf(self->types);
-    _sm_base10 = _sm_base11;
+    _sm_base10 = _sm_base5;
     _sm_base12 = &valueType;
     ns18_semClassTypeName(&haveName, _sm_base10, _sm_base12);
     _sm_base13 = &haveName;
     _sm_expr12 = simse_spanOfStr(_sm_base13);
     _sm_expr2 = equals(simse_addressOf(_sm_expr12), __sm_stringTable[1475]);
     if (_sm_expr2) goto L22;
-    _sm_base15 = simse_addressOf(self->types);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base5;
     _sm_base16 = &haveName;
     _sm_base17 = &expectedName;
     _sm_expr2 = ns18_semDerivesFromName(_sm_base14, _sm_base16, _sm_base17);
@@ -25598,7 +25510,7 @@ void ns1_cgSubtypeText(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e, ns3_A
 // src/codegen/CgExpr.kt
 void ns1_cgSliceText(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* source, ns3_AstXmlNode* expectedPointee, Str* expectedName) {
     Char* __sm_catP;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base1, * _sm_base5, * _sm_base6;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base1, * _sm_base5;
     Str _sm_base2, _sm_base17, copiedText, fieldName, _sm_expr8, _sm_expr10, fieldsText, sliceType,
         _sm_expr11;
     ns3_AstXmlNode* _sm_base4, * _sm_base7, * _sm_base13, * _sm_base14, * expectedDecl, * field;
@@ -25635,8 +25547,7 @@ void ns1_cgSliceText(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* source, ns
     copiedText = ns1_expr(self, source, 0, _sm_base4);
     L4:;
     parts = List<Str>();
-    _sm_base6 = simse_addressOf(self->types);
-    _sm_base5 = _sm_base6;
+    _sm_base5 = _sm_base1;
     _sm_base7 = expectedDecl;
     ns18_semAllFields(&_sm_expr5, _sm_base5, _sm_base7);
     _sm_base8 = &_sm_expr5;
@@ -26230,11 +26141,10 @@ void ns1_functionReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, Str* name) {
 void ns1_memberCallReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* callee) {
     ns3_AstNodeKind _sm_base1, _sm_base13, _sm_base37, _sm_base70, _sm_base82;
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12,
-        * _sm_base14, * _sm_base15, * _sm_base16, * _sm_base17, * _sm_base18, * _sm_base23, * _sm_base24,
-        * _sm_base25, * _sm_base26, * _sm_base27, * _sm_base28, * _sm_base29, * _sm_base32, * _sm_base33,
-        * _sm_base34, * _sm_base35, * _sm_base36, * _sm_base38, * _sm_base47, * _sm_base50, * _sm_base63,
-        * _sm_base64, * _sm_base69, * _sm_base71, * _sm_base72, * _sm_base73, * _sm_base81, * _sm_expr1,
-        * ret;
+        * _sm_base14, * _sm_base15, * _sm_base17, * _sm_base18, * _sm_base23, * _sm_base24, * _sm_base25,
+        * _sm_base26, * _sm_base28, * _sm_base29, * _sm_base32, * _sm_base33, * _sm_base34, * _sm_base35,
+        * _sm_base36, * _sm_base38, * _sm_base47, * _sm_base50, * _sm_base63, * _sm_base64, * _sm_base69,
+        * _sm_base71, * _sm_base72, * _sm_base73, * _sm_base81, * _sm_expr1, * ret;
     ns3_AstNodeAttributeKind _sm_base4, _sm_base39, _sm_base51, _sm_base74;
     Dictionary<Str, List<Int>>* _sm_base5;
     ns1_CgFn* _sm_base7, * fn;
@@ -26298,8 +26208,7 @@ void ns1_memberCallReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXml
     _sm_base14 = &recv;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base14);
     if (_sm_expr3) goto L3;
-    _sm_base16 = simse_addressOf(fn->receiver);
-    _sm_base15 = _sm_base16;
+    _sm_base15 = _sm_base10;
     ns1_resolveAlias(&_sm_expr9, self, _sm_base15);
     _sm_base17 = &_sm_expr9;
     _sm_base18 = &recv;
@@ -26333,8 +26242,7 @@ void ns1_memberCallReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXml
     _sm_base24 = _sm_base25;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base24);
     if (_sm_expr3) goto L14;
-    _sm_base27 = simse_addressOf(ext->receiver);
-    _sm_base26 = _sm_base27;
+    _sm_base26 = _sm_base25;
     ns1_resolveAlias(&_sm_expr17, self, _sm_base26);
     _sm_base28 = &_sm_expr17;
     _sm_base29 = &recv;
@@ -26565,16 +26473,15 @@ void ns1_inferType(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e
         _sm_baseName_2, op, operatorName;
     ns3_AstNodeAttributeKind _sm_base11, _sm_base19, _sm_base23, _sm_base25, _sm_base28, _sm_base35,
         _sm_base45, _sm_base56, _sm_base63, _sm_base73, _sm_base84, _sm_base108, _sm_base127;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base13, * _sm_base46, * _sm_base48, * _sm_base49, * _sm_base57,
-        * _sm_base64;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base13, * _sm_base46, * _sm_base48, * _sm_base57, * _sm_base64;
     ns3_AstXmlNode* _sm_base16, * _sm_base26, * _sm_base27, * _sm_base29, * _sm_base31, * _sm_base33,
         * _sm_base34, * _sm_base37, * _sm_base43, * _sm_base44, * _sm_base50, * _sm_base52, * _sm_base53,
         * _sm_base69, * _sm_base70, * _sm_base71, * _sm_base72, * _sm_base77, * _sm_base78, * _sm_base80,
         * _sm_base81, * _sm_base83, * _sm_base90, * _sm_base92, * _sm_base94, * _sm_base95, * _sm_base96,
         * _sm_base101, * _sm_base103, * _sm_base104, * _sm_base106, * _sm_base125, * _sm_base126,
-        * _sm_base129, * _sm_base130, * _sm_base133, * _sm_base137, * localType, * lhs, * decl, * callee,
-        * _sm_expr100, * pointee, * _sm_expr136, * _sm_expr141, * _sm_pointee_2, * _sm_expr160,
-        * _sm_expr183, * ret, * _sm_expr189;
+        * _sm_base129, * _sm_base133, * _sm_base137, * localType, * lhs, * decl, * callee, * _sm_expr100,
+        * pointee, * _sm_expr136, * _sm_expr141, * _sm_pointee_2, * _sm_expr160, * _sm_expr183, * ret,
+        * _sm_expr189;
     Dictionary<Str, Bool>* _sm_base17, * _sm_base24;
     ns3_AstNodeKind _sm_base20, _sm_base22, _sm_base32, _sm_base38, _sm_base54, _sm_base55, _sm_base59,
         _sm_base68, _sm_base79, _sm_base82, _sm_base87, _sm_base89, _sm_base91, _sm_base93, _sm_base97,
@@ -26854,8 +26761,7 @@ void ns1_inferType(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e
     if (_sm_expr2) goto L55;
     goto L59;
     L55:;
-    _sm_base49 = simse_addressOf(self->types);
-    _sm_base48 = _sm_base49;
+    _sm_base48 = _sm_base46;
     _sm_base50 = decl;
     _sm_base51 = &memberText;
     ns18_semFindField(&field, _sm_base48, _sm_base50, _sm_base51);
@@ -27247,8 +27153,7 @@ void ns1_inferType(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* e
     if (_sm_expr2) goto L132;
     goto L135;
     L132:;
-    _sm_base130 = simse_addressOf(fn->decl);
-    _sm_base129 = _sm_base130;
+    _sm_base129 = _sm_base126;
     _sm_base131 = ns3_AstNodeKind::ReturnType;
     ret = ns2_xmlChildPtr(_sm_base129, _sm_base131);
     _sm_expr2 = ns2_xmlIsEmpty(ret);
@@ -27311,7 +27216,7 @@ void ns1_emitProfileText(ns1_Emitter* self) {
 }
 // src/codegen/CgProfile.kt
 Int ns1_profIndexOf(ns1_Emitter* self, Str* name) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base6;
+    Dictionary<Str, Int>* _sm_base1;
     Str _sm_base2, _sm_base7, _sm_expr5;
     List<Str>* _sm_base4;
     Bool _sm_expr1, _sm_expr2;
@@ -27338,9 +27243,8 @@ Int ns1_profIndexOf(ns1_Emitter* self, Str* name) {
     index = simse_lenOf((*_sm_base4));
     ns1_prettySymbol(&_sm_expr5, self, name);
     simse_list_append((*_sm_base4), _sm_expr5);
-    _sm_base6 = simse_addressOf(self->profNameIndex);
     _sm_base7 = *name;
-    simse_dict_insert((*_sm_base6), _sm_base7, index);
+    simse_dict_insert((*_sm_base1), _sm_base7, index);
     return index;
 }
 // src/codegen/CgProfile.kt
@@ -27520,7 +27424,7 @@ void ns1_protocolDispatchName(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* p
 }
 // src/codegen/CgProtocol.kt
 void ns1_cgReceiverPattern(ns3_AstXmlNode* _sm_out, ns1_CgFn* fn) {
-    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * _sm_base5, * _sm_expr3;
+    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base4, * _sm_base5, * _sm_expr3;
     Bool _sm_expr1, _sm_expr2;
     ns3_AstXmlNode _sm_expr4;
     _sm_base2 = simse_addressOf(fn->receiver);
@@ -27530,8 +27434,7 @@ void ns1_cgReceiverPattern(ns3_AstXmlNode* _sm_out, ns1_CgFn* fn) {
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base3 = simse_addressOf(fn->receiver);
-    _sm_expr3 = _sm_base3;
+    _sm_expr3 = _sm_base2;
     *_sm_out = *(_sm_expr3);
     return;
     L2:;
@@ -27771,7 +27674,7 @@ void ns1_collectProtocolReach(ns1_Emitter* self) {
 void ns1_cgNativeSymbol(Str* _sm_out, ns1_Emitter* self, ns1_CgFn* fn) {
     Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base1;
     Str _sm_base2, _sm_base13, _sm_expr10;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7, * _sm_base8, * _sm_base9;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base8, * _sm_base9;
     List<Str>* _sm_base10, * _sm_base11;
     Dictionary<Str, Str>* _sm_base12;
     List<ns1_CgNativeExt>* extensions;
@@ -27808,8 +27711,7 @@ void ns1_cgNativeSymbol(Str* _sm_out, ns1_Emitter* self, ns1_CgFn* fn) {
     if (_sm_expr1) goto L7;
     goto L3;
     L7:;
-    _sm_base7 = simse_addressOf(ext->receiver);
-    _sm_base6 = _sm_base7;
+    _sm_base6 = _sm_base5;
     ns1_resolveAlias(&_sm_expr8, self, _sm_base6);
     _sm_base8 = &_sm_expr8;
     _sm_base9 = &receiverPattern;
@@ -27845,18 +27747,18 @@ void ns1_emitProtocolDispatch(ns1_Emitter* self, ns1_CgProtocolImpl* impl, Bool 
         * _sm_base45, * _sm_base47, * _sm_base48, * _sm_base49, * _sm_base50, * _sm_base51, * _sm_base53,
         * protocolName;
     ns3_AstXmlNode* _sm_base3, * _sm_base8, * _sm_base9, * _sm_base13, * _sm_base14, * _sm_base16,
-        * _sm_base35, * _sm_base36, * param, * paramType, * retNode;
+        * _sm_base35, * param, * paramType, * retNode;
     ns1_CgFn* _sm_base4, * fn;
     List<ns1_CgFn>* _sm_base5;
-    List<Str>* _sm_base6, * _sm_base7, * _sm_base17, * _sm_base23, * _sm_base24, * _sm_base38,
-        * _sm_base39, * _sm_base40, * _sm_base44;
+    List<Str>* _sm_base6, * _sm_base7, * _sm_base17, * _sm_base23, * _sm_base24, * _sm_base39,
+        * _sm_base44;
     List<ns3_AstXmlNode>* _sm_base10;
     ns3_AstNodeAttributeKind _sm_base11;
     ns3_AstNodeKind _sm_base12, _sm_base15;
     Str _sm_base19, _sm_base33, _sm_base42, _sm_base46, _sm_expr3, paramName, _sm_expr9, _sm_expr10,
         _sm_expr11, ret, _sm_expr16, signature, signatureKey, tmpl, _sm_expr23, target, _sm_expr27,
         _sm_expr35, argsText, implKey, _sm_expr40, _sm_expr43, _sm_expr48, _sm_expr52;
-    Dictionary<Str, Bool>* _sm_base21, * _sm_base22, * _sm_base52;
+    Dictionary<Str, Bool>* _sm_base21, * _sm_base52;
     ns3_AstXmlNode protocolDecl, receiverPattern;
     Bool _sm_expr1, _sm_expr14;
     Int _sm_expr2, _sm_expr28;
@@ -27989,8 +27891,7 @@ void ns1_emitProtocolDispatch(ns1_Emitter* self, ns1_CgProtocolImpl* impl, Bool 
     L17:;
     return;
     L18:;
-    _sm_base22 = simse_addressOf(self->emittedProtocols);
-    simse_dict_insert((*_sm_base22), signatureKey, true);
+    simse_dict_insert((*_sm_base21), signatureKey, true);
     _sm_base24 = simse_addressOf(fn->templateParams);
     _sm_base23 = _sm_base24;
     ns1_templateClause(&tmpl, self, _sm_base23);
@@ -28043,14 +27944,12 @@ void ns1_emitProtocolDispatch(ns1_Emitter* self, ns1_CgProtocolImpl* impl, Bool 
     std::memcpy(__sm_catP, _sm_base33.data(), _sm_base33.size());
     __sm_catP = __sm_catP + _sm_base33.size();
     *__sm_catP = (char) ('\'');
-    _sm_base36 = simse_addressOf(fn->decl);
-    _sm_base35 = _sm_base36;
+    _sm_base35 = _sm_base14;
     _sm_base37 = &_sm_expr27;
     ns1_fail(self, _sm_base35, _sm_base37);
     return;
     L27:;
-    _sm_base38 = simse_addressOf(fn->templateParams);
-    _sm_expr28 = simse_lenOf((*_sm_base38));
+    _sm_expr28 = simse_lenOf((*_sm_base24));
     _sm_expr1 = _sm_expr28 > 0;
     if (_sm_expr1) goto L28;
     goto L29;
@@ -28060,8 +27959,7 @@ void ns1_emitProtocolDispatch(ns1_Emitter* self, ns1_CgProtocolImpl* impl, Bool 
     std::memcpy(__sm_catP, target.data(), target.size());
     __sm_catP = __sm_catP + target.size();
     *__sm_catP = (char) ('<');
-    _sm_base40 = simse_addressOf(fn->templateParams);
-    _sm_base39 = _sm_base40;
+    _sm_base39 = _sm_base24;
     _sm_base42 = __sm_stringTable[1376];
     _sm_base41 = &_sm_base42;
     ns1_cgJoin(&_sm_expr10, _sm_base39, _sm_base41);
@@ -28365,7 +28263,7 @@ void ns1_emitProtocolDispatches(ns1_Emitter* self, Bool prototypeOnly) {
 }
 // src/codegen/CgProtocol.kt
 void ns1_setActiveConstraints(ns1_Emitter* self, ns3_AstXmlNode* decl) {
-    Dictionary<Str, List<Str>>* _sm_base1, * _sm_base5, * _sm_base10;
+    Dictionary<Str, List<Str>>* _sm_base1, * _sm_base5;
     List<ns18_ProtocolConstraint>* _sm_base2;
     Dictionary<Str, Bool>* _sm_base3;
     Str _sm_base4, _sm_base6, _sm_base8, _sm_base9, _sm_base11;
@@ -28405,9 +28303,8 @@ void ns1_setActiveConstraints(ns1_Emitter* self, ns3_AstXmlNode* decl) {
     fresh = List<Str>();
     _sm_base9 = constraint->protocol;
     simse_list_append(fresh, _sm_base9);
-    _sm_base10 = simse_addressOf(self->activeConstraints);
     _sm_base11 = constraint->param;
-    simse_dict_insert((*_sm_base10), _sm_base11, fresh);
+    simse_dict_insert((*_sm_base5), _sm_base11, fresh);
     goto L1;
     L2:;
 }
@@ -28568,8 +28465,7 @@ void ns1_renameRole(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns3_AstXmlNode* 
 }
 // src/codegen/CgResolve.kt
 Int ns1_findExtensionFnByType(ns1_Emitter* self, Str* name, ns3_AstXmlNode recv, Int argCount) {
-    ns3_AstXmlNode* _sm_base1, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base11,
-        * _sm_base12;
+    ns3_AstXmlNode* _sm_base1, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base11, * _sm_base12;
     Dictionary<Str, List<Int>>* _sm_base2;
     Str _sm_base3;
     ns1_CgFn* _sm_base5, * fn;
@@ -28617,8 +28513,7 @@ Int ns1_findExtensionFnByType(ns1_Emitter* self, Str* name, ns3_AstXmlNode recv,
     _sm_expr2 = fn->paramCount;
     _sm_expr1 = _sm_expr2 != argCount;
     if (_sm_expr1) goto L5;
-    _sm_base10 = simse_addressOf(fn->receiver);
-    _sm_base9 = _sm_base10;
+    _sm_base9 = _sm_base8;
     ns1_resolveAlias(&_sm_expr11, self, _sm_base9);
     _sm_base11 = &_sm_expr11;
     _sm_base12 = &recv;
@@ -28692,7 +28587,7 @@ ns1_CgFn* ns1_findMachineCreator(ns1_Emitter* self, ns3_AstXmlNode* recvType) {
     Char* __sm_catP;
     ns3_AstNodeAttributeKind _sm_base1;
     Str* _sm_base2, * _sm_base13, * _sm_base14, * _sm_base15;
-    List<ns1_CgFn>* _sm_base4, * _sm_base6;
+    List<ns1_CgFn>* _sm_base4;
     ns1_CgFn* _sm_base5, * fn;
     ns3_AstXmlNode* _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base11;
     Str name, _sm_expr7, _sm_expr8, _sm_expr9, bare, _sm_expr10, _sm_expr11, _sm_expr12, _sm_expr13,
@@ -28716,8 +28611,7 @@ ns1_CgFn* ns1_findMachineCreator(ns1_Emitter* self, ns3_AstXmlNode* recvType) {
     _sm_expr3 = simse_lenOf((*_sm_base4));
     _sm_expr2 = i < _sm_expr3;
     if (!(_sm_expr2)) goto L4;
-    _sm_base6 = simse_addressOf(self->functions);
-    _sm_base5 = simse_addressOf((*_sm_base6)[i]);
+    _sm_base5 = simse_addressOf((*_sm_base4)[i]);
     fn = _sm_base5;
     i = i + 1;
     _sm_expr2 = fn->isNative;
@@ -28773,7 +28667,7 @@ Bool ns1_machineCallArgsFromReceiver(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXml
         * creatorReturn;
     Str* _sm_base3, * _sm_base9;
     ns3_AstNodeKind _sm_base8, _sm_base13;
-    List<Str>* _sm_base10, * _sm_base11, * _sm_base14, * _sm_base15;
+    List<Str>* _sm_base10, * _sm_base14, * _sm_base15;
     Str calleeElement, creatorElement, _sm_expr8;
     Span<Char> _sm_expr1;
     Bool _sm_expr2;
@@ -28822,8 +28716,7 @@ Bool ns1_machineCallArgsFromReceiver(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXml
     _sm_expr6 = simse_lenOf((*_sm_base10));
     _sm_expr2 = e < _sm_expr6;
     if (!(_sm_expr2)) goto L8;
-    _sm_base11 = simse_addressOf(creator->templateParams);
-    _sm_expr8 = (*_sm_base11)[e];
+    _sm_expr8 = (*_sm_base10)[e];
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr8))), simse_spanOfStr(simse_addressOf(creatorElement)));
     if (_sm_expr2) goto L9;
     goto L10;
@@ -28875,7 +28768,7 @@ Str ns1_receiverArg(ns1_Emitter* self, ns3_AstXmlNode* pattern, ns3_AstXmlNode* 
         * _sm_base21;
     Str* _sm_base12, * _sm_base22, * _sm_base23, * _sm_base26, * _sm_base27, * _sm_expr9;
     Dictionary<Str, Str>* _sm_base16;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base17, * _sm_base18, * _sm_base19, * _sm_base24, * _sm_base25;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base17, * _sm_base18, * _sm_base19, * _sm_base24;
     Bool _sm_expr1, _sm_expr13;
     ns1_NameKind _sm_expr3, _sm_expr4;
     ns3_AstNodeCategory _sm_expr6, _sm_expr7, kind;
@@ -29001,8 +28894,7 @@ Str ns1_receiverArg(ns1_Emitter* self, ns3_AstXmlNode* pattern, ns3_AstXmlNode* 
     if (_sm_expr1) goto L22;
     goto L21;
     L22:;
-    _sm_base25 = simse_addressOf(self->types);
-    _sm_base24 = _sm_base25;
+    _sm_base24 = _sm_base18;
     _sm_base26 = &recvName;
     _sm_base27 = &patternName;
     _sm_expr1 = ns18_semDerivesFromName(_sm_base24, _sm_base26, _sm_base27);
@@ -29130,7 +29022,7 @@ Int ns1_findReceiverFnByName(ns1_Emitter* self, Str* name) {
 // src/codegen/CgResolve.kt
 Int ns1_findExtensionFn(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr, Int argCount) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base9, * _sm_base10, * _sm_base11,
-        * _sm_base12, * _sm_base13, * _sm_base14;
+        * _sm_base13, * _sm_base14;
     Dictionary<Str, List<Int>>* _sm_base4;
     Str _sm_base5;
     ns1_CgFn* _sm_base7, * fn;
@@ -29185,8 +29077,7 @@ Int ns1_findExtensionFn(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr, 
     if (_sm_expr2) goto L12;
     goto L5;
     L12:;
-    _sm_base12 = simse_addressOf(fn->receiver);
-    _sm_base11 = _sm_base12;
+    _sm_base11 = _sm_base10;
     ns1_resolveAlias(&_sm_expr12, self, _sm_base11);
     _sm_base13 = &_sm_expr12;
     _sm_base14 = &recv;
@@ -29242,7 +29133,7 @@ Int ns1_operatorBinaryFn(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr,
     Str _sm_base2, _sm_base11;
     ns1_CgFn* _sm_base4, * fn;
     List<ns1_CgFn>* _sm_base5;
-    ns3_AstXmlNode* _sm_base6, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base12, * _sm_base13;
+    ns3_AstXmlNode* _sm_base6, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base12;
     ns3_AstNodeAttributeKind _sm_base10;
     Int direct, _sm_expr4, i;
     Bool _sm_expr1, _sm_expr3;
@@ -29300,8 +29191,7 @@ Int ns1_operatorBinaryFn(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr,
     _sm_base11 = *(_sm_expr13);
     _sm_expr1 = (!equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_base11))), __sm_stringTable[1291]));
     if (_sm_expr1) goto L7;
-    _sm_base13 = simse_addressOf(fn->receiver);
-    _sm_base12 = _sm_base13;
+    _sm_base12 = _sm_base7;
     _sm_expr1 = ns1_isCharSpanType(self, _sm_base12);
     if (_sm_expr1) goto L16;
     goto L7;
@@ -29615,8 +29505,7 @@ void ns1_operatorBinaryText(Str* _sm_out, ns1_Emitter* self, Int at, Str* op, ns
     List<ns1_CgFn>* _sm_base2;
     Dictionary<Str, Bool>* _sm_base3;
     Str _sm_base4, _sm_base23, recvText, recvView, rhsText, qualifyText, cgJoinText, call, _sm_expr13;
-    ns3_AstXmlNode* _sm_base5, * _sm_base6, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12,
-        * _sm_base13;
+    ns3_AstXmlNode* _sm_base5, * _sm_base6, * _sm_base9, * _sm_base11, * _sm_base12, * _sm_base13;
     ns3_AstXmlNode _sm_base14, borrowed, _sm_expr5, _sm_expr6;
     List<ns3_AstXmlNode>* _sm_base15;
     List<Str>* _sm_base16, * _sm_base21;
@@ -29652,8 +29541,7 @@ void ns1_operatorBinaryText(Str* _sm_out, ns1_Emitter* self, Int at, Str* op, ns
     *__sm_catP = (char) (')');
     goto L4;
     L2:;
-    _sm_base10 = simse_addressOf(fn->receiver);
-    _sm_base9 = _sm_base10;
+    _sm_base9 = _sm_base6;
     recvText = ns1_receiverArg(self, _sm_base9, lhsExpr);
     L4:;
     rhsText = __sm_stringTable[1475];
@@ -29827,8 +29715,7 @@ Bool ns1_operatorParamIsView(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* ar
 // src/codegen/CgResolve.kt
 Bool ns1_operatorParamIsPointer(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* argExpr) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8,
-        * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base14, * _sm_base15,
-        * _sm_base16;
+        * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base15, * _sm_base16;
     ns3_AstNodeKind _sm_base3, _sm_base6;
     List<Str>* _sm_base17;
     List<ns3_AstXmlNode> params;
@@ -29881,8 +29768,7 @@ Bool ns1_operatorParamIsPointer(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode*
     ns18_semPointeeOf(&_sm_expr11, _sm_base11);
     _sm_base12 = &argType;
     ns18_semPointeeOf(&_sm_expr12, _sm_base12);
-    _sm_base14 = simse_addressOf(fn->decl);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base2;
     ns2_xmlTypeParamNames(&_sm_expr13, _sm_base13);
     _sm_base15 = &_sm_expr11;
     _sm_base16 = &_sm_expr12;
@@ -29895,7 +29781,7 @@ Int ns1_findNativeExt(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr, In
     Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base1;
     Str _sm_base2;
     ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7, * _sm_base8, * _sm_base9,
-        * _sm_base10, * _sm_base11, * _sm_base12;
+        * _sm_base11, * _sm_base12;
     List<Str>* _sm_base13, * _sm_base14;
     List<ns1_CgNativeExt>* extensions;
     Bool _sm_expr1;
@@ -29945,8 +29831,7 @@ Int ns1_findNativeExt(ns1_Emitter* self, Str* name, ns3_AstXmlNode* recvExpr, In
     if (_sm_expr1) goto L9;
     goto L5;
     L9:;
-    _sm_base10 = simse_addressOf(ext->receiver);
-    _sm_base9 = _sm_base10;
+    _sm_base9 = _sm_base8;
     ns1_resolveAlias(&_sm_expr11, self, _sm_base9);
     _sm_base11 = &_sm_expr11;
     _sm_base12 = &recv;
@@ -30496,7 +30381,7 @@ void ns1_cgRunLengthEncode(List<Int>* _sm_out, List<Int>* values) {
 }
 // src/codegen/CgStringTable.kt
 void ns1_add(ns1_StringTable* self, Str* text) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base3;
+    Dictionary<Str, Int>* _sm_base1;
     Str _sm_base2, _sm_base4, _sm_base6;
     List<Str>* _sm_base5;
     Bool _sm_expr1;
@@ -30508,9 +30393,8 @@ void ns1_add(ns1_StringTable* self, Str* text) {
     L1:;
     return;
     L2:;
-    _sm_base3 = simse_addressOf(self->indexAt);
     _sm_base4 = *(text);
-    simse_dict_insert((*_sm_base3), _sm_base4, 0);
+    simse_dict_insert((*_sm_base1), _sm_base4, 0);
     _sm_base5 = simse_addressOf(self->entries);
     _sm_base6 = *(text);
     simse_list_append((*_sm_base5), _sm_base6);
@@ -30533,7 +30417,7 @@ Str ns1_entry(ns1_StringTable* self, Int index) {
 }
 // src/codegen/CgStringTable.kt
 void ns1_sort(ns1_StringTable* self) {
-    List<Str>* _sm_base1, * _sm_base4, * _sm_base7;
+    List<Str>* _sm_base1, * _sm_base4;
     ns1_sort_closure1 _sm_base2;
     Dictionary<Str, Int> _sm_base3;
     Dictionary<Str, Int>* _sm_base5;
@@ -30552,8 +30436,7 @@ void ns1_sort(ns1_StringTable* self) {
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
     _sm_base5 = simse_addressOf(self->indexAt);
-    _sm_base7 = simse_addressOf(self->entries);
-    _sm_base6 = (*_sm_base7)[i];
+    _sm_base6 = (*_sm_base4)[i];
     simse_dict_insert((*_sm_base5), _sm_base6, i);
     i = i + 1;
     goto L1;
@@ -30735,7 +30618,7 @@ void ns1_collectAsync(ns1_Emitter* self) {
 }
 // src/codegen/CgTask.kt
 void ns1_asyncReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, Str* name) {
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base1, * _sm_base3;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base1;
     Str _sm_base2, _sm_base4;
     Bool _sm_expr1, _sm_expr2;
     ns3_AstXmlNode _sm_expr3;
@@ -30751,9 +30634,8 @@ void ns1_asyncReturn(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, Str* name) {
     *_sm_out = _sm_expr3;
     return;
     L2:;
-    _sm_base3 = simse_addressOf(self->asyncFns);
     _sm_base4 = *(name);
-    _sm_expr4 = simse_dict_getPtr((*_sm_base3), _sm_base4);
+    _sm_expr4 = simse_dict_getPtr((*_sm_base1), _sm_base4);
     _sm_expr3 = *_sm_expr4;
     *_sm_out = _sm_expr3;
     return;
@@ -30951,8 +30833,8 @@ void ns1_addTaskHelpers(ns1_Emitter* self, ns1_CgFn* fn) {
 // src/codegen/CgTask.kt
 void ns1_emitTask(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Bool prototypeOnly, ns18_SemFacts* facts) {
     Char* __sm_catP;
-    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base5, * _sm_base6, * _sm_base18, * _sm_base19,
-        * _sm_base37, * _sm_base38;
+    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base5, * _sm_base18, * _sm_base19, * _sm_base37,
+        * _sm_base38;
     Str* _sm_base3, * _sm_base4, * _sm_base7, * _sm_base10, * _sm_base12, * _sm_base20, * _sm_base24,
         * _sm_base31, * _sm_base33, * _sm_base34, * _sm_base35, * _sm_base42, * _sm_base43, * _sm_base44,
         * _sm_base46, * _sm_base48, * fieldMemberText;
@@ -30985,8 +30867,7 @@ void ns1_emitTask(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Bool pr
     _sm_expr1 = _sm_expr2;
     _sm_sc1:;
     isMain = _sm_expr1;
-    _sm_base6 = simse_addressOf(fn->receiver);
-    _sm_base5 = _sm_base6;
+    _sm_base5 = _sm_base2;
     _sm_expr2 = ns2_xmlIsEmpty(_sm_base5);
     _sm_expr6 = !_sm_expr2;
     if (_sm_expr6) goto L1;
@@ -31146,7 +31027,7 @@ void ns1_lowerTask(ns11_TskTask* _sm_out, ns1_Emitter* self, ns1_CgFn* fn, ns3_A
     ns3_AstNodeAttributeKind _sm_base2;
     Str _sm_base3, _sm_base6, _sm_base9, _sm_expr24, _sm_expr26, _sm_expr27, _sm_expr29, _sm_expr33,
         taskKey;
-    Str* _sm_base5, * _sm_base8, * _sm_base19, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_expr5;
+    Str* _sm_base5, * _sm_base8, * _sm_base19, * _sm_base22, * _sm_base23, * _sm_expr5;
     List<ns3_AstXmlNode>* _sm_base11, * _sm_base14, * _sm_base17;
     ns3_AstXmlNode _sm_base12, _sm_expr19, _sm_expr20, resultType;
     List<Str> _sm_base13, _sm_expr21, reserved;
@@ -31285,8 +31166,7 @@ void ns1_lowerTask(ns11_TskTask* _sm_out, ns1_Emitter* self, ns1_CgFn* fn, ns3_A
     if (_sm_expr37) goto L11;
     goto L12;
     L11:;
-    _sm_base24 = simse_addressOf(task.error);
-    _sm_base23 = _sm_base24;
+    _sm_base23 = _sm_base22;
     ns1_fail(self, decl, _sm_base23);
     *_sm_out = task;
     return;
@@ -31605,7 +31485,7 @@ Res<Str> ns1_run(ns1_Emitter* self) {
     ns3_AstXmlNode* _sm_base18, * _sm_base19, * _sm_base22, * _sm_base23, * _sm_base89;
     ns3_Sections* _sm_base24, * _sm_base28, * _sm_base31, * _sm_base39, * _sm_base42, * _sm_base51,
         * _sm_base60, * _sm_base68, * _sm_base73, * _sm_base86, * _sm_base96;
-    ns1_StringTable* _sm_base27, * _sm_base36;
+    ns1_StringTable* _sm_base27;
     ns18_SemFacts* _sm_base63, * _sm_base81;
     List<ns1_CgFn>* _sm_base78;
     Bool _sm_expr1, _sm_expr40;
@@ -31726,8 +31606,7 @@ Res<Str> ns1_run(ns1_Emitter* self) {
     if (_sm_expr1) goto L11;
     goto L12;
     L11:;
-    _sm_base36 = simse_addressOf(self->literals);
-    _sm_expr15 = ns1_count(_sm_base36);
+    _sm_expr15 = ns1_count(_sm_base27);
     stringsDiag = toString(simse_addressOf(_sm_expr15));
     _sm_expr16.resize(25 + stringsDiag.size());
     __sm_catP = simse_str_data(&_sm_expr16);
@@ -32359,9 +32238,8 @@ void ns1_dumpIl(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, List<ns3_
 void ns1_ilFunctionFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, ns18_SemFacts* facts, Dictionary<Str, ns3_AstXmlNode>* inferred) {
     ns3_AstNodeAttributeKind _sm_base1, _sm_base6, _sm_base14, _sm_base30, _sm_base40;
     Str* _sm_base2, * _sm_base3, * _sm_expr1, * _sm_expr3, * _sm_expr15, * _sm_expr29, * _sm_expr34;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_base25,
-        * _sm_base26, * _sm_base27, * _sm_base35, * _sm_base36, * _sm_base38, * _sm_base39, * param,
-        * paramType, * pointee, * typeNode;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_base26,
+        * _sm_base27, * _sm_base35, * _sm_base36, * _sm_base38, * param, * paramType, * pointee, * typeNode;
     Str _sm_base7, _sm_base16, _sm_base32, _sm_base42, symbol, _sm_expr35;
     ns3_AstXmlNode _sm_base8, _sm_base9, _sm_base18, _sm_expr6, _sm_expr27;
     List<Str> _sm_base10, _sm_expr7;
@@ -32473,8 +32351,7 @@ void ns1_ilFunctionFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* fn
     _sm_expr25 = ext->argCount;
     _sm_expr2 = _sm_expr25 != 1;
     if (_sm_expr2) goto L15;
-    _sm_base25 = simse_addressOf(ext->receiver);
-    _sm_base24 = _sm_base25;
+    _sm_base24 = _sm_base23;
     ns1_resolveAlias(&_sm_expr27, self, _sm_base24);
     _sm_base26 = &_sm_expr27;
     _sm_base27 = pointee;
@@ -32508,8 +32385,7 @@ void ns1_ilFunctionFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* fn
     if (_sm_expr33) goto L24;
     goto L22;
     L24:;
-    _sm_base39 = simse_addressOf(entry->decl);
-    _sm_base38 = _sm_base39;
+    _sm_base38 = _sm_base36;
     _sm_base40 = ns3_AstNodeAttributeKind::Name;
     _sm_expr34 = ns2_xmlAttr(_sm_base38, _sm_base40);
     ns11_ilTypeText(&_sm_expr35, typeNode);
@@ -32526,7 +32402,7 @@ void ns1_ilDestructorFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* 
     ns3_AstXmlNode _sm_base1, _sm_expr1;
     List<Str> _sm_base2, _sm_expr3;
     List<ns1_CgStatic>* _sm_base3, * _sm_base4;
-    ns3_AstXmlNode* _sm_base5, * _sm_base6, * _sm_base8, * _sm_base9, * typeNode;
+    ns3_AstXmlNode* _sm_base5, * _sm_base6, * _sm_base8, * typeNode;
     ns3_AstNodeKind _sm_base7;
     ns3_AstNodeAttributeKind _sm_base10;
     Dictionary<Str, Str>* _sm_base11;
@@ -32568,8 +32444,7 @@ void ns1_ilDestructorFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* 
     if (_sm_expr11) goto L3;
     goto L1;
     L3:;
-    _sm_base9 = simse_addressOf(entry->decl);
-    _sm_base8 = _sm_base9;
+    _sm_base8 = _sm_base6;
     _sm_base10 = ns3_AstNodeAttributeKind::Name;
     _sm_expr12 = ns2_xmlAttr(_sm_base8, _sm_base10);
     ns11_ilTypeText(&_sm_expr13, typeNode);
@@ -32584,7 +32459,7 @@ void ns1_ilDestructorFor(ns11_IlFunction* _sm_out, ns1_Emitter* self, ns1_CgFn* 
 // src/codegen/IlConcat.kt
 void ns1_ilConcatPoolOf(ns1_IlConcatPool* _sm_out, ns11_IlBody* il) {
     List<ns11_IlOp>* _sm_base1, * _sm_base2;
-    List<Int>* _sm_base3, * _sm_base4, * _sm_base5, * _sm_base6;
+    List<Int>* _sm_base3, * _sm_base5;
     List<Str>* _sm_base7;
     Str* _sm_base8, * _sm_base9;
     ns1_IlConcatPool pool;
@@ -32616,8 +32491,7 @@ void ns1_ilConcatPoolOf(ns1_IlConcatPool* _sm_out, ns11_IlBody* il) {
     _sm_expr2 = _sm_expr7 > 1;
     _sm_expr6 = _sm_expr2;
     if (!(_sm_expr6)) goto _sm_sc1;
-    _sm_base4 = simse_addressOf(op->operands);
-    _sm_expr7 = (*_sm_base4)[1];
+    _sm_expr7 = (*_sm_base3)[1];
     _sm_expr10 = ns11_ilConcatDst(op);
     _sm_expr2 = _sm_expr7 == _sm_expr10;
     _sm_expr6 = _sm_expr2;
@@ -32630,8 +32504,7 @@ void ns1_ilConcatPoolOf(ns1_IlConcatPool* _sm_out, ns11_IlBody* il) {
     _sm_expr7 = simse_lenOf((*_sm_base5));
     _sm_expr2 = j < _sm_expr7;
     if (!(_sm_expr2)) goto L6;
-    _sm_base6 = simse_addressOf(op->operands);
-    part = (*_sm_base6)[j];
+    part = (*_sm_base5)[j];
     if (inPlace) goto L9;
     goto L8;
     L9:;
@@ -32804,7 +32677,7 @@ void ns1_ilConcatReachScan(ns1_Emitter* self) {
     List<ns1_CgFn>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base9;
     ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base16, * _sm_base17;
     Dictionary<Str, Bool>* _sm_base5;
-    Str* _sm_base10, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base14, * _sm_base15;
+    Str* _sm_base10, * _sm_base11, * _sm_base12, * _sm_base14;
     Span<ns1_CgFn> _sm_expr1, _sm_expr6;
     Span_iter_yieldable<ns1_CgFn> _sm_for5, _sm_for4;
     Bool _sm_expr2;
@@ -32857,13 +32730,11 @@ void ns1_ilConcatReachScan(ns1_Emitter* self) {
     _sm_expr10 = simse_spanOfStr(_sm_base10);
     _sm_expr2 = equals(simse_addressOf(_sm_expr10), __sm_stringTable[878]);
     if (_sm_expr2) goto L10;
-    _sm_base13 = simse_addressOf(helper->name);
-    _sm_base12 = _sm_base13;
+    _sm_base12 = _sm_base11;
     _sm_expr10 = simse_spanOfStr(_sm_base12);
     _sm_expr2 = equals(simse_addressOf(_sm_expr10), __sm_stringTable[639]);
     if (_sm_expr2) goto L10;
-    _sm_base15 = simse_addressOf(helper->name);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base11;
     _sm_expr10 = simse_spanOfStr(_sm_base14);
     _sm_expr2 = equals(simse_addressOf(_sm_expr10), __sm_stringTable[767]);
     if (_sm_expr2) goto L10;
@@ -32943,7 +32814,7 @@ Bool ns1_ilConcatStatements(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* fra
     Int __sm_catC0;
     List<ns11_IlVar>* _sm_base1, * _sm_base3;
     ns11_IlVar* _sm_base2;
-    List<Int>* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7, * _sm_base54;
+    List<Int>* _sm_base4, * _sm_base6;
     List<Str>* _sm_base8, * _sm_base55, * _sm_base62, * _sm_base73;
     Str* _sm_base13, * _sm_base16, * _sm_base25, * _sm_base26, * _sm_base33, * _sm_base38, * _sm_base45,
         * _sm_base56, * _sm_base59, * sum;
@@ -32986,8 +32857,7 @@ Bool ns1_ilConcatStatements(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* fra
     _sm_expr1 = _sm_expr2 > 1;
     _sm_expr5 = _sm_expr1;
     if (!(_sm_expr5)) goto _sm_sc1;
-    _sm_base5 = simse_addressOf(op->operands);
-    _sm_expr2 = (*_sm_base5)[1];
+    _sm_expr2 = (*_sm_base4)[1];
     _sm_expr1 = _sm_expr2 == dst;
     _sm_expr5 = _sm_expr1;
     _sm_sc1:;
@@ -33005,8 +32875,7 @@ Bool ns1_ilConcatStatements(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* fra
     _sm_expr2 = simse_lenOf((*_sm_base6));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L7;
-    _sm_base7 = simse_addressOf(op->operands);
-    part = (*_sm_base7)[i];
+    part = (*_sm_base6)[i];
     if (inPlace) goto L10;
     goto L9;
     L10:;
@@ -33347,8 +33216,7 @@ Bool ns1_ilConcatStatements(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* fra
     i = i + 1;
     goto L6;
     L7:;
-    _sm_base54 = simse_addressOf(op->operands);
-    _sm_expr2 = simse_lenOf((*_sm_base54));
+    _sm_expr2 = simse_lenOf((*_sm_base6));
     _sm_expr1 = _sm_expr2 < 2;
     if (_sm_expr1) goto L44;
     goto L45;
@@ -33569,13 +33437,13 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     Char* __sm_catP;
     List<ns11_IlOp>* _sm_base1, * _sm_base3;
     ns11_IlOp* _sm_base2, * op;
-    List<Int>* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8, * _sm_base15, * _sm_base16,
-        * _sm_base18, * _sm_base20, * _sm_base30, * _sm_base31, * _sm_base37, * _sm_base39;
+    List<Int>* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base15, * _sm_base16, * _sm_base18,
+        * _sm_base30, * _sm_base31, * _sm_base37;
     ns3_AstXmlNode* _sm_base6, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12, * _sm_base17,
         * _sm_base21, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_base40, * _sm_base41, * _sm_base42,
         * _sm_base48, * _sm_base49;
     Int _sm_base19, _sm_base38, _sm_expr2, dst, _sm_expr15, slot, j, typeAt, _sm_j_2;
-    List<Str>* _sm_base25, * _sm_base32, * _sm_base35, * _sm_base43;
+    List<Str>* _sm_base25, * _sm_base32, * _sm_base43;
     Str* _sm_base26, * _sm_base44, * found;
     Str _sm_base27, _sm_base34, _sm_base45, typeText, exprText, _sm_expr18, _sm_expr27, typeText2,
         cgJoinText2, _sm_expr28, closureType, _sm_expr40, cgJoinText3, _sm_expr41, _sm_expr43;
@@ -33646,8 +33514,7 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     *_sm_out = _sm_ctor3;
     return;
     L13:;
-    _sm_base8 = simse_addressOf(op->operands);
-    _sm_base7 = _sm_base8;
+    _sm_base7 = _sm_base5;
     _sm_expr15 = ns1_ilOpOperand(self, _sm_base7, 1);
     ns1_ilOperandNode(&operand, self, il, frame, _sm_expr15, 0);
     _sm_base9 = &operand;
@@ -33707,8 +33574,7 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_expr2 = simse_lenOf((*_sm_base18));
     _sm_expr1 = j < _sm_expr2;
     if (!(_sm_expr1)) goto L21;
-    _sm_base20 = simse_addressOf(op->operands);
-    _sm_base19 = (*_sm_base20)[j];
+    _sm_base19 = (*_sm_base18)[j];
     ns1_ilOperandNode(&value, self, il, frame, _sm_base19, 0);
     _sm_base21 = &value;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base21);
@@ -33766,8 +33632,7 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     goto L30;
     L26:;
     _sm_base33 = simse_addressOf(self->closureTypes);
-    _sm_base35 = simse_addressOf(il->types);
-    _sm_base34 = (*_sm_base35)[typeAt];
+    _sm_base34 = (*_sm_base32)[typeAt];
     found = simse_dict_getPtr((*_sm_base33), _sm_base34);
     _sm_expr1 = found != nullptr;
     if (_sm_expr1) goto L29;
@@ -33781,8 +33646,7 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_expr2 = simse_lenOf((*_sm_base37));
     _sm_expr1 = _sm_j_2 < _sm_expr2;
     if (!(_sm_expr1)) goto L32;
-    _sm_base39 = simse_addressOf(op->operands);
-    _sm_base38 = (*_sm_base39)[_sm_j_2];
+    _sm_base38 = (*_sm_base37)[_sm_j_2];
     ns1_ilOperandNode(&arg, self, il, frame, _sm_base38, 0);
     _sm_base40 = &arg;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base40);
@@ -33838,7 +33702,7 @@ void ns1_ilValueText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
 // src/codegen/IlConcat.kt
 void ns1_ilBoxedCtorText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, ns11_IlOp* op) {
     Char* __sm_catP;
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base10;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base8;
     List<ns11_IlVar>* _sm_base3;
     ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base11, * _sm_base12, * _sm_base13,
         * inner;
@@ -33900,8 +33764,7 @@ void ns1_ilBoxedCtorText(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, 
     _sm_expr2 = simse_lenOf((*_sm_base8));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L10;
-    _sm_base10 = simse_addressOf(op->operands);
-    _sm_base9 = (*_sm_base10)[i];
+    _sm_base9 = (*_sm_base8)[i];
     ns1_ilOperandNode(&arg, self, il, frame, _sm_base9, 0);
     _sm_base11 = &arg;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base11);
@@ -33951,19 +33814,17 @@ void ns1_ilLine(ns1_Emitter* self, Str* out, Int level, Str text) {
 }
 // src/codegen/IlEmit.kt
 void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, ns11_IlOp* op) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base3;
+    List<Int>* _sm_base1, * _sm_base2;
     List<ns11_IlMethod>* _sm_base4, * _sm_base6;
     ns11_IlMethod* _sm_base5;
-    Str* _sm_base7, * _sm_base8, * _sm_base14, * _sm_base15, * _sm_base18, * _sm_base19, * _sm_base20,
-        * _sm_base21, * _sm_base27, * _sm_base28, * _sm_base29, * _sm_base30, * _sm_base33, * _sm_base34,
-        * _sm_base35, * _sm_base36, * _sm_base37, * _sm_base38, * _sm_base40, * _sm_base41, * _sm_base42,
-        * _sm_base43, * _sm_base47;
+    Str* _sm_base7, * _sm_base8, * _sm_base14, * _sm_base18, * _sm_base19, * _sm_base20, * _sm_base21,
+        * _sm_base27, * _sm_base29, * _sm_base30, * _sm_base33, * _sm_base34, * _sm_base35, * _sm_base37,
+        * _sm_base40, * _sm_base42, * _sm_base43, * _sm_base47;
     ns3_AstXmlNode* _sm_base9, * _sm_base12, * _sm_base23, * _sm_base24, * _sm_base46, * callee, * recv;
     ns3_AstNodeKind _sm_base10, _sm_base11, _sm_base13;
     ns1_CgFn* _sm_base16, * fn;
     List<ns1_CgFn>* _sm_base17;
-    Dictionary<Str, Bool>* _sm_base22, * _sm_base25, * _sm_base32, * _sm_base39, * _sm_base45,
-        * _sm_base48;
+    Dictionary<Str, Bool>* _sm_base22, * _sm_base25, * _sm_base32, * _sm_base39, * _sm_base45;
     Str _sm_base26, _sm_expr7, typeKey, _sm_expr24, byNameKey, ownKey, _sm_expr29, fnKey, calleeText;
     Int _sm_expr1, methodAt, methodIndex, argCount, fnIndex;
     Bool hasDst, _sm_expr16;
@@ -33990,8 +33851,7 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     *_sm_out = __sm_stringTable[1475];
     return;
     L4:;
-    _sm_base3 = simse_addressOf(op->operands);
-    _sm_base2 = _sm_base3;
+    _sm_base2 = _sm_base1;
     methodIndex = ns1_ilOpOperand(self, _sm_base2, methodAt);
     hasDst = methodIndex < 0;
     if (hasDst) goto L5;
@@ -34044,8 +33904,7 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     _sm_base13 = ns3_AstNodeKind::Arg;
     ns2_xmlChildren(&_sm_expr17, _sm_base12, _sm_base13);
     argCount = simse_lenOf(_sm_expr17);
-    _sm_base15 = simse_addressOf(method.name);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base8;
     fnIndex = ns1_findExtensionFn(self, _sm_base14, recv, argCount);
     hasDst = fnIndex >= 0;
     if (hasDst) goto L16;
@@ -34084,11 +33943,10 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     if (hasDst) goto L20;
     goto L24;
     L20:;
-    _sm_base28 = simse_addressOf(method.name);
-    _sm_base27 = _sm_base28;
+    _sm_base27 = _sm_base8;
     ns1_functionPackage(&_sm_expr24, self, _sm_base27);
     _sm_base29 = &_sm_expr24;
-    _sm_base30 = _sm_base28;
+    _sm_base30 = _sm_base8;
     ns1_qualify(&byNameKey, self, _sm_base29, _sm_base30);
     _sm_base32 = simse_addressOf(self->sretFns);
     hasDst = simse_dict_has((*_sm_base32), byNameKey);
@@ -34108,10 +33966,8 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     if (hasDst) goto L25;
     goto L26;
     L25:;
-    _sm_base36 = simse_addressOf(method.packageName);
-    _sm_base35 = _sm_base36;
-    _sm_base38 = simse_addressOf(method.name);
-    _sm_base37 = _sm_base38;
+    _sm_base35 = _sm_base34;
+    _sm_base37 = _sm_base8;
     ns1_qualify(&ownKey, self, _sm_base35, _sm_base37);
     _sm_base39 = simse_addressOf(self->sretFns);
     hasDst = simse_dict_has((*_sm_base39), ownKey);
@@ -34124,11 +33980,10 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     *_sm_out = __sm_stringTable[1475];
     return;
     L26:;
-    _sm_base41 = simse_addressOf(method.name);
-    _sm_base40 = _sm_base41;
+    _sm_base40 = _sm_base8;
     ns1_functionPackage(&_sm_expr29, self, _sm_base40);
     _sm_base42 = &_sm_expr29;
-    _sm_base43 = _sm_base41;
+    _sm_base43 = _sm_base8;
     ns1_qualify(&fnKey, self, _sm_base42, _sm_base43);
     _sm_base45 = simse_addressOf(self->sretFns);
     hasDst = simse_dict_has((*_sm_base45), fnKey);
@@ -34147,8 +34002,7 @@ void ns1_ilSretKey(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame
     if (hasDst) goto L33;
     goto L32;
     L33:;
-    _sm_base48 = simse_addressOf(self->sretFns);
-    hasDst = simse_dict_has((*_sm_base48), calleeText);
+    hasDst = simse_dict_has((*_sm_base45), calleeText);
     if (hasDst) goto L31;
     goto L32;
     L31:;
@@ -34197,7 +34051,7 @@ Bool ns1_ilTwinAliased(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, I
     List<ns11_IlVar>* _sm_base3;
     ns3_AstXmlNode* _sm_base4, * _sm_base5;
     Dictionary<Int, Int>* _sm_base6, * _sm_base7;
-    List<ns11_IlOp>* _sm_base8, * _sm_base10;
+    List<ns11_IlOp>* _sm_base8;
     ns11_IlOp* _sm_base9;
     Span<Char> _sm_expr1;
     Bool _sm_expr2;
@@ -34243,8 +34097,7 @@ Bool ns1_ilTwinAliased(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, I
     _sm_expr4 = simse_lenOf((*_sm_base8));
     _sm_expr2 = def >= _sm_expr4;
     if (_sm_expr2) goto L8;
-    _sm_base10 = simse_addressOf(il->ops);
-    _sm_base9 = simse_addressOf((*_sm_base10)[def]);
+    _sm_base9 = simse_addressOf((*_sm_base8)[def]);
     _sm_expr14 = _sm_base9->kind;
     _sm_expr15 = ns11_IlOpKind::CallCtor;
     _sm_expr2 = _sm_expr14 != _sm_expr15;
@@ -34258,16 +34111,14 @@ Bool ns1_ilTwinAliased(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, I
 // src/codegen/IlEmit.kt
 void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, Int level) {
     Char* __sm_catP;
-    List<ns11_IlOp>* _sm_base1, * _sm_base3, * _sm_base11, * _sm_base15, * _sm_base34, * _sm_base36,
-        * _sm_base44, * _sm_base46;
+    List<ns11_IlOp>* _sm_base1, * _sm_base11, * _sm_base15, * _sm_base34, * _sm_base44;
     ns11_IlOp* _sm_base2, * _sm_base14, * _sm_base35, * _sm_base45, * op, * _sm_op_2;
     List<Int>* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base19, * _sm_base20, * _sm_base55,
-        * _sm_base56, * _sm_base60, * _sm_base61, * _sm_base67, * _sm_base68, * _sm_base77, * _sm_base78,
-        * _sm_base85, * _sm_base86, * _sm_base97, * _sm_base98, * _sm_base102, * _sm_base103, * _sm_base104,
-        * _sm_base138, * _sm_base140, * _sm_base181, * _sm_base182, * _sm_base183, * _sm_base200,
-        * _sm_base201, * _sm_base203, * _sm_base204, * _sm_base209, * _sm_base210, * _sm_base211,
-        * _sm_base235, * _sm_base236, * _sm_base259, * _sm_base260, * _sm_base271, * _sm_base272,
-        * _sm_base273, * _sm_base314, * _sm_base315, * _sm_base317, * _sm_base318;
+        * _sm_base56, * _sm_base60, * _sm_base61, * _sm_base67, * _sm_base77, * _sm_base78, * _sm_base85,
+        * _sm_base97, * _sm_base102, * _sm_base104, * _sm_base138, * _sm_base181, * _sm_base182,
+        * _sm_base183, * _sm_base200, * _sm_base201, * _sm_base203, * _sm_base209, * _sm_base210,
+        * _sm_base211, * _sm_base235, * _sm_base259, * _sm_base260, * _sm_base271, * _sm_base272,
+        * _sm_base273, * _sm_base314, * _sm_base315, * _sm_base317;
     Dictionary<Int, Int>* _sm_base6, * _sm_base7, * _sm_base32, * _sm_base33, * _sm_base154,
         * _sm_base155;
     Dictionary<Int, ns1_IlCrossing>* _sm_base9;
@@ -34282,8 +34133,8 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
         * _sm_base280, * _sm_base282, * _sm_base290, * _sm_base292, * _sm_base293, * _sm_base294,
         * _sm_base296, * _sm_base298, * _sm_base300, * _sm_base302, * _sm_base305, * _sm_base308,
         * _sm_base309, * _sm_base312, * _sm_base313, * _sm_base316, * _sm_base323, * _sm_base324,
-        * _sm_base325, * _sm_base329, * _sm_base330, * _sm_base333, * _sm_base336, * nameText, * nameText2,
-        * nameText3, * dstNamePA, * outName, * nameText4, * nameText5, * nameText6, * _sm_outName_2;
+        * _sm_base329, * _sm_base330, * _sm_base333, * _sm_base336, * nameText, * nameText2, * nameText3,
+        * dstNamePA, * outName, * nameText4, * nameText5, * nameText6, * _sm_outName_2;
     ns1_IlScope* _sm_base12;
     List<ns1_IlScope>* _sm_base17;
     List<ns11_IlVar>* _sm_base21, * _sm_base27, * _sm_base39, * _sm_base50, * _sm_base114, * _sm_base126,
@@ -34316,9 +34167,8 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
         _sm_expr278, exprText5, exprText6, _sm_expr280, _sm_expr289, keyV, callTextV, headV, argsTextV,
         retTextV, scratchV, _sm_expr301, argsJoinedV, _sm_expr305, _sm_expr307, _sm_expr310, exprText7,
         _sm_expr324, _sm_expr325, _sm_expr331, ilOpKindTextText2, _sm_expr333;
-    List<Str>* _sm_base57, * _sm_base58, * _sm_base62, * _sm_base63, * _sm_base79, * _sm_base82,
-        * _sm_base83, * _sm_base128, * _sm_base145, * _sm_base202, * _sm_base208, * _sm_base275,
-        * _sm_base277, * _sm_base299, * shared;
+    List<Str>* _sm_base57, * _sm_base58, * _sm_base62, * _sm_base63, * _sm_base79, * _sm_base128,
+        * _sm_base145, * _sm_base202, * _sm_base208, * _sm_base275, * _sm_base277, * _sm_base299, * shared;
     Dictionary<Str, List<ns1_CgNativeExt>>* _sm_base91;
     ns1_CgNativeExt* _sm_base92;
     Dictionary<Str, Bool>* _sm_base93;
@@ -34367,8 +34217,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = scan < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(il->ops);
-    _sm_base2 = simse_addressOf((*_sm_base3)[scan]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[scan]);
     op = _sm_base2;
     _sm_expr3 = op->kind;
     _sm_expr4 = ns11_IlOpKind::Declare;
@@ -34626,8 +34475,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_expr1 = simse_lenOf((*_sm_base34));
     _sm_expr2 = u < _sm_expr1;
     if (!(_sm_expr2)) goto L57;
-    _sm_base36 = simse_addressOf(il->ops);
-    _sm_base35 = simse_addressOf((*_sm_base36)[u]);
+    _sm_base35 = simse_addressOf((*_sm_base34)[u]);
     _sm_expr3 = _sm_base35->kind;
     _sm_expr4 = ns11_IlOpKind::Unsupported;
     _sm_expr2 = _sm_expr3 == _sm_expr4;
@@ -34682,8 +34530,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     if (_sm_expr2) goto L64;
     goto L63;
     L64:;
-    _sm_base46 = simse_addressOf(il->ops);
-    _sm_base45 = simse_addressOf((*_sm_base46)[_sm_def_2]);
+    _sm_base45 = simse_addressOf((*_sm_base44)[_sm_def_2]);
     _sm_expr3 = _sm_base45->kind;
     _sm_expr4 = ns11_IlOpKind::Unsupported;
     _sm_expr2 = _sm_expr3 == _sm_expr4;
@@ -34822,8 +34669,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     i = i + 1;
     goto L17;
     L83:;
-    _sm_base68 = simse_addressOf(_sm_op_2->operands);
-    _sm_base67 = _sm_base68;
+    _sm_base67 = _sm_base61;
     _sm_expr110 = ns1_ilOpOperand(self, _sm_base67, 0);
     ns1_ilOperandNode(&cond, self, il, frame, _sm_expr110, 0);
     _sm_base69 = &cond;
@@ -34894,15 +34740,13 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     if (_sm_expr2) goto L93;
     goto L92;
     L93:;
-    _sm_base82 = simse_addressOf(il->pool);
-    _sm_base81 = simse_addressOf((*_sm_base82)[opIndexPA]);
+    _sm_base81 = simse_addressOf((*_sm_base79)[opIndexPA]);
     _sm_base80 = _sm_base81;
     _sm_expr2 = ns11_isCompoundAssignOp(_sm_base80);
     if (_sm_expr2) goto L91;
     goto L92;
     L91:;
-    _sm_base83 = simse_addressOf(il->pool);
-    compoundPA = (*_sm_base83)[opIndexPA];
+    compoundPA = (*_sm_base79)[opIndexPA];
     spelledPA = false;
     _sm_base84 = &compoundPA;
     _sm_expr123 = simse_spanOfStr(_sm_base84);
@@ -34910,8 +34754,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     if (_sm_expr2) goto L95;
     goto L100;
     L95:;
-    _sm_base86 = simse_addressOf(_sm_op_2->operands);
-    _sm_base85 = _sm_base86;
+    _sm_base85 = _sm_base78;
     _sm_expr125 = ns1_ilOpOperand(self, _sm_base85, 2);
     ns1_ilSlotNode(&recvPA, self, il, frame, _sm_expr125, 0);
     _sm_base87 = &recvPA;
@@ -34939,8 +34782,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_base95 = &recvPA;
     _sm_base96 = &_sm_expr129;
     _sm_expr83 = ns1_expr(self, _sm_base95, 0, _sm_base96);
-    _sm_base98 = simse_addressOf(_sm_op_2->operands);
-    _sm_base97 = _sm_base98;
+    _sm_base97 = _sm_base78;
     _sm_expr130 = ns1_ilOpOperand(self, _sm_base97, 3);
     ns1_ilOperandNode(&valuePA, self, il, frame, _sm_expr130, 0);
     ns2_xmlEmptyNode(&_sm_expr131);
@@ -34971,11 +34813,10 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     i = i + 1;
     goto L17;
     L102:;
-    _sm_base103 = simse_addressOf(_sm_op_2->operands);
-    _sm_base102 = _sm_base103;
+    _sm_base102 = _sm_base78;
     _sm_expr138 = ns1_ilOpOperand(self, _sm_base102, 2);
     ns1_ilOperandNode(&lhsPA, self, il, frame, _sm_expr138, 0);
-    _sm_base104 = _sm_base103;
+    _sm_base104 = _sm_base78;
     _sm_expr139 = ns1_ilOpOperand(self, _sm_base104, 3);
     ns1_ilOperandNode(&rhsPA, self, il, frame, _sm_expr139, 0);
     _sm_base106 = &compoundPA;
@@ -35173,8 +35014,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     _sm_expr1 = simse_lenOf((*_sm_base138));
     _sm_expr2 = t < _sm_expr1;
     if (!(_sm_expr2)) goto L132;
-    _sm_base140 = simse_addressOf(_sm_op_2->operands);
-    _sm_base139 = (*_sm_base140)[t];
+    _sm_base139 = (*_sm_base138)[t];
     ns1_ilOperandNode(&argNode, self, il, frame, _sm_base139, 0);
     _sm_base141 = &argNode;
     _sm_expr2 = ns2_xmlIsEmpty(_sm_base141);
@@ -35420,8 +35260,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     *_sm_out = _sm_expr45;
     return;
     L154:;
-    _sm_base204 = simse_addressOf(_sm_op_2->operands);
-    _sm_base203 = _sm_base204;
+    _sm_base203 = _sm_base201;
     _sm_expr225 = ns1_ilOpOperand(self, _sm_base203, 0);
     ns1_ilSlotNode(&base, self, il, frame, _sm_expr225, 0);
     _sm_base205 = &base;
@@ -35503,8 +35342,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     if (_sm_expr2) goto L166;
     goto L167;
     L166:;
-    _sm_base236 = simse_addressOf(_sm_op_2->operands);
-    _sm_base235 = _sm_base236;
+    _sm_base235 = _sm_base210;
     _sm_expr243 = ns1_ilOpOperand(self, _sm_base235, 2);
     ns1_ilOperandNode(&setValue, self, il, frame, _sm_expr243, 0);
     _sm_base237 = &_sm_base_2;
@@ -35847,8 +35685,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     i = i + 1;
     goto L17;
     L212:;
-    _sm_base318 = simse_addressOf(_sm_op_2->operands);
-    _sm_base317 = _sm_base318;
+    _sm_base317 = _sm_base315;
     _sm_expr319 = ns1_ilOpOperand(self, _sm_base317, 0);
     ns1_ilOperandNode(&_sm_value_4, self, il, frame, _sm_expr319, 0);
     _sm_base319 = &_sm_value_4;
@@ -35871,8 +35708,7 @@ void ns1_ilEmitOps(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_
     if (_sm_expr2) goto L215;
     goto L216;
     L215:;
-    _sm_base325 = simse_addressOf(self->curSretOut);
-    _sm_outName_2 = _sm_base325;
+    _sm_outName_2 = _sm_base324;
     _sm_base327 = *(_sm_outName_2);
     _sm_expr324.resize(5 + _sm_base327.size() + exprText7.size());
     __sm_catP = simse_str_data(&_sm_expr324);
@@ -35956,7 +35792,7 @@ void ns1_ilUnsupportedReason(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, I
     ns11_IlOp* _sm_base1, * op;
     List<ns11_IlOp>* _sm_base2;
     List<Int>* _sm_base3, * _sm_base4;
-    List<Str>* _sm_base5, * _sm_base6;
+    List<Str>* _sm_base5;
     Int textIndex, _sm_expr2;
     Bool _sm_expr1;
     Str _sm_expr4, _sm_expr5;
@@ -35976,8 +35812,7 @@ void ns1_ilUnsupportedReason(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il, I
     if (_sm_expr1) goto L1;
     goto L2;
     L1:;
-    _sm_base6 = simse_addressOf(il->pool);
-    _sm_expr4 = (*_sm_base6)[textIndex];
+    _sm_expr4 = (*_sm_base5)[textIndex];
     _sm_expr5.resize(13 + _sm_expr4.size());
     __sm_catP = simse_str_data(&_sm_expr5);
     std::memcpy(__sm_catP, "unsupported: ", 13);
@@ -36054,7 +35889,7 @@ void ns1_ilClosureTypeTable(Dictionary<Str, Str>* _sm_out, ns1_Emitter* self, ns
 void ns1_ilClosureTypeText(Str* _sm_out, ns1_Emitter* self, ns11_IlClosure* closure) {
     Char* __sm_catP;
     Int __sm_catAt;
-    List<Str>* _sm_base1, * _sm_base2, * _sm_base3;
+    List<Str>* _sm_base1, * _sm_base2;
     Str* _sm_base4;
     Str _sm_base5, text, cgJoinText;
     Int _sm_expr1;
@@ -36066,8 +35901,7 @@ void ns1_ilClosureTypeText(Str* _sm_out, ns1_Emitter* self, ns11_IlClosure* clos
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base3 = simse_addressOf(closure->templateParams);
-    _sm_base2 = _sm_base3;
+    _sm_base2 = _sm_base1;
     _sm_base5 = __sm_stringTable[1376];
     _sm_base4 = &_sm_base5;
     ns1_cgJoin(&cgJoinText, _sm_base2, _sm_base4);
@@ -36107,7 +35941,7 @@ void ns1_ilClosureTypeOfNode(Str* _sm_out, ns1_Emitter* self, ns3_AstXmlNode typ
 // src/codegen/IlEmit.kt
 void ns1_ilVerifyBody(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il) {
     Char* __sm_catP;
-    List<ns11_IlOp>* _sm_base1, * _sm_base3, * _sm_base9, * _sm_base11;
+    List<ns11_IlOp>* _sm_base1, * _sm_base9;
     ns11_IlOp* _sm_base2, * _sm_base10;
     List<Int>* _sm_base4, * _sm_base5, * _sm_base12, * _sm_base13;
     List<Str>* _sm_base6, * _sm_base14, * _sm_base18;
@@ -36125,8 +35959,7 @@ void ns1_ilVerifyBody(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(il->ops);
-    _sm_base2 = simse_addressOf((*_sm_base3)[i]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
     op = *(_sm_base2);
     _sm_expr3 = op.kind;
     _sm_expr4 = ns11_IlOpKind::Label;
@@ -36165,8 +35998,7 @@ void ns1_ilVerifyBody(Str* _sm_out, ns1_Emitter* self, ns11_IlBody* il) {
     _sm_expr1 = simse_lenOf((*_sm_base9));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L9;
-    _sm_base11 = simse_addressOf(il->ops);
-    _sm_base10 = simse_addressOf((*_sm_base11)[i]);
+    _sm_base10 = simse_addressOf((*_sm_base9)[i]);
     _sm_op_2 = *(_sm_base10);
     _sm_expr3 = _sm_op_2.kind;
     _sm_expr4 = ns11_IlOpKind::Goto;
@@ -36412,8 +36244,8 @@ void ns1_emitClosureBodyText(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit
 // src/codegen/IlEmit.kt
 void ns1_ilClosureParamList(List<Str>* _sm_out, ns1_Emitter* self, ns11_IlClosure* closure) {
     Char* __sm_catP;
-    List<ns11_IlVar>* _sm_base3, * _sm_base8, * _sm_base13;
-    List<ns3_AstXmlNode>* _sm_base4, * _sm_base5;
+    List<ns11_IlVar>* _sm_base3;
+    List<ns3_AstXmlNode>* _sm_base4;
     ns3_AstXmlNode* _sm_base6;
     ns11_IlVar* _sm_base7, * _sm_base12;
     Str _sm_base9, selfTypeText, _sm_expr1, paramNameText, paramNameText2, paramTypeText, _sm_expr8;
@@ -36442,16 +36274,14 @@ void ns1_ilClosureParamList(List<Str>* _sm_out, ns1_Emitter* self, ns11_IlClosur
     if (_sm_expr3) goto L3;
     goto L4;
     L3:;
-    _sm_base5 = simse_addressOf(closure->paramTypes);
-    paramType = (*_sm_base5)[i];
+    paramType = (*_sm_base4)[i];
     L4:;
     _sm_base6 = &paramType;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base6);
     if (_sm_expr3) goto L5;
     goto L6;
     L5:;
-    _sm_base8 = simse_addressOf(closure->params);
-    _sm_base7 = simse_addressOf((*_sm_base8)[i]);
+    _sm_base7 = simse_addressOf((*_sm_base3)[i]);
     paramNameText = _sm_base7->name;
     _sm_base9.resize(113 + paramNameText.size() + paramNameText.size());
     __sm_catP = simse_str_data(&_sm_base9);
@@ -36469,8 +36299,7 @@ void ns1_ilClosureParamList(List<Str>* _sm_out, ns1_Emitter* self, ns11_IlClosur
     *_sm_out = _sm_expr7;
     return;
     L6:;
-    _sm_base13 = simse_addressOf(closure->params);
-    _sm_base12 = simse_addressOf((*_sm_base13)[i]);
+    _sm_base12 = simse_addressOf((*_sm_base3)[i]);
     paramNameText2 = _sm_base12->name;
     ns1_ilClosureTypeOfNode(&paramTypeText, self, paramType);
     _sm_expr8.resize(1 + paramTypeText.size() + paramNameText2.size());
@@ -36500,8 +36329,8 @@ void ns1_ilClosureFuncType(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlClosure*
     Char* __sm_catP;
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base7;
     ns3_AstXmlNode _sm_base3, paramType;
-    List<ns11_IlVar>* _sm_base4, * _sm_base9;
-    List<ns3_AstXmlNode>* _sm_base5, * _sm_base6;
+    List<ns11_IlVar>* _sm_base4;
+    List<ns3_AstXmlNode>* _sm_base5;
     ns11_IlVar* _sm_base8;
     Str _sm_base10, _sm_base15, retText, paramNameText, _sm_expr9, cgJoinText, _sm_expr11;
     List<Str>* _sm_base13;
@@ -36542,16 +36371,14 @@ void ns1_ilClosureFuncType(Opt<Str>* _sm_out, ns1_Emitter* self, ns11_IlClosure*
     if (_sm_expr1) goto L7;
     goto L8;
     L7:;
-    _sm_base6 = simse_addressOf(closure->paramTypes);
-    paramType = (*_sm_base6)[i];
+    paramType = (*_sm_base5)[i];
     L8:;
     _sm_base7 = &paramType;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base7);
     if (_sm_expr1) goto L9;
     goto L10;
     L9:;
-    _sm_base9 = simse_addressOf(closure->params);
-    _sm_base8 = simse_addressOf((*_sm_base9)[i]);
+    _sm_base8 = simse_addressOf((*_sm_base4)[i]);
     paramNameText = _sm_base8->name;
     _sm_base10.resize(113 + paramNameText.size() + paramNameText.size());
     __sm_catP = simse_str_data(&_sm_base10);
@@ -36630,11 +36457,10 @@ void ns1_emitClosureStruct(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlClosur
         funcTypeText, retText, invokeRef, cgJoinText, tmpl, cgJoinText2, _sm_expr13, _sm_expr14, _sm_expr15,
         _sm_expr18, _sm_expr20, _sm_expr23, _sm_expr25, _sm_expr31, fieldTypeText, _sm_expr34, indent2,
         _sm_expr36, _sm_expr38;
-    List<Str>* _sm_base6, * _sm_base7, * _sm_base8, * _sm_base13, * _sm_base14, * _sm_base15,
-        * _sm_base27, * _sm_base32, * _sm_base37;
+    List<Str>* _sm_base6, * _sm_base7, * _sm_base13, * _sm_base15, * _sm_base27;
     Str* _sm_base9, * _sm_base16, * _sm_base18, * _sm_base21, * _sm_base24, * _sm_base31, * _sm_base36,
         * capturesText, * captureText;
-    List<ns3_AstXmlNode>* _sm_base28, * _sm_base29;
+    List<ns3_AstXmlNode>* _sm_base28;
     ns3_AstXmlNode* _sm_base30;
     Opt<Str> funcType;
     Bool _sm_expr1, _sm_expr2;
@@ -36690,8 +36516,7 @@ void ns1_emitClosureStruct(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlClosur
     if (_sm_expr1) goto L7;
     goto L8;
     L7:;
-    _sm_base8 = simse_addressOf(closure->templateParams);
-    _sm_base7 = _sm_base8;
+    _sm_base7 = _sm_base6;
     _sm_base10 = __sm_stringTable[1376];
     _sm_base9 = &_sm_base10;
     ns1_cgJoin(&cgJoinText, _sm_base7, _sm_base9);
@@ -36704,8 +36529,7 @@ void ns1_emitClosureStruct(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlClosur
     __sm_catP = __sm_catP + cgJoinText.size();
     *__sm_catP = (char) ('>');
     L8:;
-    _sm_base14 = simse_addressOf(closure->templateParams);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base6;
     ns1_templateClause(&tmpl, self, _sm_base13);
     _sm_base15 = &params;
     _sm_base17 = __sm_stringTable[1376];
@@ -36810,16 +36634,14 @@ void ns1_emitClosureStruct(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlClosur
     if (_sm_expr1) goto L17;
     goto L18;
     L17:;
-    _sm_base29 = simse_addressOf(closure->captureTypes);
-    fieldType = (*_sm_base29)[i];
+    fieldType = (*_sm_base28)[i];
     L18:;
     _sm_base30 = &fieldType;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base30);
     if (_sm_expr1) goto L19;
     goto L20;
     L19:;
-    _sm_base32 = simse_addressOf(closure->captures);
-    _sm_base31 = simse_addressOf((*_sm_base32)[i]);
+    _sm_base31 = simse_addressOf((*_sm_base27)[i]);
     capturesText = _sm_base31;
     _sm_base34 = *(capturesText);
     _sm_expr31.resize(26 + _sm_base34.size());
@@ -36834,8 +36656,7 @@ void ns1_emitClosureStruct(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlClosur
     return;
     L20:;
     ns1_ilClosureTypeOfNode(&fieldTypeText, self, fieldType);
-    _sm_base37 = simse_addressOf(closure->captures);
-    _sm_base36 = simse_addressOf((*_sm_base37)[i]);
+    _sm_base36 = simse_addressOf((*_sm_base27)[i]);
     captureText = _sm_base36;
     _sm_base39 = *(captureText);
     _sm_expr14.resize(6 + fieldTypeText.size() + _sm_base39.size());
@@ -37012,10 +36833,10 @@ void ns1_emitClosureInvoke(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit* 
 // src/codegen/IlMachine.kt
 void ns1_emitClosureClasses(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit* unit) {
     Char* __sm_catP;
-    List<ns11_IlClosure>* _sm_base1, * _sm_base3, * _sm_base5, * _sm_base13, * _sm_base15;
+    List<ns11_IlClosure>* _sm_base1, * _sm_base3, * _sm_base13;
     Dictionary<Str, Str> _sm_base2, savedClosures;
     ns11_IlClosure* _sm_base4, * _sm_base14, * closure, * _sm_closure_2;
-    Dictionary<Str, Bool>* _sm_base6, * _sm_base11, * _sm_base16, * _sm_base20;
+    Dictionary<Str, Bool>* _sm_base6, * _sm_base16;
     Str _sm_base7, _sm_base10, _sm_base12, _sm_base19, _sm_base23, _sm_expr11, methodKey;
     Str* _sm_base8, * _sm_base9, * _sm_base17, * _sm_base18, * _sm_base22, * _sm_base24;
     ns3_Sections* _sm_base21;
@@ -37043,8 +36864,7 @@ void ns1_emitClosureClasses(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit*
     _sm_expr1 = simse_lenOf((*_sm_base3));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L4;
-    _sm_base5 = simse_addressOf(unit->closures);
-    _sm_base4 = simse_addressOf((*_sm_base5)[i]);
+    _sm_base4 = simse_addressOf((*_sm_base3)[i]);
     closure = _sm_base4;
     i = i + 1;
     _sm_base6 = simse_addressOf(self->emittedClosures);
@@ -37066,9 +36886,8 @@ void ns1_emitClosureClasses(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit*
     L8:;
     _sm_base10 = classText.text;
     simse_str_appendStr(classesText, _sm_base10);
-    _sm_base11 = simse_addressOf(self->emittedClosures);
     _sm_base12 = closure->symbol;
-    simse_dict_insert((*_sm_base11), _sm_base12, true);
+    simse_dict_insert((*_sm_base6), _sm_base12, true);
     goto L3;
     L4:;
     Str methodsText;
@@ -37079,8 +36898,7 @@ void ns1_emitClosureClasses(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit*
     _sm_expr1 = simse_lenOf((*_sm_base13));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L10;
-    _sm_base15 = simse_addressOf(unit->closures);
-    _sm_base14 = simse_addressOf((*_sm_base15)[i]);
+    _sm_base14 = simse_addressOf((*_sm_base13)[i]);
     _sm_closure_2 = _sm_base14;
     i = i + 1;
     _sm_expr11 = _sm_closure_2->symbol;
@@ -37107,8 +36925,7 @@ void ns1_emitClosureClasses(ns1_IlText* _sm_out, ns1_Emitter* self, ns11_IlUnit*
     L14:;
     _sm_base19 = methodText.text;
     simse_str_appendStr(methodsText, _sm_base19);
-    _sm_base20 = simse_addressOf(self->emittedClosures);
-    simse_dict_insert((*_sm_base20), methodKey, true);
+    simse_dict_insert((*_sm_base16), methodKey, true);
     goto L9;
     L10:;
     self->closureTypes = savedClosures;
@@ -37161,12 +36978,12 @@ void ns1_closureFail(ns1_Emitter* self, ns11_IlClosure* closure, Str* message) {
 void ns1_emitYieldable(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Str* className, Str* classType, Bool prototypeOnly, ns1_NameKind selfK, ns3_AstXmlNode* selfTypePtr, ns18_SemFacts* facts) {
     Char* __sm_catP;
     ns3_AstNodeKind _sm_base1, _sm_base2, _sm_base9, _sm_base10, _sm_base51, _sm_base57;
-    Str* _sm_base3, * _sm_base23, * _sm_base25, * _sm_base26, * _sm_base27, * _sm_base31, * _sm_base32,
-        * _sm_base37, * _sm_base39, * _sm_base44, * _sm_base46, * _sm_base54, * _sm_expr14;
+    Str* _sm_base3, * _sm_base23, * _sm_base25, * _sm_base26, * _sm_base31, * _sm_base32, * _sm_base37,
+        * _sm_base39, * _sm_base44, * _sm_base46, * _sm_base54, * _sm_expr14;
     Str _sm_base4, _sm_base6, _sm_base8, _sm_base19, _sm_base34, _sm_base40, _sm_base43, _sm_base47,
         _sm_base50, _sm_base60, _sm_expr10, qualifyText, factory, tmpl, cgJoinText, _sm_expr18, cgJoinText2,
         _sm_expr21, _sm_expr22, name, yldFieldNameText, _sm_expr25, yldReceiverFieldText, _sm_expr29;
-    Dictionary<Str, Bool>* _sm_base5, * _sm_base7;
+    Dictionary<Str, Bool>* _sm_base5;
     List<ns3_AstXmlNode>* _sm_base11, * _sm_base15, * _sm_base21, * _sm_base52;
     ns3_AstXmlNode _sm_base12, _sm_base14, _sm_base24, _sm_expr6;
     List<Str> _sm_base13, _sm_expr7, machineReserved, _sm_expr15, factoryParams;
@@ -37204,9 +37021,8 @@ void ns1_emitYieldable(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, St
     if (_sm_expr3) goto L3;
     goto L8;
     L3:;
-    _sm_base7 = simse_addressOf(self->emittedYieldables);
     _sm_base8 = *(className);
-    simse_dict_insert((*_sm_base7), _sm_base8, true);
+    simse_dict_insert((*_sm_base5), _sm_base8, true);
     _sm_base9 = ns3_AstNodeKind::Body;
     _sm_expr4 = ns2_xmlChildPtr(decl, _sm_base9);
     _sm_base10 = ns3_AstNodeKind::Stmt;
@@ -37245,8 +37061,7 @@ void ns1_emitYieldable(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, St
     if (_sm_expr3) goto L5;
     goto L6;
     L5:;
-    _sm_base27 = simse_addressOf(machine.error);
-    _sm_base26 = _sm_base27;
+    _sm_base26 = _sm_base25;
     ns1_fail(self, decl, _sm_base26);
     return;
     L6:;
@@ -37388,7 +37203,7 @@ void ns1_emitYieldable(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, St
 // src/codegen/IlMachine.kt
 void ns1_parameterList(List<Str>* _sm_out, ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl) {
     Char* __sm_catP;
-    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * param, * paramType;
+    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * param, * paramType;
     ns3_AstNodeKind _sm_base5, _sm_base7;
     List<ns3_AstXmlNode>* _sm_base6;
     ns3_AstNodeAttributeKind _sm_base8, _sm_base12;
@@ -37407,8 +37222,7 @@ void ns1_parameterList(List<Str>* _sm_out, ns1_Emitter* self, ns1_CgFn* fn, ns3_
     if (_sm_expr2) goto L1;
     goto L4;
     L1:;
-    _sm_base4 = simse_addressOf(fn->receiver);
-    _sm_base3 = _sm_base4;
+    _sm_base3 = _sm_base2;
     ns1_receiverParam(&_sm_expr3, self, _sm_base3);
     simse_list_append(params, _sm_expr3);
     _sm_expr1 = self->failed;
@@ -37546,8 +37360,8 @@ void ns1_emitMachine(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Str*
         _sm_base67, _sm_base69, tmpl, _sm_expr7, _sm_expr11, typeText2, _sm_expr12, classTypeText,
         cgJoinText, _sm_expr18, typeText3, _sm_expr21, result, methodNameText, cgJoinText3, _sm_expr27;
     List<ns11_YldField>* _sm_base13, * _sm_base14;
-    ns3_AstXmlNode* _sm_base15, * _sm_base16, * _sm_base22, * _sm_base23, * _sm_base40, * _sm_base41,
-        * _sm_base62, * _sm_base63, * _sm_base64, * _sm_base65, * _sm_base71, * _sm_base72;
+    ns3_AstXmlNode* _sm_base15, * _sm_base16, * _sm_base22, * _sm_base40, * _sm_base41, * _sm_base62,
+        * _sm_base63, * _sm_base64, * _sm_base71, * _sm_base72;
     List<ns11_YldParam>* _sm_base38, * _sm_base39, * _sm_base60, * _sm_base61;
     ns1_NameKind _sm_base54, savedSelfKind, _sm_expr35;
     ns3_AstNodeKind _sm_base55;
@@ -37647,8 +37461,7 @@ void ns1_emitMachine(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Str*
     ns1_fail(self, decl, _sm_base21);
     return;
     L8:;
-    _sm_base23 = simse_addressOf(field->typeNode);
-    _sm_base22 = _sm_base23;
+    _sm_base22 = _sm_base16;
     typeText2 = ns1_type(self, _sm_base22);
     _sm_base24 = simse_addressOf(field->name);
     fieldNameText2 = _sm_base24;
@@ -37808,8 +37621,7 @@ void ns1_emitMachine(ns1_Emitter* self, ns1_CgFn* fn, ns3_AstXmlNode* decl, Str*
     if (_sm_expr34) goto L25;
     goto L23;
     L25:;
-    _sm_base65 = simse_addressOf(_sm_param_2->typeNode);
-    _sm_base64 = _sm_base65;
+    _sm_base64 = _sm_base63;
     ns1_kindOf(&_sm_expr35, self, _sm_base64);
     _sm_base66 = simse_addressOf(self->nameKinds);
     _sm_base67 = _sm_param_2->name;
@@ -37855,7 +37667,7 @@ void ns1_ilMachineMethod(ns11_IlFunction* _sm_out, ns1_Emitter* self, Str* class
     List<Str>* _sm_base8;
     List<ns3_AstXmlNode>* _sm_base10;
     List<ns1_CgStatic>* _sm_base12, * _sm_base13;
-    ns3_AstXmlNode* _sm_base14, * _sm_base15, * _sm_base17, * _sm_base18, * typeNode;
+    ns3_AstXmlNode* _sm_base14, * _sm_base15, * _sm_base17, * typeNode;
     ns3_AstNodeKind _sm_base16;
     ns3_AstNodeAttributeKind _sm_base19;
     Dictionary<Str, Str>* _sm_base20;
@@ -37927,8 +37739,7 @@ void ns1_ilMachineMethod(ns11_IlFunction* _sm_out, ns1_Emitter* self, Str* class
     if (_sm_expr16) goto L5;
     goto L3;
     L5:;
-    _sm_base18 = simse_addressOf(entry->decl);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base15;
     _sm_base19 = ns3_AstNodeAttributeKind::Name;
     _sm_expr17 = ns2_xmlAttr(_sm_base17, _sm_base19);
     ns11_ilTypeText(&_sm_expr18, typeNode);
@@ -37947,7 +37758,7 @@ void ns1_ilTaskMethod(ns11_IlFunction* _sm_out, ns1_Emitter* self, Str* classNam
     ns3_AstXmlNode _sm_base4, _sm_expr1, _sm_expr2;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base6, * _sm_base7;
     List<ns1_CgStatic>* _sm_base8, * _sm_base9;
-    ns3_AstXmlNode* _sm_base10, * _sm_base11, * _sm_base13, * _sm_base14, * typeNode;
+    ns3_AstXmlNode* _sm_base10, * _sm_base11, * _sm_base13, * typeNode;
     ns3_AstNodeKind _sm_base12;
     ns3_AstNodeAttributeKind _sm_base15;
     Dictionary<Str, Str>* _sm_base16;
@@ -37999,8 +37810,7 @@ void ns1_ilTaskMethod(ns11_IlFunction* _sm_out, ns1_Emitter* self, Str* classNam
     if (_sm_expr14) goto L3;
     goto L1;
     L3:;
-    _sm_base14 = simse_addressOf(entry->decl);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base11;
     _sm_base15 = ns3_AstNodeAttributeKind::Name;
     _sm_expr15 = ns2_xmlAttr(_sm_base13, _sm_base15);
     ns11_ilTypeText(&_sm_expr16, typeNode);
@@ -38352,8 +38162,8 @@ void ns1_ilSeedFrameTypes(ns1_Emitter* self, ns11_IlBody* il) {
 void ns1_ilAnalyze(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame) {
     List<ns11_IlOp>* _sm_base1, * _sm_base2;
     List<ns11_IlVar>* _sm_base3, * _sm_base10;
-    Dictionary<Int, Int>* _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12;
-    List<Int>* _sm_base8, * _sm_base9;
+    Dictionary<Int, Int>* _sm_base4, * _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12;
+    List<Int>* _sm_base8;
     Span<ns11_IlOp> _sm_expr1;
     Span_iter_yieldable<ns11_IlOp> _sm_for3;
     Int _sm_index3, i, dst, _sm_expr7, j, operand;
@@ -38395,8 +38205,7 @@ void ns1_ilAnalyze(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame) {
     if (_sm_expr10) goto L8;
     goto L9;
     L8:;
-    _sm_base5 = simse_addressOf(frame->defOp);
-    simse_dict_insert((*_sm_base5), dst, i);
+    simse_dict_insert((*_sm_base4), dst, i);
     L9:;
     _sm_base7 = simse_addressOf(frame->defineCount);
     _sm_base6 = _sm_base7;
@@ -38435,8 +38244,7 @@ void ns1_ilAnalyze(ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame) {
     if (read) goto L18;
     goto L21;
     L18:;
-    _sm_base9 = simse_addressOf(op->operands);
-    operand = (*_sm_base9)[j];
+    operand = (*_sm_base8)[j];
     _sm_expr2 = operand >= 0;
     if (_sm_expr2) goto L22;
     goto L21;
@@ -38828,7 +38636,7 @@ void ns1_ilDeclLines(List<Str>* _sm_out, Str* typeText, List<Str>* names) {
 }
 // src/codegen/IlSlot.kt
 void ns1_ilDeclGroups(Dictionary<Int, List<Str>>* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, Dictionary<Int, ns1_IlCrossing>* blockEnd) {
-    List<ns11_IlOp>* _sm_base1, * _sm_base3, * _sm_base4, * _sm_base6, * _sm_base10;
+    List<ns11_IlOp>* _sm_base1, * _sm_base4;
     ns11_IlOp* _sm_base2, * _sm_base5, * _sm_base9;
     List<Int>* _sm_base7, * _sm_base8;
     List<ns11_IlVar>* _sm_base11, * _sm_base17;
@@ -38851,8 +38659,7 @@ void ns1_ilDeclGroups(Dictionary<Int, List<Str>>* _sm_out, ns1_Emitter* self, ns
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(il->ops);
-    _sm_base2 = simse_addressOf((*_sm_base3)[i]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
     _sm_expr3 = _sm_base2->kind;
     _sm_expr4 = ns11_IlOpKind::Declare;
     _sm_expr2 = _sm_expr3 != _sm_expr4;
@@ -38874,8 +38681,7 @@ void ns1_ilDeclGroups(Dictionary<Int, List<Str>>* _sm_out, ns1_Emitter* self, ns
     if (_sm_expr2) goto L23;
     goto L7;
     L23:;
-    _sm_base6 = simse_addressOf(il->ops);
-    _sm_base5 = simse_addressOf((*_sm_base6)[at]);
+    _sm_base5 = simse_addressOf((*_sm_base4)[at]);
     _sm_expr3 = _sm_base5->kind;
     _sm_expr4 = ns11_IlOpKind::Declare;
     _sm_expr2 = _sm_expr3 == _sm_expr4;
@@ -38884,8 +38690,7 @@ void ns1_ilDeclGroups(Dictionary<Int, List<Str>>* _sm_out, ns1_Emitter* self, ns
     L22:;
     _sm_expr2 = simse_dict_has((*blockEnd), at);
     if (_sm_expr2) goto L7;
-    _sm_base10 = simse_addressOf(il->ops);
-    _sm_base9 = simse_addressOf((*_sm_base10)[at]);
+    _sm_base9 = simse_addressOf((*_sm_base4)[at]);
     _sm_base8 = simse_addressOf(_sm_base9->operands);
     _sm_base7 = _sm_base8;
     slot = ns1_ilOpOperand(self, _sm_base7, 0);
@@ -39139,7 +38944,7 @@ void ns1_ilSlotNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
 }
 // src/codegen/IlSlot.kt
 void ns1_ilOperandNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, Int operand, Int depth) {
-    List<Str>* _sm_base1, * _sm_base4;
+    List<Str>* _sm_base1;
     Str* _sm_base2, * _sm_base3;
     Bool _sm_expr1;
     Int _sm_expr2, index, _sm_expr3;
@@ -39160,8 +38965,7 @@ void ns1_ilOperandNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* 
     *_sm_out = _sm_expr5;
     return;
     L4:;
-    _sm_base4 = simse_addressOf(il->pool);
-    _sm_base3 = simse_addressOf((*_sm_base4)[index]);
+    _sm_base3 = simse_addressOf((*_sm_base1)[index]);
     _sm_base2 = _sm_base3;
     ns1_ilLiteralNode(&_sm_expr5, self, _sm_base2);
     *_sm_out = _sm_expr5;
@@ -39444,8 +39248,7 @@ void ns1_ilTypeBaseNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody*
 // src/codegen/IlSlot.kt
 void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, ns11_IlOp* op) {
     Char* __sm_catP;
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base9, * _sm_base45, * _sm_base58,
-        * _sm_base60;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base58;
     List<ns11_IlMethod>* _sm_base3, * _sm_base5;
     ns11_IlMethod* _sm_base4, * method;
     ns3_AstNodeKind _sm_base6, _sm_base16, _sm_base17, _sm_base20, _sm_base50, _sm_base56, _sm_base66;
@@ -39456,8 +39259,8 @@ void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
     Str _sm_base11, _sm_base27, _sm_base43, _sm_base62, closureCall, methodNameText, methodNameText2,
         _sm_expr29, methodNameText3;
     Str* _sm_base23, * _sm_base24, * _sm_base31, * _sm_base32, * _sm_base33, * _sm_base34, * _sm_base35,
-        * _sm_base36, * _sm_base37, * _sm_base38, * _sm_base40, * _sm_base41, * _sm_base47, * _sm_base48,
-        * _sm_base52, * _sm_base53, * _sm_base54;
+        * _sm_base36, * _sm_base37, * _sm_base40, * _sm_base41, * _sm_base47, * _sm_base48, * _sm_base52,
+        * _sm_base53, * _sm_base54;
     Int _sm_base25, _sm_base59, _sm_expr1, methodAt, methodIndex, first, recvSlot, _sm_expr40, i;
     ns3_AstNodeAttributeKind _sm_base42;
     List<ns3_AstNodeAttribute>* _sm_base44;
@@ -39511,8 +39314,7 @@ void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
     if (hasDst) goto L6;
     goto L7;
     L6:;
-    _sm_base9 = simse_addressOf(op->operands);
-    _sm_base8 = _sm_base9;
+    _sm_base8 = _sm_base2;
     recvSlot = ns1_ilOpOperand(self, _sm_base8, first);
     ns1_ilSlotNode(&recv, self, il, frame, recvSlot, 0);
     _sm_base10 = &recv;
@@ -39618,8 +39420,7 @@ void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
     ns1_ilNameNode(&callee, self, _sm_base36);
     goto L21;
     L20:;
-    _sm_base38 = simse_addressOf(method->name);
-    _sm_base37 = _sm_base38;
+    _sm_base37 = _sm_base34;
     ns1_ilNameNode(&callee, self, _sm_base37);
     L21:;
     _sm_base39 = &callee;
@@ -39654,8 +39455,7 @@ void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
     if (hasDst) goto L27;
     goto L28;
     L27:;
-    _sm_base45 = simse_addressOf(op->operands);
-    _sm_expr1 = simse_lenOf((*_sm_base45));
+    _sm_expr1 = simse_lenOf((*_sm_base2));
     _sm_expr40 = _sm_expr1 - first;
     _sm_base46 = &callee;
     _sm_base48 = simse_addressOf(method->name);
@@ -39688,8 +39488,7 @@ void ns1_ilCallNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il,
     _sm_expr1 = simse_lenOf((*_sm_base58));
     hasDst = i < _sm_expr1;
     if (!(hasDst)) goto L32;
-    _sm_base60 = simse_addressOf(op->operands);
-    _sm_base59 = (*_sm_base60)[i];
+    _sm_base59 = (*_sm_base58)[i];
     ns1_ilOperandNode(&arg, self, il, frame, _sm_base59, 0);
     _sm_base61 = &arg;
     hasDst = ns2_xmlIsEmpty(_sm_base61);
@@ -39862,10 +39661,9 @@ void ns1_attachMachineCallArgs(ns1_Emitter* self, ns11_IlBody* il, ns11_IlOp* op
 void ns1_ilOpValueNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* il, ns1_IlFrame* frame, Int opIndex, Int depth) {
     List<ns11_IlOp>* _sm_base1, * _sm_base3;
     ns11_IlOp* _sm_base2, * op;
-    List<Int>* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base9, * _sm_base11, * _sm_base12,
-        * _sm_base13, * _sm_base20, * _sm_base21, * _sm_base22, * _sm_base35, * _sm_base36, * _sm_base38,
-        * _sm_base39, * _sm_base45, * _sm_base46, * _sm_base47, * _sm_base60, * _sm_base61, * _sm_base68,
-        * _sm_base69, * _sm_base76, * _sm_base78;
+    List<Int>* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base9, * _sm_base11, * _sm_base13,
+        * _sm_base20, * _sm_base21, * _sm_base22, * _sm_base35, * _sm_base36, * _sm_base38, * _sm_base45,
+        * _sm_base46, * _sm_base47, * _sm_base60, * _sm_base61, * _sm_base68, * _sm_base69, * _sm_base76;
     ns3_AstNodeKind _sm_base6, _sm_base26, _sm_base33, _sm_base51, _sm_base54, _sm_base57, _sm_base63,
         _sm_base65, _sm_base71, _sm_base74, _sm_base81;
     ns3_AstNodeCategory _sm_base7, _sm_base27, _sm_base52, _sm_base72, category;
@@ -39951,11 +39749,10 @@ void ns1_ilOpValueNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* 
     *_sm_out = _sm_expr5;
     return;
     L14:;
-    _sm_base12 = simse_addressOf(op->operands);
-    _sm_base11 = _sm_base12;
+    _sm_base11 = _sm_base9;
     _sm_expr21 = ns1_ilOpOperand(self, _sm_base11, 2);
     ns1_ilOperandNode(&lhs, self, il, frame, _sm_expr21, depth);
-    _sm_base13 = _sm_base12;
+    _sm_base13 = _sm_base9;
     _sm_expr22 = ns1_ilOpOperand(self, _sm_base13, 3);
     ns1_ilOperandNode(&rhs, self, il, frame, _sm_expr22, depth);
     _sm_base15 = &lhs;
@@ -40035,8 +39832,7 @@ void ns1_ilOpValueNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* 
     *_sm_out = _sm_expr5;
     return;
     L28:;
-    _sm_base39 = simse_addressOf(op->operands);
-    _sm_base38 = _sm_base39;
+    _sm_base38 = _sm_base36;
     _sm_expr44 = ns1_ilOpOperand(self, _sm_base38, 1);
     ns1_ilSlotNode(&base, self, il, frame, _sm_expr44, depth);
     _sm_base40 = &base;
@@ -40230,8 +40026,7 @@ void ns1_ilOpValueNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* 
     _sm_expr2 = simse_lenOf((*_sm_base76));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L69;
-    _sm_base78 = simse_addressOf(op->operands);
-    _sm_base77 = (*_sm_base78)[i];
+    _sm_base77 = (*_sm_base76)[i];
     ns1_ilOperandNode(&arg, self, il, frame, _sm_base77, 0);
     _sm_base79 = &arg;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base79);
@@ -40260,8 +40055,8 @@ void ns1_ilOpValueNode(ns3_AstXmlNode* _sm_out, ns1_Emitter* self, ns11_IlBody* 
 // src/codegen/IlSlot.kt
 void ns1_ilLabelPositions(List<Int>* _sm_out, ns1_Emitter* self, ns11_IlBody* il) {
     List<Str>* _sm_base1;
-    List<Int>* _sm_base2, * _sm_base6, * _sm_base7;
-    List<ns11_IlOp>* _sm_base3, * _sm_base5;
+    List<Int>* _sm_base2, * _sm_base6;
+    List<ns11_IlOp>* _sm_base3;
     ns11_IlOp* _sm_base4, * op;
     List<Int> positions;
     Int i, _sm_expr1, _sm_expr3, label;
@@ -40288,8 +40083,7 @@ void ns1_ilLabelPositions(List<Int>* _sm_out, ns1_Emitter* self, ns11_IlBody* il
     _sm_expr1 = simse_lenOf((*_sm_base3));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L4;
-    _sm_base5 = simse_addressOf(il->ops);
-    _sm_base4 = simse_addressOf((*_sm_base5)[i]);
+    _sm_base4 = simse_addressOf((*_sm_base3)[i]);
     op = _sm_base4;
     _sm_expr6 = op->kind;
     _sm_expr7 = ns11_IlOpKind::Label;
@@ -40303,8 +40097,7 @@ void ns1_ilLabelPositions(List<Int>* _sm_out, ns1_Emitter* self, ns11_IlBody* il
     if (_sm_expr2) goto L5;
     goto L9;
     L5:;
-    _sm_base7 = simse_addressOf(op->operands);
-    label = (*_sm_base7)[0];
+    label = (*_sm_base6)[0];
     _sm_expr2 = label >= 0;
     if (_sm_expr2) goto L10;
     goto L9;
@@ -42596,11 +42389,11 @@ int main(int argc, char** argv) {
     Str* _sm_base1, * _sm_base4, * _sm_base5, * _sm_base7, * _sm_base12, * _sm_base13, * _sm_base19,
         * _sm_base21, * _sm_base22, * _sm_base23, * _sm_base25, * _sm_base44, * _sm_base48, * _sm_base49,
         * _sm_base52, * _sm_base53, * _sm_base54, * _sm_base56, * _sm_base69, * _sm_base70, * _sm_base71,
-        * _sm_base72, * _sm_base73, * _sm_base75, * _sm_base76, * _sm_base78, * _sm_base84, * _sm_base91,
-        * _sm_base92, * _sm_base93, * _sm_base95, * _sm_base96, * _sm_base98, * _sm_base112, * _sm_base113,
-        * _sm_base115, * _sm_base116, * _sm_base118, * _sm_base119, * _sm_base121, * _sm_base122,
-        * _sm_base132, * _sm_base136, * _sm_base148, * _sm_base153, * _sm_base158, * _sm_base165,
-        * _sm_base166, * _sm_base168, * _sm_base170, * borrowLine, * escapeLine;
+        * _sm_base73, * _sm_base75, * _sm_base76, * _sm_base78, * _sm_base84, * _sm_base91, * _sm_base92,
+        * _sm_base93, * _sm_base95, * _sm_base96, * _sm_base98, * _sm_base112, * _sm_base113, * _sm_base115,
+        * _sm_base116, * _sm_base118, * _sm_base119, * _sm_base121, * _sm_base122, * _sm_base132,
+        * _sm_base136, * _sm_base148, * _sm_base153, * _sm_base158, * _sm_base165, * _sm_base166,
+        * _sm_base168, * _sm_base170, * borrowLine, * escapeLine;
     Str _sm_base2, _sm_base3, _sm_base6, _sm_base10, _sm_base26, _sm_base45, _sm_base57, _sm_base68,
         _sm_base74, _sm_base79, _sm_base85, _sm_base90, _sm_base94, _sm_base99, _sm_base124, _sm_base126,
         _sm_base133, _sm_base135, _sm_base137, _sm_base139, _sm_base142, _sm_base146, _sm_base149,
@@ -43306,8 +43099,7 @@ int main(int argc, char** argv) {
     if (_sm_expr2) goto L148;
     goto L149;
     L148:;
-    _sm_base72 = simse_addressOf(generated.Value);
-    _sm_base71 = _sm_base72;
+    _sm_base71 = _sm_base70;
     _sm_base74 = __sm_stringTable[515];
     _sm_base73 = &_sm_base74;
     ns3_driverParseSource(&parsedGenerated, _sm_base71, _sm_base73);
@@ -43833,7 +43625,7 @@ Bool ns3_sourceGenResHas(ns3_FullCompiledState* state, Str* key) {
 }
 // src/compiler/GenTypes.kt
 void ns3_sourceGenResText(Str* _sm_out, ns3_FullCompiledState* state, Str* key) {
-    List<ns17_ResourceItem>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * _sm_base5, * _sm_base6;
+    List<ns17_ResourceItem>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base5, * _sm_base6;
     Bool _sm_expr1;
     Str _sm_expr2;
     _sm_base2 = simse_addressOf(state->resources);
@@ -43842,8 +43634,7 @@ void ns3_sourceGenResText(Str* _sm_out, ns3_FullCompiledState* state, Str* key) 
     if (_sm_expr1) goto L1;
     goto L2;
     L1:;
-    _sm_base4 = simse_addressOf(state->resources);
-    _sm_base3 = _sm_base4;
+    _sm_base3 = _sm_base2;
     ns17_resValueOf(&_sm_expr2, _sm_base3, key);
     *_sm_out = _sm_expr2;
     return;
@@ -43859,7 +43650,7 @@ ns3_SourceGenTransform ns3_ktGen(ns3_SourceGenContext* ctx) {
     Char* __sm_catP;
     ns3_SourceTransformation _sm_base1, _sm_base8, _sm_base14;
     ns3_FullCompiledState* _sm_base2;
-    Str* _sm_base3, * _sm_base4, * _sm_base10, * _sm_base13;
+    Str* _sm_base3, * _sm_base4, * _sm_base10;
     Str _sm_base5, _sm_base9, section, key, source;
     ns3_SourceGenPhase _sm_expr1, _sm_expr2;
     Bool _sm_expr3;
@@ -43925,8 +43716,7 @@ ns3_SourceGenTransform ns3_ktGen(ns3_SourceGenContext* ctx) {
     if (_sm_expr3) goto L5;
     goto L6;
     L5:;
-    _sm_base13 = simse_addressOf(ctx->source);
-    simse_str_append((*_sm_base13), '\n');
+    simse_str_append((*_sm_base10), '\n');
     L6:;
     _sm_base14 = ns3_SourceTransformation::ReparseRequired;
     _sm_expr4 = ns3_SourceGenTransform{_sm_base14, section};
@@ -45316,8 +45106,8 @@ void ns3_resGenAlways(ns3_SourceGenTransform* _sm_out, ns3_SourceGenContext* ctx
     List<ns17_ResourceItem>* _sm_base1, * _sm_base2, * _sm_base11, * _sm_base12;
     ns3_FullCompiledState* _sm_base3, * _sm_base13, * _sm_base23, * _sm_base26, * _sm_base30,
         * _sm_base36;
-    Str* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base14, * _sm_base15,
-        * _sm_base17, * _sm_base18, * _sm_base19, * _sm_base24, * _sm_base33;
+    Str* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8, * _sm_base14, * _sm_base15, * _sm_base17,
+        * _sm_base18, * _sm_base24, * _sm_base33;
     Str _sm_base6, _sm_base16, _sm_base27, _sm_base34, _sm_base37, _sm_expr8, _sm_expr16, section;
     List<Str>* _sm_base21;
     Dictionary<Str, Str>* _sm_base22, * _sm_base25, * _sm_base29, * _sm_base35;
@@ -45357,10 +45147,9 @@ void ns3_resGenAlways(ns3_SourceGenTransform* _sm_out, ns3_SourceGenContext* ctx
     if (_sm_expr2) goto L3;
     goto L1;
     L3:;
-    _sm_base9 = simse_addressOf(entry->key);
-    _sm_expr6 = simse_lenOf((*_sm_base9));
+    _sm_expr6 = simse_lenOf((*_sm_base4));
     _sm_expr7 = _sm_expr6 - 5;
-    _sm_expr8 = substr(_sm_base9, 0, _sm_expr7);
+    _sm_expr8 = substr(_sm_base4, 0, _sm_expr7);
     simse_list_append(sections, _sm_expr8);
     goto L1;
     L2:;
@@ -45387,10 +45176,9 @@ void ns3_resGenAlways(ns3_SourceGenTransform* _sm_out, ns3_SourceGenContext* ctx
     if (_sm_expr2) goto L8;
     goto L6;
     L8:;
-    _sm_base19 = simse_addressOf(_sm_entry_2->key);
-    _sm_expr6 = simse_lenOf((*_sm_base19));
+    _sm_expr6 = simse_lenOf((*_sm_base14));
     _sm_expr15 = _sm_expr6 - 5;
-    _sm_expr16 = substr(_sm_base19, 0, _sm_expr15);
+    _sm_expr16 = substr(_sm_base14, 0, _sm_expr15);
     simse_list_append(sections, _sm_expr16);
     goto L6;
     L7:;
@@ -45548,7 +45336,7 @@ Bool ns3_resGenAddSection(ns3_SourceGenContext* ctx, Str* section) {
 }
 // src/compiler/Sections.kt
 Int ns3_indexOf(ns3_Sections* self, Str* name) {
-    List<ns3_NamedSection>* _sm_base1, * _sm_base3;
+    List<ns3_NamedSection>* _sm_base1;
     ns3_NamedSection* _sm_base2;
     Str _sm_base4, _sm_expr3;
     Int i, _sm_expr1;
@@ -45559,8 +45347,7 @@ Int ns3_indexOf(ns3_Sections* self, Str* name) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(self->sections);
-    _sm_base2 = simse_addressOf((*_sm_base3)[i]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
     _sm_expr3 = _sm_base2->name;
     _sm_base4 = *(name);
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr3))), simse_spanOfStr(simse_addressOf(_sm_base4)));
@@ -46123,7 +45910,7 @@ void ns3_sourceGenDeclare(Res<Str>* _sm_out, ns3_AstXmlNode* decl, Str* fileName
     ns3_SourceGenPhase _sm_base7;
     ns3_AstXmlNode _sm_base8, _sm_base15;
     ns3_SourceGenContext* _sm_base11;
-    Str* _sm_base12, * _sm_base13, * _sm_base14, * _sm_expr1, * _sm_expr3, * _sm_expr4;
+    Str* _sm_base12, * _sm_base13, * _sm_expr1, * _sm_expr3, * _sm_expr4;
     List<Str> _sm_base16, _sm_expr5;
     List<ns3_SourceGenRequest>* _sm_base19;
     ns3_FullCompiledState* _sm_base20, * _sm_expr6;
@@ -46160,8 +45947,8 @@ void ns3_sourceGenDeclare(Res<Str>* _sm_out, ns3_AstXmlNode* decl, Str* fileName
     ctx = ns3_SourceGenContext{name, _sm_base7, _sm_base8, declName, _sm_expr5, symbol, __sm_stringTable[1475], __sm_stringTable[1475], _sm_base9, prelude, _sm_expr6, _sm_expr7, nullptr};
     _sm_base11 = &ctx;
     {
-        ns3_SourceGenTransform _sm_sret62;
-        ns3_runSourceGen(&_sm_sret62, _sm_base11);
+        ns3_SourceGenTransform _sm_sret61;
+        ns3_runSourceGen(&_sm_sret61, _sm_base11);
     }
     _sm_base12 = simse_addressOf(ctx.error);
     _sm_expr8 = simse_lenOf((*_sm_base12));
@@ -46169,8 +45956,7 @@ void ns3_sourceGenDeclare(Res<Str>* _sm_out, ns3_AstXmlNode* decl, Str* fileName
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base14 = simse_addressOf(ctx.error);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base12;
     _sm_expr10 = simse_resErr<Str>(_sm_base13);
     *_sm_out = _sm_expr10;
     return;
@@ -46198,7 +45984,7 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
     List<Str> _sm_base8, _sm_expr10;
     Bool _sm_base11, _sm_expr2;
     ns3_SourceGenContext* _sm_base12, * _sm_base18;
-    Str* _sm_base13, * _sm_base14, * _sm_base15, * _sm_base19, * _sm_base20, * _sm_base21;
+    Str* _sm_base13, * _sm_base14, * _sm_base19, * _sm_base20;
     Span<ns3_SourceGenRequest> _sm_expr1;
     Span_iter_yieldable<ns3_SourceGenRequest> _sm_for2;
     ns3_SourceGenRequest* request;
@@ -46230,8 +46016,8 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
     ctx = ns3_SourceGenContext{_sm_base4, _sm_base5, _sm_base6, _sm_base7, _sm_base8, _sm_base9, __sm_stringTable[1475], __sm_stringTable[1475], _sm_base10, _sm_base11, _sm_expr3, sections, reachedNames};
     _sm_base12 = &ctx;
     {
-        ns3_SourceGenTransform _sm_sret57;
-        ns3_runSourceGen(&_sm_sret57, _sm_base12);
+        ns3_SourceGenTransform _sm_sret55;
+        ns3_runSourceGen(&_sm_sret55, _sm_base12);
     }
     _sm_base13 = simse_addressOf(ctx.error);
     _sm_expr4 = simse_lenOf((*_sm_base13));
@@ -46239,8 +46025,7 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
     if (_sm_expr2) goto L3;
     goto L1;
     L3:;
-    _sm_base15 = simse_addressOf(ctx.error);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base13;
     _sm_expr6 = simse_resErr<Str>(_sm_base14);
     *_sm_out = _sm_expr6;
     return;
@@ -46260,8 +46045,8 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
     program = ns3_SourceGenContext{_sm_base16, _sm_base17, _sm_expr9, __sm_stringTable[1475], _sm_expr10, __sm_stringTable[1475], __sm_stringTable[1475], __sm_stringTable[1475], __sm_stringTable[1475], false, _sm_expr11, sections, reachedNames};
     _sm_base18 = &program;
     {
-        ns3_SourceGenTransform _sm_sret83;
-        ns3_runSourceGen(&_sm_sret83, _sm_base18);
+        ns3_SourceGenTransform _sm_sret80;
+        ns3_runSourceGen(&_sm_sret80, _sm_base18);
     }
     _sm_base19 = simse_addressOf(program.error);
     _sm_expr4 = simse_lenOf((*_sm_base19));
@@ -46269,8 +46054,7 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
     if (_sm_expr2) goto L7;
     goto L5;
     L7:;
-    _sm_base21 = simse_addressOf(program.error);
-    _sm_base20 = _sm_base21;
+    _sm_base20 = _sm_base19;
     _sm_expr6 = simse_resErr<Str>(_sm_base20);
     *_sm_out = _sm_expr6;
     return;
@@ -46281,8 +46065,8 @@ void ns3_sourceGenEmit(Res<Str>* _sm_out, ns3_Sections* sections, Dictionary<Str
 }
 // src/compiler/SourceGen.kt
 void ns3_sourceGenReparseSource(Res<Str>* _sm_out) {
-    ns3_FullCompiledState* _sm_base1, * _sm_base3, * _sm_base7;
-    List<ns3_AstXmlNode>* _sm_base2, * _sm_base6;
+    ns3_FullCompiledState* _sm_base1, * _sm_base3;
+    List<ns3_AstXmlNode>* _sm_base2;
     ns3_AstXmlNode* _sm_base4, * _sm_base5;
     List<Str>* _sm_base8, * _sm_base9;
     List<Str> blocks;
@@ -46301,9 +46085,7 @@ void ns3_sourceGenReparseSource(Res<Str>* _sm_out) {
     _sm_expr1 = simse_lenOf((*_sm_base2));
     _sm_expr2 = m < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base7 = &ns3_sourceGenState;
-    _sm_base6 = simse_addressOf(_sm_base7->modules);
-    _sm_base5 = simse_addressOf((*_sm_base6)[m]);
+    _sm_base5 = simse_addressOf((*_sm_base2)[m]);
     _sm_base4 = _sm_base5;
     _sm_base8 = &blocks;
     ns3_sourceGenReparseNode(&collected, _sm_base4, _sm_base8);
@@ -48545,7 +48327,7 @@ void ns10_setSource(ns10_Scanner* self, Str* text) {
 }
 // src/lex/Scanner.kt
 void ns10_advance(ns10_Scanner* self, Int count) {
-    Str* _sm_base1, * _sm_base3;
+    Str* _sm_base1;
     Int _sm_base4, _sm_base5, _sm_base6, _sm_base7, _sm_base8, _sm_base9, i, _sm_expr2, _sm_expr4,
         _sm_expr5, _sm_expr6;
     Bool _sm_expr1, _sm_expr3, followedByLf;
@@ -48565,8 +48347,7 @@ void ns10_advance(ns10_Scanner* self, Int count) {
     if (!(_sm_expr3)) goto _sm_sc1;
     _sm_expr2 = self->pos;
     _sm_expr4 = _sm_expr2 + 1;
-    _sm_base3 = simse_addressOf(self->source);
-    _sm_expr10 = (*_sm_base3)[_sm_expr4];
+    _sm_expr10 = (*_sm_base1)[_sm_expr4];
     _sm_expr1 = _sm_expr10 == '\n';
     _sm_expr3 = _sm_expr1;
     _sm_sc1:;
@@ -48598,7 +48379,7 @@ void ns10_advance(ns10_Scanner* self, Int count) {
 }
 // src/lex/Scanner.kt
 void ns10_nextToken(Res<ns10_Token>* _sm_out, ns10_Scanner* self) {
-    Str* _sm_base1, * _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12;
+    Str* _sm_base1, * _sm_base6, * _sm_base11, * _sm_base12;
     Int _sm_base2, _sm_base3, _sm_base4, _sm_base8, _sm_base9, _sm_base10, _sm_base13, _sm_base14,
         _sm_base15, _sm_base16, _sm_base18, _sm_expr1, _sm_expr2;
     ns10_TokenKind _sm_base5, _sm_base17;
@@ -48626,8 +48407,7 @@ void ns10_nextToken(Res<ns10_Token>* _sm_out, ns10_Scanner* self) {
     *_sm_out = _sm_expr6;
     return;
     L2:;
-    _sm_base7 = simse_addressOf(self->source);
-    _sm_base6 = _sm_base7;
+    _sm_base6 = _sm_base1;
     _sm_expr7 = simse_spanOfStr(_sm_base6);
     _sm_base8 = self->pos;
     view = slice(simse_addressOf(_sm_expr7), _sm_base8);
@@ -51035,12 +50815,12 @@ void ns11_call(ns11_IlExtractor* self, Int dst, ns3_AstXmlNode* e) {
     List<ns11_IlVar>* _sm_base3, * _sm_base9, * _sm_base26, * _sm_base37, * _sm_base103, * _sm_base206,
         * _sm_base210;
     ns11_IlBody* _sm_base4, * _sm_base10, * _sm_base27, * _sm_base28, * _sm_base29, * _sm_base32,
-        * _sm_base33, * _sm_base38, * _sm_base85, * _sm_base86, * _sm_base96, * _sm_base97, * _sm_base104,
-        * _sm_base121, * _sm_base122, * _sm_base152, * _sm_base153, * _sm_base182, * _sm_base183,
-        * _sm_base207, * _sm_base211, * _sm_base219, * _sm_base220;
+        * _sm_base85, * _sm_base86, * _sm_base96, * _sm_base97, * _sm_base121, * _sm_base122, * _sm_base152,
+        * _sm_base153, * _sm_base182, * _sm_base183, * _sm_base207, * _sm_base211, * _sm_base219,
+        * _sm_base220;
     ns3_AstNodeAttributeKind _sm_base6, _sm_base181, _sm_base234;
     Dictionary<Str, Bool>* _sm_base11;
-    ns11_IlFunction* _sm_base12, * _sm_base14, * _sm_base52, * _sm_base82;
+    ns11_IlFunction* _sm_base12, * _sm_base52, * _sm_base82;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base13, * _sm_base79, * _sm_base80, * _sm_base116,
         * _sm_base128, * _sm_base137, * _sm_base141, * _sm_base146, * _sm_base190, * _sm_base195;
     ns3_AstXmlNode* _sm_base16, * _sm_base17, * _sm_base19, * _sm_base30, * _sm_base34, * _sm_base35,
@@ -51173,8 +50953,7 @@ void ns11_call(ns11_IlExtractor* self, Int dst, ns3_AstXmlNode* e) {
     goto L14;
     L13:;
     ns2_xmlEmptyNode(&captureType);
-    _sm_base14 = simse_addressOf(self->fn);
-    _sm_base13 = simse_addressOf(_sm_base14->captureTypes);
+    _sm_base13 = simse_addressOf(_sm_base12->captureTypes);
     found = simse_dict_getPtr((*_sm_base13), calleeName);
     _sm_expr4 = found != nullptr;
     if (_sm_expr4) goto L16;
@@ -51233,8 +51012,7 @@ void ns11_call(ns11_IlExtractor* self, Int dst, ns3_AstXmlNode* e) {
     if (_sm_expr4) goto L25;
     goto L28;
     L25:;
-    _sm_base33 = simse_addressOf(self->out);
-    _sm_base32 = _sm_base33;
+    _sm_base32 = _sm_base29;
     ns11_ilVarType(&calleeType, _sm_base32, calleeSlot);
     ns11_callResultTypeOf(&result, self, calleeType);
     _sm_base34 = &result;
@@ -51247,8 +51025,7 @@ void ns11_call(ns11_IlExtractor* self, Int dst, ns3_AstXmlNode* e) {
     goto L28;
     L27:;
     ns11_setSlotType(self, dst, result);
-    _sm_base38 = simse_addressOf(self->out);
-    _sm_base37 = simse_addressOf(_sm_base38->vars);
+    _sm_base37 = simse_addressOf(_sm_base29->vars);
     _sm_base36 = simse_addressOf((*_sm_base37)[dst]);
     returnType = _sm_base36->typeIndex;
     L28:;
@@ -51533,8 +51310,7 @@ void ns11_call(ns11_IlExtractor* self, Int dst, ns3_AstXmlNode* e) {
     _sm_base99 = &dstType;
     _sm_expr4 = ns11_ilIsHandleType(_sm_base99);
     if (_sm_expr4) goto L92;
-    _sm_base104 = simse_addressOf(self->out);
-    _sm_base103 = simse_addressOf(_sm_base104->vars);
+    _sm_base103 = simse_addressOf(_sm_base97->vars);
     _sm_base102 = simse_addressOf((*_sm_base103)[dst]);
     _sm_base101 = simse_addressOf(_sm_base102->name);
     _sm_base100 = _sm_base101;
@@ -52615,15 +52391,14 @@ void ns11_ilBindCallableArg(ns11_IlExtractor* self, ns3_AstXmlNode pattern, ns3_
 // src/linear/LinearFormCall.kt
 void ns11_ilConfusingLambdaOverload(Str* _sm_out, ns11_IlExtractor* self, ns3_AstXmlNode* callee, Bool member, List<ns3_AstXmlNode>* argNodes) {
     Char* __sm_catP;
-    ns11_IlFunction* _sm_base1, * _sm_base6, * _sm_base11;
+    ns11_IlFunction* _sm_base1, * _sm_base11;
     ns3_AstNodeAttributeKind _sm_base3;
     Dictionary<Str, List<Int>>* _sm_base4;
     ns18_SemFacts* _sm_base5, * _sm_base10, * _sm_expr1;
     ns18_SemFnFact* _sm_base8, * fact;
     List<ns18_SemFnFact>* _sm_base9;
-    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base14, * _sm_base15, * _sm_base16, * _sm_base17,
-        * _sm_base19, * _sm_base22, * _sm_base24, * _sm_base27, * _sm_base28, * _sm_base29, * _sm_base30,
-        * pattern;
+    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base14, * _sm_base15, * _sm_base16, * _sm_base19,
+        * _sm_base22, * _sm_base24, * _sm_base27, * _sm_base28, * _sm_base29, * _sm_base30, * pattern;
     ns3_AstNodeKind _sm_base18, _sm_base26;
     List<ns3_AstXmlNode>* _sm_base21;
     ns3_AstXmlNode _sm_base23, _sm_base25, _sm_expr25;
@@ -52649,8 +52424,7 @@ void ns11_ilConfusingLambdaOverload(Str* _sm_out, ns11_IlExtractor* self, ns3_As
     name = *(ns2_xmlAttr(callee, _sm_base3));
     callableCandidates = 0;
     valueCandidates = 0;
-    _sm_base6 = simse_addressOf(self->fn);
-    _sm_base5 = _sm_base6->facts;
+    _sm_base5 = _sm_base1->facts;
     _sm_base4 = simse_addressOf(_sm_base5->functionsByName);
     named = simse_dict_getPtr((*_sm_base4), name);
     _sm_expr2 = named == nullptr;
@@ -52695,11 +52469,10 @@ void ns11_ilConfusingLambdaOverload(Str* _sm_out, ns11_IlExtractor* self, ns3_As
     _sm_expr14 = simse_lenOf((*argNodes));
     _sm_expr2 = _sm_expr13 != _sm_expr14;
     if (_sm_expr2) goto L5;
-    _sm_base17 = simse_addressOf(fact->decl);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base13;
     _sm_base18 = ns3_AstNodeKind::Param;
     ns2_xmlChildren(&params, _sm_base16, _sm_base18);
-    _sm_base19 = _sm_base17;
+    _sm_base19 = _sm_base13;
     offset = ns18_semReceiverParams(_sm_base19);
     takesCallable = false;
     takesValue = false;
@@ -52795,14 +52568,14 @@ void ns11_ilConfusingLambdaOverload(Str* _sm_out, ns11_IlExtractor* self, ns3_As
 }
 // src/linear/LinearFormCall.kt
 Bool ns11_ilOverloadsAllTakeValue(ns11_IlExtractor* self, Str* name, Int at, Int argCount) {
-    ns11_IlFunction* _sm_base1, * _sm_base5, * _sm_base11;
+    ns11_IlFunction* _sm_base1, * _sm_base11;
     Dictionary<Str, List<Int>>* _sm_base3;
     ns18_SemFacts* _sm_base4, * _sm_base10, * _sm_expr3;
     Str _sm_base6;
     ns18_SemFnFact* _sm_base8, * fact;
     List<ns18_SemFnFact>* _sm_base9;
-    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base14, * _sm_base15, * _sm_base17, * _sm_base19,
-        * _sm_base20, * paramType;
+    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base14, * _sm_base17, * _sm_base19, * _sm_base20,
+        * paramType;
     ns3_AstNodeKind _sm_base16, _sm_base21;
     Span<Char> _sm_expr1;
     Bool _sm_expr2, sawAny;
@@ -52827,8 +52600,7 @@ Bool ns11_ilOverloadsAllTakeValue(ns11_IlExtractor* self, Str* name, Int at, Int
     L3:;
     return false;
     L4:;
-    _sm_base5 = simse_addressOf(self->fn);
-    _sm_base4 = _sm_base5->facts;
+    _sm_base4 = _sm_base1->facts;
     _sm_base3 = simse_addressOf(_sm_base4->functionsByName);
     _sm_base6 = *(name);
     named = simse_dict_getPtr((*_sm_base3), _sm_base6);
@@ -52858,11 +52630,10 @@ Bool ns11_ilOverloadsAllTakeValue(ns11_IlExtractor* self, Str* name, Int at, Int
     _sm_expr2 = _sm_expr9 != argCount;
     if (_sm_expr2) goto L7;
     sawAny = true;
-    _sm_base15 = simse_addressOf(fact->decl);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base13;
     _sm_base16 = ns3_AstNodeKind::Param;
     ns2_xmlChildren(&params, _sm_base14, _sm_base16);
-    _sm_base17 = _sm_base15;
+    _sm_base17 = _sm_base13;
     _sm_expr9 = ns18_semReceiverParams(_sm_base17);
     pos = _sm_expr9 + at;
     _sm_expr12 = simse_lenOf(params);
@@ -52898,7 +52669,7 @@ Bool ns11_ilOverloadsAllTakeValue(ns11_IlExtractor* self, Str* name, Int at, Int
 // src/linear/LinearFormCall.kt
 void ns11_ownerSymbol(Str* _sm_out, ns11_IlExtractor* self) {
     Str* _sm_base1;
-    ns11_IlFunction* _sm_base2, * _sm_base3;
+    ns11_IlFunction* _sm_base2;
     Bool _sm_expr1;
     Str _sm_expr2;
     _sm_base2 = simse_addressOf(self->fn);
@@ -52910,8 +52681,7 @@ void ns11_ownerSymbol(Str* _sm_out, ns11_IlExtractor* self) {
     *_sm_out = __sm_stringTable[620];
     return;
     L2:;
-    _sm_base3 = simse_addressOf(self->fn);
-    _sm_expr2 = _sm_base3->symbol;
+    _sm_expr2 = _sm_base2->symbol;
     *_sm_out = _sm_expr2;
     return;
 }
@@ -52923,8 +52693,7 @@ Int ns11_lambdaOf(ns11_IlExtractor* self, ns3_AstXmlNode* e, Int dst, ns3_AstXml
         _sm_index14, ci, target, _sm_expr116, _sm_expr119;
     ns3_AstNodeAttributeKind _sm_base6;
     List<Str>* _sm_base7, * _sm_base13, * _sm_base17, * _sm_base29, * _sm_base41, * _sm_base71,
-        * _sm_base89, * _sm_base101, * _sm_base110, * _sm_base111, * _sm_base118, * _sm_base121,
-        * _sm_base139;
+        * _sm_base89, * _sm_base101, * _sm_base110, * _sm_base118, * _sm_base121, * _sm_base139;
     ns3_AstNodeKind _sm_base8, _sm_base19, _sm_base22, _sm_base50, _sm_base63, _sm_base67;
     Array<ns3_AstXmlNode>* _sm_base9, * _sm_base10;
     List<ns3_AstXmlNode>* _sm_base11, * _sm_base23, * _sm_base26, * _sm_base51, * _sm_base56,
@@ -52943,11 +52712,10 @@ Int ns11_lambdaOf(ns11_IlExtractor* self, ns3_AstXmlNode* e, Int dst, ns3_AstXml
         _sm_expr34, _sm_expr42, _sm_expr43, _sm_expr44, slotType, _sm_expr57, _sm_expr58, _sm_expr59,
         returnType, declaredReturn, _sm_expr84, _sm_expr96, classType, _sm_expr114;
     Str* _sm_base30, * _sm_base31, * _sm_base43, * _sm_base52, * _sm_base72, * _sm_base76, * _sm_base77,
-        * _sm_base97, * _sm_base98, * _sm_base108, * _sm_base109, * _sm_base112, * _sm_base119,
-        * _sm_base122, * _sm_base131, * _sm_base132, * _sm_base137, * _sm_base140, * _sm_expr1, * typeParam,
-        * slotNameText;
+        * _sm_base97, * _sm_base98, * _sm_base108, * _sm_base109, * _sm_base119, * _sm_base122,
+        * _sm_base131, * _sm_base132, * _sm_base137, * _sm_base140, * _sm_expr1, * typeParam, * slotNameText;
     Dictionary<Str, Str> _sm_base32;
-    ns11_IlFunction* _sm_base33, * _sm_base54, * _sm_base88;
+    ns11_IlFunction* _sm_base33, * _sm_base54;
     ns18_SemFacts* _sm_base34, * _sm_base57;
     List<Str> _sm_base36, _sm_base53, _sm_base87, read, paramNames, _sm_expr6, captured, paramTexts;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base38, * _sm_base47, * _sm_base60, * _sm_base83, * _sm_base90;
@@ -53294,8 +53062,7 @@ Int ns11_lambdaOf(ns11_IlExtractor* self, ns3_AstXmlNode* e, Int dst, ns3_AstXml
     _sm_base86 = self->unit;
     _sm_base85 = simse_addressOf(_sm_base86->lambdas);
     _sm_expr80 = simse_lenOf((*_sm_base85));
-    _sm_base88 = simse_addressOf(self->fn);
-    _sm_base87 = _sm_base88->typeParams;
+    _sm_base87 = _sm_base54->typeParams;
     closure = ns11_IlClosure{symbol, __sm_stringTable[1475], captured, _sm_expr75, _sm_expr76, _sm_expr77, returnType, _sm_base87, _sm_expr78, _sm_expr79, _sm_expr80};
     _sm_base89 = &captured;
     _sm_expr81 = simse_spanOf(_sm_base89);
@@ -53404,11 +53171,9 @@ Int ns11_lambdaOf(ns11_IlExtractor* self, ns3_AstXmlNode* e, Int dst, ns3_AstXml
     goto L69;
     L68:;
     _sm_expr9 = _sm_slot_2->typeIndex;
-    _sm_base111 = simse_addressOf(innerBody.types);
-    typeText = (*_sm_base111)[_sm_expr9];
+    typeText = (*_sm_base110)[_sm_expr9];
     L69:;
-    _sm_base112 = simse_addressOf(_sm_slot_2->name);
-    slotNameText = _sm_base112;
+    slotNameText = _sm_base109;
     _sm_base114 = *(slotNameText);
     _sm_expr110.resize(1 + typeText.size() + _sm_base114.size());
     __sm_catP = simse_str_data(&_sm_expr110);
@@ -53719,9 +53484,9 @@ void ns11_lambdaReturnOf(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, List<n
     ns18_SemFacts* _sm_base1;
     ns11_IlFunction* _sm_base2;
     ns3_AstXmlNode* _sm_base3, * _sm_base11, * stmt;
-    List<ns11_IlOp>* _sm_base4, * _sm_base6;
+    List<ns11_IlOp>* _sm_base4;
     ns11_IlOp* _sm_base5, * op;
-    List<Int>* _sm_base7, * _sm_base10;
+    List<Int>* _sm_base7;
     ns11_IlBody* _sm_base8;
     Int _sm_base9, i, _sm_expr5;
     Span<ns3_AstXmlNode> _sm_expr1;
@@ -53753,8 +53518,7 @@ void ns11_lambdaReturnOf(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, List<n
     _sm_expr5 = simse_lenOf((*_sm_base4));
     _sm_expr2 = i < _sm_expr5;
     if (!(_sm_expr2)) goto L6;
-    _sm_base6 = simse_addressOf(body->ops);
-    _sm_base5 = simse_addressOf((*_sm_base6)[i]);
+    _sm_base5 = simse_addressOf((*_sm_base4)[i]);
     op = _sm_base5;
     i = i + 1;
     _sm_expr7 = op->kind;
@@ -53766,8 +53530,7 @@ void ns11_lambdaReturnOf(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, List<n
     _sm_expr2 = _sm_expr5 == 0;
     if (_sm_expr2) goto L5;
     _sm_base8 = body;
-    _sm_base10 = simse_addressOf(op->operands);
-    _sm_base9 = (*_sm_base10)[0];
+    _sm_base9 = (*_sm_base7)[0];
     ns11_ilVarTypeNode(&typeNode, _sm_base8, _sm_base9);
     _sm_base11 = &typeNode;
     _sm_expr2 = ns2_xmlIsEmpty(_sm_base11);
@@ -53966,7 +53729,7 @@ void ns11_ilInitByValueStmt(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, Str
 }
 // src/linear/LinearFormExpr.kt
 Bool ns11_hasInitByValueExt(ns11_IlExtractor* self, Str* typeName) {
-    ns11_IlFunction* _sm_base1, * _sm_base5, * _sm_base10;
+    ns11_IlFunction* _sm_base1, * _sm_base10;
     Dictionary<Str, List<Int>>* _sm_base3;
     ns18_SemFacts* _sm_base4, * _sm_base9, * _sm_expr1;
     ns18_SemFnFact* _sm_base7, * fact;
@@ -53989,8 +53752,7 @@ Bool ns11_hasInitByValueExt(ns11_IlExtractor* self, Str* typeName) {
     L1:;
     return false;
     L2:;
-    _sm_base5 = simse_addressOf(self->fn);
-    _sm_base4 = _sm_base5->facts;
+    _sm_base4 = _sm_base1->facts;
     _sm_base3 = simse_addressOf(_sm_base4->functionsByName);
     named = simse_dict_getPtr((*_sm_base3), __sm_stringTable[761]);
     _sm_expr2 = named == nullptr;
@@ -54029,7 +53791,7 @@ Bool ns11_isTypeBase(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
     ns3_AstNodeAttributeKind _sm_base1;
     Str* _sm_base2, * _sm_base3;
     Dictionary<Str, Bool>* _sm_base4;
-    ns11_IlFunction* _sm_base5, * _sm_base7;
+    ns11_IlFunction* _sm_base5;
     Dictionary<Str, Str>* _sm_base6;
     ns3_AstNodeCategory kind, _sm_expr1;
     Bool _sm_expr2, _sm_expr10;
@@ -54071,8 +53833,7 @@ Bool ns11_isTypeBase(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
     L8:;
     return false;
     L9:;
-    _sm_base7 = simse_addressOf(self->fn);
-    _sm_base6 = simse_addressOf(_sm_base7->statics);
+    _sm_base6 = simse_addressOf(_sm_base5->statics);
     _sm_expr2 = simse_dict_has((*_sm_base6), name);
     _sm_expr10 = !_sm_expr2;
     return _sm_expr10;
@@ -54385,8 +54146,7 @@ void ns11_ilListOfType(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, ns3_AstX
 }
 // src/linear/LinearFormExpr.kt
 Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNode* receiver, List<ns3_AstXmlNode> argNodes, Bool member) {
-    ns11_IlFunction* _sm_base1, * _sm_base6, * _sm_base11, * _sm_base21, * _sm_base31, * _sm_base43,
-        * _sm_base50, * _sm_base54;
+    ns11_IlFunction* _sm_base1, * _sm_base11, * _sm_base21, * _sm_base50, * _sm_base54;
     ns3_AstNodeAttributeKind _sm_base3;
     Dictionary<Str, List<Int>>* _sm_base4;
     ns18_SemFacts* _sm_base5, * _sm_base10, * _sm_base20, * _sm_base30, * _sm_base35, * _sm_base42,
@@ -54399,7 +54159,7 @@ Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNo
         * _sm_base57, * _sm_base58, * _sm_base59, * _sm_base61, * _sm_base62, * _sm_base64, * _sm_base65,
         * _sm_base68, * _sm_base69, * _sm_base70, * paramType;
     List<Int>* _sm_base17, * _sm_base46, * named;
-    List<Str>* _sm_base26, * _sm_base27, * _sm_base66, * _sm_base67, * _sm_base71, * _sm_base72;
+    List<Str>* _sm_base26, * _sm_base27, * _sm_base66, * _sm_base67, * _sm_base71;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base28, * _sm_base29, * _sm_base33, * _sm_base34, * _sm_base40,
         * _sm_base41;
     Str* _sm_base38, * _sm_base39, * _sm_base44, * _sm_base45;
@@ -54426,8 +54186,7 @@ Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNo
     L2:;
     _sm_base3 = ns3_AstNodeAttributeKind::Name;
     name = *(ns2_xmlAttr(callee, _sm_base3));
-    _sm_base6 = simse_addressOf(self->fn);
-    _sm_base5 = _sm_base6->facts;
+    _sm_base5 = _sm_base1->facts;
     _sm_base4 = simse_addressOf(_sm_base5->functionsByName);
     named = simse_dict_getPtr((*_sm_base4), name);
     _sm_expr2 = named == nullptr;
@@ -54514,13 +54273,12 @@ Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNo
     if (_sm_expr2) goto L20;
     goto L21;
     L20:;
-    _sm_base31 = simse_addressOf(self->fn);
-    _sm_base30 = _sm_base31->facts;
+    _sm_base30 = _sm_base21->facts;
     _sm_base29 = simse_addressOf(_sm_base30->types);
     _sm_base28 = _sm_base29;
     _sm_base32 = &pattern;
     ns18_semClassTypeName(&patternName, _sm_base28, _sm_base32);
-    _sm_base35 = _sm_base31->facts;
+    _sm_base35 = _sm_base21->facts;
     _sm_base34 = simse_addressOf(_sm_base35->types);
     _sm_base33 = _sm_base34;
     _sm_base37 = &recv;
@@ -54535,8 +54293,7 @@ Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNo
     _sm_expr2 = (!equals(simse_addressOf(_sm_expr24), __sm_stringTable[1475]));
     _sm_expr23 = _sm_expr2;
     if (!(_sm_expr23)) goto _sm_sc3;
-    _sm_base43 = simse_addressOf(self->fn);
-    _sm_base42 = _sm_base43->facts;
+    _sm_base42 = _sm_base21->facts;
     _sm_base41 = simse_addressOf(_sm_base42->types);
     _sm_base40 = _sm_base41;
     _sm_base44 = &recvName;
@@ -54675,8 +54432,7 @@ Int ns11_callTarget(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_AstXmlNo
     L47:;
     _sm_base69 = &paramPointee;
     _sm_base70 = &argType;
-    _sm_base72 = simse_addressOf(_sm_fact_4->templateParams);
-    _sm_base71 = _sm_base72;
+    _sm_base71 = _sm_base67;
     unify = ns18_semUnifyType(_sm_base69, _sm_base70, _sm_base71);
     L48:;
     t = t + 1;
@@ -54818,7 +54574,7 @@ void ns11_asConstruction(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, ns3_As
 }
 // src/linear/LinearFormExpr.kt
 void ns11_dataClassDecl(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, Str* name) {
-    ns11_IlFunction* _sm_base1, * _sm_base5;
+    ns11_IlFunction* _sm_base1;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base3;
     ns18_SemFacts* _sm_base4, * _sm_expr1;
     Str _sm_base6;
@@ -54840,8 +54596,7 @@ void ns11_dataClassDecl(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, Str* na
     *_sm_out = _sm_expr5;
     return;
     L2:;
-    _sm_base5 = simse_addressOf(self->fn);
-    _sm_base4 = _sm_base5->facts;
+    _sm_base4 = _sm_base1->facts;
     _sm_base3 = simse_addressOf(_sm_base4->types);
     _sm_base6 = *(name);
     decl = simse_dict_getPtr((*_sm_base3), _sm_base6);
@@ -55131,7 +54886,7 @@ Int ns11_convertArgument(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_Ast
     Dictionary<Str, ns3_AstXmlNode>* _sm_base17, * _sm_base18, * _sm_base22, * _sm_base23, * _sm_base29,
         * _sm_base30;
     ns18_SemFacts* _sm_base19, * _sm_base24, * _sm_base31;
-    ns11_IlFunction* _sm_base20, * _sm_base32;
+    ns11_IlFunction* _sm_base20;
     Str* _sm_base27, * _sm_base28, * _sm_base33, * _sm_base34, * _sm_base40, * _sm_base45, * _sm_base50,
         * _sm_expr19;
     ns11_IlOpKind _sm_base42, _sm_base52;
@@ -55282,8 +55037,7 @@ Int ns11_convertArgument(ns11_IlExtractor* self, ns3_AstXmlNode* callee, ns3_Ast
     _sm_expr1 = (!equals(simse_addressOf(_sm_expr40), __sm_stringTable[1475]));
     _sm_expr39 = _sm_expr1;
     if (!(_sm_expr39)) goto _sm_sc4;
-    _sm_base32 = simse_addressOf(self->fn);
-    _sm_base31 = _sm_base32->facts;
+    _sm_base31 = _sm_base20->facts;
     _sm_base30 = simse_addressOf(_sm_base31->types);
     _sm_base29 = _sm_base30;
     _sm_base33 = &givenName;
@@ -55472,10 +55226,10 @@ void ns11_setSlotType(ns11_IlExtractor* self, Int slot, ns3_AstXmlNode typeNode)
 }
 // src/linear/LinearFormFrame.kt
 Int ns11_typeIndex(ns11_IlExtractor* self, Str* text, ns3_AstXmlNode* node) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base19;
+    Dictionary<Str, Int>* _sm_base1;
     Str _sm_base2, _sm_base13, _sm_base20;
-    List<ns3_AstXmlNode>* _sm_base4, * _sm_base7, * _sm_base9, * _sm_base14;
-    ns11_IlBody* _sm_base5, * _sm_base8, * _sm_base10, * _sm_base12;
+    List<ns3_AstXmlNode>* _sm_base4, * _sm_base14;
+    ns11_IlBody* _sm_base5, * _sm_base12;
     ns3_AstXmlNode* _sm_base6, * existing;
     List<Str>* _sm_base11;
     ns3_AstXmlNode _sm_base16;
@@ -55499,17 +55253,13 @@ Int ns11_typeIndex(ns11_IlExtractor* self, Str* text, ns3_AstXmlNode* node) {
     if (_sm_expr1) goto L3;
     goto L7;
     L3:;
-    _sm_base8 = simse_addressOf(self->out);
-    _sm_base7 = simse_addressOf(_sm_base8->typeNodes);
-    _sm_base6 = simse_addressOf((*_sm_base7)[index]);
+    _sm_base6 = simse_addressOf((*_sm_base4)[index]);
     existing = _sm_base6;
     _sm_expr1 = ns2_xmlIsEmpty(existing);
     if (_sm_expr1) goto L6;
     goto L7;
     L6:;
-    _sm_base10 = simse_addressOf(self->out);
-    _sm_base9 = simse_addressOf(_sm_base10->typeNodes);
-    (*_sm_base9)[index] = *(node);
+    (*_sm_base4)[index] = *(node);
     L7:;
     return index;
     L2:;
@@ -55522,9 +55272,8 @@ Int ns11_typeIndex(ns11_IlExtractor* self, Str* text, ns3_AstXmlNode* node) {
     simse_list_append((*_sm_base14), _sm_base16);
     _sm_expr3 = simse_lenOf((*_sm_base11));
     _sm_expr7 = _sm_expr3 - 1;
-    _sm_base19 = simse_addressOf(self->typeAt);
     _sm_base20 = *(text);
-    simse_dict_insert((*_sm_base19), _sm_base20, _sm_expr7);
+    simse_dict_insert((*_sm_base1), _sm_base20, _sm_expr7);
     _sm_expr8 = simse_lenOf((*_sm_base11));
     _sm_expr9 = _sm_expr8 - 1;
     return _sm_expr9;
@@ -55541,7 +55290,7 @@ Int ns11_typeIndexText(ns11_IlExtractor* self, Str* text) {
 }
 // src/linear/LinearFormFrame.kt
 Int ns11_poolIndex(ns11_IlExtractor* self, Str* text) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base9;
+    Dictionary<Str, Int>* _sm_base1;
     Str _sm_base2, _sm_base6, _sm_base10;
     List<Str>* _sm_base4;
     ns11_IlBody* _sm_base5;
@@ -55564,16 +55313,15 @@ Int ns11_poolIndex(ns11_IlExtractor* self, Str* text) {
     simse_list_append((*_sm_base4), _sm_base6);
     _sm_expr2 = simse_lenOf((*_sm_base4));
     _sm_expr4 = _sm_expr2 - 1;
-    _sm_base9 = simse_addressOf(self->poolAt);
     _sm_base10 = *(text);
-    simse_dict_insert((*_sm_base9), _sm_base10, _sm_expr4);
+    simse_dict_insert((*_sm_base1), _sm_base10, _sm_expr4);
     _sm_expr5 = simse_lenOf((*_sm_base4));
     _sm_expr6 = _sm_expr5 - 1;
     return _sm_expr6;
 }
 // src/linear/LinearFormFrame.kt
 Int ns11_labelIndex(ns11_IlExtractor* self, Str* name) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base9;
+    Dictionary<Str, Int>* _sm_base1;
     Str _sm_base2, _sm_base6, _sm_base10;
     List<Str>* _sm_base4;
     ns11_IlBody* _sm_base5;
@@ -55596,9 +55344,8 @@ Int ns11_labelIndex(ns11_IlExtractor* self, Str* name) {
     simse_list_append((*_sm_base4), _sm_base6);
     _sm_expr2 = simse_lenOf((*_sm_base4));
     _sm_expr4 = _sm_expr2 - 1;
-    _sm_base9 = simse_addressOf(self->labelAt);
     _sm_base10 = *(name);
-    simse_dict_insert((*_sm_base9), _sm_base10, _sm_expr4);
+    simse_dict_insert((*_sm_base1), _sm_base10, _sm_expr4);
     _sm_expr5 = simse_lenOf((*_sm_base4));
     _sm_expr6 = _sm_expr5 - 1;
     return _sm_expr6;
@@ -55607,7 +55354,7 @@ Int ns11_labelIndex(ns11_IlExtractor* self, Str* name) {
 Int ns11_methodIndex(ns11_IlExtractor* self, Str* name, ns11_IlMethodKind kind, Int staticBase, Int returnType, List<Int>* argTypes, Bool recvIsValue, Str packageName) {
     Char* __sm_catP;
     Str _sm_base1, _sm_base4, _sm_expr1, _sm_expr2, _sm_expr4, _sm_expr5, key;
-    Dictionary<Str, Int>* _sm_base2, * _sm_base10;
+    Dictionary<Str, Int>* _sm_base2;
     List<Int> _sm_base5;
     List<ns11_IlMethod>* _sm_base6;
     ns11_IlBody* _sm_base7;
@@ -55678,8 +55425,7 @@ Int ns11_methodIndex(ns11_IlExtractor* self, Str* name, ns11_IlMethodKind kind, 
     simse_list_append((*_sm_base6), _sm_expr15);
     _sm_expr13 = simse_lenOf((*_sm_base6));
     _sm_expr17 = _sm_expr13 - 1;
-    _sm_base10 = simse_addressOf(self->methodAt);
-    simse_dict_insert((*_sm_base10), key, _sm_expr17);
+    simse_dict_insert((*_sm_base2), key, _sm_expr17);
     _sm_expr18 = simse_lenOf((*_sm_base6));
     _sm_expr19 = _sm_expr18 - 1;
     return _sm_expr19;
@@ -55795,12 +55541,12 @@ ns18_SemBody* ns11_bodyContext(ns11_IlExtractor* self) {
     ns18_SemBody* _sm_base1, * _sm_base4, * _sm_base7, * _sm_base10, * _sm_base13, * _sm_base16,
         * _sm_base19, * _sm_base24, * _sm_base27, * _sm_expr2;
     ns3_AstXmlNode _sm_base2, _sm_base5, _sm_base8, _sm_base28;
-    ns11_IlFunction* _sm_base3, * _sm_base26, * _sm_base31;
+    ns11_IlFunction* _sm_base3;
     List<Str> _sm_base11, _sm_base14;
     List<ns3_AstXmlNode> _sm_base17;
     Dictionary<Str, ns3_AstXmlNode> _sm_base20;
     ns3_AstXmlNode* _sm_base22, * _sm_base23;
-    Str* _sm_base25, * _sm_base29, * _sm_base30;
+    Str* _sm_base25, * _sm_base29;
     Bool _sm_expr1;
     _sm_expr1 = self->typeContextReady;
     if (_sm_expr1) goto L1;
@@ -55838,14 +55584,11 @@ ns18_SemBody* ns11_bodyContext(ns11_IlExtractor* self) {
     if (_sm_expr1) goto L5;
     goto L4;
     L5:;
-    _sm_base26 = simse_addressOf(self->fn);
-    _sm_base25 = simse_addressOf(_sm_base26->closureSymbol);
+    _sm_base25 = simse_addressOf(_sm_base3->closureSymbol);
     _sm_expr1 = isEmpty(_sm_base25);
     if (_sm_expr1) goto L4;
     _sm_base27 = self->typeContext;
-    _sm_base31 = simse_addressOf(self->fn);
-    _sm_base30 = simse_addressOf(_sm_base31->closureSymbol);
-    _sm_base29 = _sm_base30;
+    _sm_base29 = _sm_base25;
     ns11_ilNamedTypeNode(&_sm_base28, _sm_base29);
     _sm_base27->selfType = _sm_base28;
     L4:;
@@ -55856,8 +55599,8 @@ ns18_SemBody* ns11_bodyContext(ns11_IlExtractor* self) {
 // src/linear/LinearFormFrame.kt
 Dictionary<Str, ns3_AstXmlNode>* ns11_frameTypes(ns11_IlExtractor* self) {
     Dictionary<Str, ns3_AstXmlNode>* _sm_base1, * _sm_base7, * _sm_base12, * _sm_expr6;
-    List<ns11_IlVar>* _sm_base2, * _sm_base10;
-    ns11_IlBody* _sm_base3, * _sm_base4, * _sm_base5, * _sm_base11;
+    List<ns11_IlVar>* _sm_base2;
+    ns11_IlBody* _sm_base3, * _sm_base4;
     ns3_AstXmlNode* _sm_base6;
     Str _sm_base8;
     ns11_IlVar* _sm_base9;
@@ -55877,8 +55620,7 @@ Dictionary<Str, ns3_AstXmlNode>* ns11_frameTypes(ns11_IlExtractor* self) {
     _sm_expr2 = simse_lenOf((*_sm_base2));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L4;
-    _sm_base5 = simse_addressOf(self->out);
-    _sm_base4 = _sm_base5;
+    _sm_base4 = _sm_base3;
     ns11_ilVarType(&typeNode, _sm_base4, i);
     _sm_base6 = &typeNode;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base6);
@@ -55887,9 +55629,7 @@ Dictionary<Str, ns3_AstXmlNode>* ns11_frameTypes(ns11_IlExtractor* self) {
     goto L6;
     L5:;
     _sm_base7 = simse_addressOf(self->frameNames);
-    _sm_base11 = simse_addressOf(self->out);
-    _sm_base10 = simse_addressOf(_sm_base11->vars);
-    _sm_base9 = simse_addressOf((*_sm_base10)[i]);
+    _sm_base9 = simse_addressOf((*_sm_base2)[i]);
     _sm_base8 = _sm_base9->name;
     simse_dict_insert((*_sm_base7), _sm_base8, typeNode);
     L6:;
@@ -55904,7 +55644,7 @@ Dictionary<Str, ns3_AstXmlNode>* ns11_frameTypes(ns11_IlExtractor* self) {
 }
 // src/linear/LinearFormFrame.kt
 void ns11_exprType(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, ns3_AstXmlNode* e) {
-    ns11_IlFunction* _sm_base1, * _sm_base4;
+    ns11_IlFunction* _sm_base1;
     ns18_SemFacts* _sm_base3, * _sm_expr1;
     Bool _sm_expr2;
     ns3_AstXmlNode _sm_expr3;
@@ -55922,8 +55662,7 @@ void ns11_exprType(ns3_AstXmlNode* _sm_out, ns11_IlExtractor* self, ns3_AstXmlNo
     L2:;
     _sm_expr4 = ns11_bodyContext(self);
     _sm_expr5 = ns11_frameTypes(self);
-    _sm_base4 = simse_addressOf(self->fn);
-    _sm_base3 = _sm_base4->facts;
+    _sm_base3 = _sm_base1->facts;
     ns18_semTypeOfExpr(&_sm_expr3, e, _sm_base3, _sm_expr4, _sm_expr5);
     *_sm_out = _sm_expr3;
     return;
@@ -55993,9 +55732,9 @@ Int ns11_literalOperand(ns11_IlExtractor* self, Str* text) {
 }
 // src/linear/LinearFormFrame.kt
 void ns11_begin(ns11_IlExtractor* self, Str* file) {
-    ns11_IlBody* _sm_base1, * _sm_base5, * _sm_base6, * _sm_base11, * _sm_base20, * _sm_base22;
-    ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base8, * _sm_base9, * _sm_expr4;
-    ns11_IlFunction* _sm_base4, * _sm_base10, * _sm_base13, * _sm_base18;
+    ns11_IlBody* _sm_base1, * _sm_base20, * _sm_base22;
+    ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base8, * _sm_expr4;
+    ns11_IlFunction* _sm_base4, * _sm_base18;
     Int _sm_base7;
     Str _sm_base12, _sm_base23, declaredType;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base14, * _sm_base17, * _sm_base19;
@@ -56014,22 +55753,16 @@ void ns11_begin(ns11_IlExtractor* self, Str* file) {
     if (_sm_expr1) goto L1;
     goto L2;
     L1:;
-    _sm_base5 = simse_addressOf(self->out);
-    _sm_base5->line = 0;
+    _sm_base1->line = 0;
     goto L3;
     L2:;
-    _sm_base6 = simse_addressOf(self->out);
-    _sm_base10 = simse_addressOf(self->fn);
-    _sm_base9 = simse_addressOf(_sm_base10->decl);
-    _sm_base8 = _sm_base9;
+    _sm_base8 = _sm_base3;
     _sm_base7 = ns2_xmlLine(_sm_base8);
-    _sm_base6->line = _sm_base7;
+    _sm_base1->line = _sm_base7;
     L3:;
-    _sm_base11 = simse_addressOf(self->out);
-    _sm_base13 = simse_addressOf(self->fn);
-    _sm_base12 = _sm_base13->symbol;
-    _sm_base11->symbol = _sm_base12;
-    _sm_base14 = _sm_base13->inferredTypes;
+    _sm_base12 = _sm_base4->symbol;
+    _sm_base1->symbol = _sm_base12;
+    _sm_base14 = _sm_base4->inferredTypes;
     declaredTypes = simse_dict_keys((*_sm_base14));
     _sm_base16 = &declaredTypes;
     _sm_expr2 = simse_spanOf(_sm_base16);
@@ -56054,11 +55787,11 @@ void ns11_begin(ns11_IlExtractor* self, Str* file) {
 }
 // src/linear/LinearFormFrame.kt
 ns11_IlBody ns11_run(ns11_IlExtractor* self, List<ns3_AstXmlNode>* body) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base4, * _sm_base7, * _sm_base13, * _sm_base16;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base7, * _sm_base13;
     Int _sm_base3, _sm_base6, _sm_base15, _sm_expr1, i;
     ns11_IlOpKind _sm_base5;
-    List<ns11_IlOp>* _sm_base8, * _sm_base11;
-    ns11_IlBody* _sm_base9, * _sm_base12, * _sm_base14, * _sm_base17, * _sm_base18;
+    List<ns11_IlOp>* _sm_base8;
+    ns11_IlBody* _sm_base9, * _sm_base14;
     ns11_IlOp _sm_base10, _sm_expr6;
     Bool _sm_expr2;
     List<ns11_IlOp> ops;
@@ -56079,8 +55812,7 @@ ns11_IlBody ns11_run(ns11_IlExtractor* self, List<ns3_AstXmlNode>* body) {
     _sm_expr1 = simse_lenOf((*_sm_base2));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L4;
-    _sm_base4 = simse_addressOf(self->hoisted);
-    _sm_base3 = (*_sm_base4)[i];
+    _sm_base3 = (*_sm_base2)[i];
     ns11_ilOps1(&_sm_expr5, _sm_base3);
     _sm_base5 = ns11_IlOpKind::Declare;
     _sm_expr6 = ns11_IlOp{_sm_base5, _sm_expr5};
@@ -56098,9 +55830,7 @@ ns11_IlBody ns11_run(ns11_IlExtractor* self, List<ns3_AstXmlNode>* body) {
     _sm_expr1 = simse_lenOf((*_sm_base8));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L6;
-    _sm_base12 = simse_addressOf(self->out);
-    _sm_base11 = simse_addressOf(_sm_base12->ops);
-    _sm_base10 = (*_sm_base11)[i];
+    _sm_base10 = (*_sm_base8)[i];
     simse_list_append(ops, _sm_base10);
     i = i + 1;
     goto L5;
@@ -56112,16 +55842,13 @@ ns11_IlBody ns11_run(ns11_IlExtractor* self, List<ns3_AstXmlNode>* body) {
     _sm_expr1 = simse_lenOf((*_sm_base13));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L8;
-    _sm_base17 = simse_addressOf(self->out);
-    _sm_base16 = simse_addressOf(_sm_base17->lines);
-    _sm_base15 = (*_sm_base16)[i];
+    _sm_base15 = (*_sm_base13)[i];
     simse_list_append(lines, _sm_base15);
     i = i + 1;
     goto L7;
     L8:;
-    _sm_base18 = simse_addressOf(self->out);
-    _sm_base18->ops = ops;
-    _sm_base18->lines = lines;
+    _sm_base14->ops = ops;
+    _sm_base14->lines = lines;
     L2:;
     _sm_expr11 = self->out;
     return _sm_expr11;
@@ -56129,19 +55856,18 @@ ns11_IlBody ns11_run(ns11_IlExtractor* self, List<ns3_AstXmlNode>* body) {
 // src/linear/LinearFormFrame.kt
 void ns11_buildFrame(ns11_IlExtractor* self) {
     Char* __sm_catP;
-    Str* _sm_base1, * _sm_base6, * _sm_base7, * _sm_base9, * _sm_base11, * _sm_base17, * _sm_base18,
-        * _sm_base21, * _sm_base23, * _sm_base34, * _sm_base35, * _sm_base38, * _sm_base50, * _sm_base52,
-        * _sm_base62, * _sm_base63, * _sm_base65, * _sm_base68, * _sm_base69;
-    ns11_IlFunction* _sm_base2, * _sm_base5, * _sm_base8, * _sm_base16, * _sm_base27, * _sm_base29,
-        * _sm_base31, * _sm_base37, * _sm_base43, * _sm_base46, * _sm_base57;
+    Str* _sm_base1, * _sm_base6, * _sm_base9, * _sm_base11, * _sm_base17, * _sm_base21, * _sm_base23,
+        * _sm_base34, * _sm_base35, * _sm_base38, * _sm_base50, * _sm_base52, * _sm_base62, * _sm_base63,
+        * _sm_base65, * _sm_base68, * _sm_base69;
+    ns11_IlFunction* _sm_base2, * _sm_base27, * _sm_base43;
     ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base15, * _sm_base20, * _sm_base25, * _sm_base32,
-        * _sm_base33, * _sm_base40, * _sm_base41, * _sm_base42, * _sm_base44, * _sm_base45, * _sm_base47,
-        * _sm_base54, * _sm_base55, * _sm_base56, * _sm_base59, * _sm_base67, * param, * typeNode;
+        * _sm_base33, * _sm_base40, * _sm_base41, * _sm_base42, * _sm_base44, * _sm_base47, * _sm_base54,
+        * _sm_base55, * _sm_base56, * _sm_base59, * _sm_base67, * param, * typeNode;
     Str _sm_base10, _sm_base22, _sm_base51, _sm_base64, _sm_expr5, _sm_expr6, text, _sm_expr17, name,
         selfText, _sm_text_2;
     ns11_IlVarKind _sm_base14, _sm_base24, _sm_base39, _sm_base53, _sm_base66, _sm_base70;
-    List<Str>* _sm_base26, * _sm_base36;
-    List<ns3_AstXmlNode>* _sm_base28, * _sm_base30;
+    List<Str>* _sm_base26;
+    List<ns3_AstXmlNode>* _sm_base28;
     ns3_AstNodeKind _sm_base58, _sm_base61;
     ns3_AstNodeAttributeKind _sm_base60;
     Bool _sm_expr1, _sm_expr2, hasSelf;
@@ -56156,34 +55882,29 @@ void ns11_buildFrame(ns11_IlExtractor* self) {
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base5 = simse_addressOf(self->fn);
-    _sm_base4 = simse_addressOf(_sm_base5->selfDecl);
+    _sm_base4 = simse_addressOf(_sm_base2->selfDecl);
     _sm_base3 = _sm_base4;
     _sm_expr1 = ns2_xmlIsEmpty(_sm_base3);
     if (_sm_expr1) goto L3;
     goto L4;
     L3:;
-    _sm_base8 = simse_addressOf(self->fn);
-    _sm_base7 = simse_addressOf(_sm_base8->closureSymbol);
-    _sm_base6 = _sm_base7;
+    _sm_base6 = _sm_base1;
     ns11_ilNamedTypeNode(&_sm_expr4, _sm_base6);
     _sm_base10 = __sm_stringTable[1280];
     _sm_base9 = &_sm_base10;
-    _sm_base11 = _sm_base7;
+    _sm_base11 = _sm_base1;
     _sm_base14 = ns11_IlVarKind::Argument;
     _sm_base15 = &_sm_expr4;
     ns11_addVar(self, _sm_base9, _sm_base11, _sm_base14, _sm_base15);
     goto L5;
     L4:;
-    _sm_base16 = simse_addressOf(self->fn);
-    _sm_expr5 = _sm_base16->closureSymbol;
+    _sm_expr5 = _sm_base2->closureSymbol;
     _sm_expr6.resize(1 + _sm_expr5.size());
     __sm_catP = simse_str_data(&_sm_expr6);
     *__sm_catP = (char) ('*');
     __sm_catP = __sm_catP + 1;
     std::memcpy(__sm_catP, _sm_expr5.data(), _sm_expr5.size());
-    _sm_base18 = simse_addressOf(_sm_base16->closureSymbol);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base1;
     ns11_ilNamedTypeNode(&_sm_expr7, _sm_base17);
     _sm_base20 = &_sm_expr7;
     ns11_ilPointerNode(&_sm_expr8, _sm_base20);
@@ -56202,16 +55923,13 @@ void ns11_buildFrame(ns11_IlExtractor* self) {
     _sm_expr1 = _sm_i_2 < _sm_expr9;
     if (!(_sm_expr1)) goto L7;
     ns2_xmlEmptyNode(&paramType);
-    _sm_base29 = simse_addressOf(self->fn);
-    _sm_base28 = simse_addressOf(_sm_base29->paramTypes);
+    _sm_base28 = simse_addressOf(_sm_base27->paramTypes);
     _sm_expr9 = simse_lenOf((*_sm_base28));
     _sm_expr1 = _sm_i_2 < _sm_expr9;
     if (_sm_expr1) goto L8;
     goto L9;
     L8:;
-    _sm_base31 = simse_addressOf(self->fn);
-    _sm_base30 = simse_addressOf(_sm_base31->paramTypes);
-    paramType = (*_sm_base30)[_sm_i_2];
+    paramType = (*_sm_base28)[_sm_i_2];
     L9:;
     text = __sm_stringTable[1455];
     _sm_base32 = &paramType;
@@ -56223,9 +55941,7 @@ void ns11_buildFrame(ns11_IlExtractor* self) {
     _sm_base33 = &paramType;
     ns11_ilTypeText(&text, _sm_base33);
     L11:;
-    _sm_base37 = simse_addressOf(self->fn);
-    _sm_base36 = simse_addressOf(_sm_base37->paramNames);
-    _sm_base35 = simse_addressOf((*_sm_base36)[_sm_i_2]);
+    _sm_base35 = simse_addressOf((*_sm_base26)[_sm_i_2]);
     _sm_base34 = _sm_base35;
     _sm_base38 = &text;
     _sm_base39 = ns11_IlVarKind::Argument;
@@ -56245,11 +55961,9 @@ void ns11_buildFrame(ns11_IlExtractor* self) {
     if (_sm_expr2) goto L12;
     goto L13;
     L12:;
-    _sm_base46 = simse_addressOf(self->fn);
-    _sm_base45 = simse_addressOf(_sm_base46->receiver);
-    _sm_base44 = _sm_base45;
+    _sm_base44 = _sm_base42;
     ns11_ilReceiverTypeText(&_sm_expr17, _sm_base44);
-    _sm_base47 = _sm_base45;
+    _sm_base47 = _sm_base42;
     ns11_ilReceiverTypeNode(&_sm_expr18, _sm_base47);
     _sm_base51 = __sm_stringTable[1280];
     _sm_base50 = &_sm_base51;
@@ -56259,8 +55973,7 @@ void ns11_buildFrame(ns11_IlExtractor* self) {
     ns11_addVar(self, _sm_base50, _sm_base52, _sm_base53, _sm_base54);
     hasSelf = true;
     L13:;
-    _sm_base57 = simse_addressOf(self->fn);
-    _sm_base56 = simse_addressOf(_sm_base57->decl);
+    _sm_base56 = simse_addressOf(_sm_base43->decl);
     _sm_base55 = _sm_base56;
     _sm_base58 = ns3_AstNodeKind::Param;
     ns2_xmlChildren(&params, _sm_base55, _sm_base58);
@@ -56325,8 +56038,8 @@ void ns11_signatureText(Str* _sm_out, ns11_IlExtractor* self) {
     Str* _sm_base4, * _sm_base7, * _sm_base20, * typesText, * slotNameText;
     List<Str>* _sm_base5, * _sm_base19;
     Str _sm_base9, _sm_base10, _sm_base21, _sm_expr7, retText, joinStrsText, _sm_expr12;
-    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base15, * _sm_base16, * declared;
-    ns11_IlFunction* _sm_base14, * _sm_base17;
+    ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base15, * declared;
+    ns11_IlFunction* _sm_base14;
     ns3_AstNodeKind _sm_base18;
     List<Str> params;
     Span<ns11_IlVar> _sm_expr1;
@@ -56379,9 +56092,7 @@ void ns11_signatureText(Str* _sm_out, ns11_IlExtractor* self) {
     if (_sm_expr9) goto L5;
     goto L8;
     L5:;
-    _sm_base17 = simse_addressOf(self->fn);
-    _sm_base16 = simse_addressOf(_sm_base17->decl);
-    _sm_base15 = _sm_base16;
+    _sm_base15 = _sm_base13;
     _sm_base18 = ns3_AstNodeKind::ReturnType;
     declared = ns2_xmlChildPtr(_sm_base15, _sm_base18);
     _sm_expr2 = ns2_xmlIsEmpty(declared);
@@ -57212,8 +56923,8 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     Char* __sm_catP;
     Int _sm_base1, _sm_base14, _sm_base34, _sm_base38, _sm_base39, _sm_base56, i, _sm_expr13, j,
         sourceLine;
-    List<Str>* _sm_base2, * _sm_base4, * _sm_base9, * _sm_base20, * _sm_base21, * _sm_base24,
-        * _sm_base28, * _sm_base41, * _sm_base42, * _sm_base44, * _sm_base49, * _sm_base55, * _sm_base59;
+    List<Str>* _sm_base2, * _sm_base9, * _sm_base20, * _sm_base21, * _sm_base28, * _sm_base41,
+        * _sm_base42, * _sm_base49, * _sm_base55, * _sm_base59;
     Str* _sm_base3, * _sm_base8, * _sm_base13, * _sm_base19, * _sm_base22, * _sm_base23, * _sm_base27,
         * _sm_base32, * _sm_base40, * _sm_base43, * _sm_base48, * _sm_base60, * typesText, * slotNameText,
         * methodNameText2, * labelsText;
@@ -57223,16 +56934,16 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
         ilIntTextText4, ilMethodKindTextText, ilIntTextText5, text, ilIntTextText6, _sm_expr34, _sm_expr41,
         _sm_expr42, ilPadRightText, _sm_expr43, ilPadRightText2, joinStrsText, _sm_text_2, comment,
         ilPadRightText3, out;
-    List<ns11_IlVar>* _sm_base10, * _sm_base12;
+    List<ns11_IlVar>* _sm_base10;
     ns11_IlVar* _sm_base11, * slot;
     ns11_IlVarKind _sm_base15;
-    List<ns11_IlMethod>* _sm_base29, * _sm_base31;
+    List<ns11_IlMethod>* _sm_base29;
     ns11_IlMethod* _sm_base30, * method;
     ns11_IlMethodKind _sm_base33;
-    List<ns11_IlOp>* _sm_base50, * _sm_base51;
+    List<ns11_IlOp>* _sm_base50;
     ns11_IlOpKind _sm_base52, _sm_base58;
     ns11_IlSignature* _sm_base53;
-    List<Int>* _sm_base54, * _sm_base57, * _sm_base67, * _sm_base68;
+    List<Int>* _sm_base54, * _sm_base67;
     ns11_IlOp* _sm_base64;
     List<Str> types, vars, pool, methods, labels, tokens, rendered;
     Bool _sm_expr14, _sm_expr45;
@@ -57289,8 +57000,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L2;
     ns11_ilIntText(&ilIntTextText2, i);
-    _sm_base4 = simse_addressOf(body->types);
-    _sm_base3 = simse_addressOf((*_sm_base4)[i]);
+    _sm_base3 = simse_addressOf((*_sm_base2)[i]);
     typesText = _sm_base3;
     _sm_base6 = *(typesText);
     _sm_expr15.resize(1 + ilIntTextText2.size() + _sm_base6.size());
@@ -57314,8 +57024,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr13 = simse_lenOf((*_sm_base10));
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L4;
-    _sm_base12 = simse_addressOf(body->vars);
-    _sm_base11 = simse_addressOf((*_sm_base12)[i]);
+    _sm_base11 = simse_addressOf((*_sm_base10)[i]);
     slot = _sm_base11;
     ns11_ilIntText(&indexText, i);
     _sm_base13 = simse_addressOf(slot->name);
@@ -57355,8 +57064,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L6;
     ns11_ilIntText(&ilIntTextText3, i);
-    _sm_base24 = simse_addressOf(body->pool);
-    _sm_base23 = simse_addressOf((*_sm_base24)[i]);
+    _sm_base23 = simse_addressOf((*_sm_base21)[i]);
     _sm_base22 = _sm_base23;
     ns11_ilPoolAsText(&ilPoolAsTextText, _sm_base22);
     _sm_expr21.resize(1 + ilIntTextText3.size() + ilPoolAsTextText.size());
@@ -57380,8 +57088,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr13 = simse_lenOf((*_sm_base29));
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L8;
-    _sm_base31 = simse_addressOf(body->methods);
-    _sm_base30 = simse_addressOf((*_sm_base31)[i]);
+    _sm_base30 = simse_addressOf((*_sm_base29)[i]);
     method = _sm_base30;
     ns11_ilIntText(&ilIntTextText4, i);
     _sm_base32 = simse_addressOf(method->name);
@@ -57457,8 +57164,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L14;
     ns11_ilIntText(&ilIntTextText6, i);
-    _sm_base44 = simse_addressOf(body->labels);
-    _sm_base43 = simse_addressOf((*_sm_base44)[i]);
+    _sm_base43 = simse_addressOf((*_sm_base42)[i]);
     labelsText = _sm_base43;
     _sm_base46 = *(labelsText);
     _sm_expr34.resize(1 + ilIntTextText6.size() + _sm_base46.size());
@@ -57481,8 +57187,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     _sm_expr13 = simse_lenOf((*_sm_base50));
     _sm_expr14 = i < _sm_expr13;
     if (!(_sm_expr14)) goto L16;
-    _sm_base51 = simse_addressOf(body->ops);
-    op = (*_sm_base51)[i];
+    op = (*_sm_base50)[i];
     _sm_base52 = op.kind;
     ns11_ilSignature(&signature, _sm_base52);
     tokens = List<Str>();
@@ -57503,8 +57208,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     if (!(_sm_expr14)) goto L20;
     _sm_base55 = &tokens;
     ns11_ilOperandKindAt(&_sm_expr40, _sm_base55, j);
-    _sm_base57 = simse_addressOf(op.operands);
-    _sm_base56 = (*_sm_base57)[j];
+    _sm_base56 = (*_sm_base54)[j];
     ns11_ilRenderOperand(&_sm_expr41, body, _sm_expr40, _sm_base56);
     simse_list_append(rendered, _sm_expr41);
     j = j + 1;
@@ -57551,8 +57255,7 @@ void ns11_printIlBody(Str* _sm_out, ns11_IlBody* body) {
     if (_sm_expr14) goto L23;
     goto L24;
     L23:;
-    _sm_base68 = simse_addressOf(body->lines);
-    sourceLine = (*_sm_base68)[i];
+    sourceLine = (*_sm_base67)[i];
     L24:;
     _sm_expr14 = sourceLine > 0;
     if (_sm_expr14) goto L25;
@@ -57600,7 +57303,7 @@ void ns11_printIlUnit(Str* _sm_out, ns11_IlUnit* unit) {
     List<Str>* _sm_base5, * _sm_base6;
     Str* _sm_base7;
     Str _sm_base8, out, _sm_expr3, _sm_expr4, _sm_expr6, _sm_expr7, _sm_expr9, _sm_expr10;
-    List<ns11_IlBody>* _sm_base9, * _sm_base12;
+    List<ns11_IlBody>* _sm_base9;
     Span<ns11_IlClosure> _sm_expr1;
     Span_iterValues_yieldable<ns11_IlClosure> _sm_for2;
     Bool _sm_expr2;
@@ -57663,8 +57366,7 @@ void ns11_printIlUnit(Str* _sm_out, ns11_IlUnit* unit) {
     goto L1;
     L3:;
     _sm_expr12 = closure.bodyIndex;
-    _sm_base12 = simse_addressOf(unit->lambdas);
-    _sm_base11 = simse_addressOf((*_sm_base12)[_sm_expr12]);
+    _sm_base11 = simse_addressOf((*_sm_base9)[_sm_expr12]);
     _sm_base10 = _sm_base11;
     ns11_printIlBody(&_sm_expr3, _sm_base10);
     __sm_catAt = out.size();
@@ -59106,7 +58808,7 @@ void ns11_ilPoolText(Str* _sm_out, ns11_IlBody* body, Int index) {
 // src/linear/LinearFormSig.kt
 void ns11_ilVarName(Str* _sm_out, ns11_IlBody* body, Int index) {
     Char* __sm_catP;
-    List<ns11_IlVar>* _sm_base1, * _sm_base3;
+    List<ns11_IlVar>* _sm_base1;
     ns11_IlVar* _sm_base2;
     Bool _sm_expr1;
     Int _sm_expr2, _sm_expr3;
@@ -59136,8 +58838,7 @@ void ns11_ilVarName(Str* _sm_out, ns11_IlBody* body, Int index) {
     *_sm_out = _sm_expr8;
     return;
     L4:;
-    _sm_base3 = simse_addressOf(body->vars);
-    _sm_base2 = simse_addressOf((*_sm_base3)[index]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[index]);
     _sm_expr4 = _sm_base2->name;
     *_sm_out = _sm_expr4;
     return;
@@ -59706,12 +59407,12 @@ void ns11_assign(ns11_IlExtractor* self, ns3_AstXmlNode* stmt, ns3_AstXmlNode* t
     Str* _sm_base2, * _sm_base6, * _sm_base8, * _sm_base25, * _sm_base26, * _sm_base33, * _sm_base36,
         * _sm_base46;
     Dictionary<Str, Bool>* _sm_base4;
-    ns11_IlFunction* _sm_base5, * _sm_base12, * _sm_base14, * _sm_base16;
+    ns11_IlFunction* _sm_base5, * _sm_base12;
     Str _sm_base7, _sm_base47, op, name, _sm_expr11, _sm_expr20, fieldName, baseText, _sm_expr32;
     ns11_IlOpKind _sm_base9, _sm_base23, _sm_base27, _sm_base34, _sm_base37, _sm_base41, _sm_base44;
     List<Int>* _sm_base10, * _sm_base24, * _sm_base28, * _sm_base35, * _sm_base38, * _sm_base42,
         * _sm_base45;
-    List<Str>* _sm_base11, * _sm_base13;
+    List<Str>* _sm_base11;
     List<ns3_AstXmlNode>* _sm_base15;
     ns3_AstXmlNode* _sm_base17, * _sm_base18, * _sm_base19, * _sm_base20, * _sm_base21, * _sm_base22,
         * lhs, * _sm_expr42, * _sm_expr44, * _sm_expr50;
@@ -59766,15 +59467,12 @@ void ns11_assign(ns11_IlExtractor* self, ns3_AstXmlNode* stmt, ns3_AstXmlNode* t
     _sm_expr9 = simse_lenOf((*_sm_base11));
     _sm_expr1 = handleAt < _sm_expr9;
     if (!(_sm_expr1)) goto L8;
-    _sm_base14 = simse_addressOf(self->fn);
-    _sm_base13 = simse_addressOf(_sm_base14->paramNames);
-    _sm_expr11 = (*_sm_base13)[handleAt];
+    _sm_expr11 = (*_sm_base11)[handleAt];
     _sm_expr1 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr11))), simse_spanOfStr(simse_addressOf(name)));
     if (_sm_expr1) goto L9;
     goto L10;
     L9:;
-    _sm_base16 = simse_addressOf(self->fn);
-    _sm_base15 = simse_addressOf(_sm_base16->paramTypes);
+    _sm_base15 = simse_addressOf(_sm_base12->paramTypes);
     paramType = (*_sm_base15)[handleAt];
     _sm_base17 = &paramType;
     ns2_xmlKind(&paramKind, _sm_base17);
@@ -59916,13 +59614,13 @@ void ns11_assignCompound(ns11_IlExtractor* self, ns3_AstXmlNode* target, Str op,
         * _sm_base54, * _sm_base57, * _sm_base71;
     ns3_AstNodeAttributeKind _sm_base2, _sm_base23, _sm_base51;
     Dictionary<Str, Bool>* _sm_base3, * _sm_base18;
-    ns11_IlFunction* _sm_base4, * _sm_base11, * _sm_base13, * _sm_base15, * _sm_base19;
+    ns11_IlFunction* _sm_base4, * _sm_base11;
     Str _sm_base6, _sm_base72, binOp, name, _sm_expr8, fieldName, baseText, _sm_expr37;
     ns11_IlOpKind _sm_base8, _sm_base38, _sm_base41, _sm_base45, _sm_base48, _sm_base55, _sm_base58,
         _sm_base62, _sm_base64, _sm_base67, _sm_base69;
     List<Int>* _sm_base9, * _sm_base39, * _sm_base42, * _sm_base46, * _sm_base49, * _sm_base56,
         * _sm_base59, * _sm_base63, * _sm_base65, * _sm_base68, * _sm_base70;
-    List<Str>* _sm_base10, * _sm_base12;
+    List<Str>* _sm_base10;
     List<ns3_AstXmlNode>* _sm_base14;
     ns3_AstXmlNode* _sm_base16, * _sm_base25, * _sm_base29, * _sm_base31, * _sm_base32, * _sm_base35,
         * _sm_base37, * _sm_base40, * lhs, * _sm_expr44, * _sm_expr45, * _sm_expr51;
@@ -59978,15 +59676,12 @@ void ns11_assignCompound(ns11_IlExtractor* self, ns3_AstXmlNode* target, Str op,
     _sm_expr6 = simse_lenOf((*_sm_base10));
     _sm_expr2 = handleAt < _sm_expr6;
     if (!(_sm_expr2)) goto L6;
-    _sm_base13 = simse_addressOf(self->fn);
-    _sm_base12 = simse_addressOf(_sm_base13->paramNames);
-    _sm_expr8 = (*_sm_base12)[handleAt];
+    _sm_expr8 = (*_sm_base10)[handleAt];
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr8))), simse_spanOfStr(simse_addressOf(name)));
     if (_sm_expr2) goto L7;
     goto L8;
     L7:;
-    _sm_base15 = simse_addressOf(self->fn);
-    _sm_base14 = simse_addressOf(_sm_base15->paramTypes);
+    _sm_base14 = simse_addressOf(_sm_base11->paramTypes);
     paramType = (*_sm_base14)[handleAt];
     _sm_base16 = &paramType;
     ns2_xmlKind(&paramKind, _sm_base16);
@@ -60004,8 +59699,7 @@ void ns11_assignCompound(ns11_IlExtractor* self, ns3_AstXmlNode* target, Str op,
     if (_sm_expr2) goto L14;
     goto L13;
     L14:;
-    _sm_base19 = simse_addressOf(self->fn);
-    _sm_base18 = simse_addressOf(_sm_base19->plusAssignParams);
+    _sm_base18 = simse_addressOf(_sm_base11->plusAssignParams);
     _sm_expr2 = simse_dict_has((*_sm_base18), name);
     if (_sm_expr2) goto L12;
     goto L13;
@@ -61193,7 +60887,7 @@ Int ns11_receiverOf(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
 Int ns11_nameOf(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
     ns3_AstNodeAttributeKind _sm_base1;
     Dictionary<Str, Bool>* _sm_base2;
-    ns11_IlFunction* _sm_base3, * _sm_base5, * _sm_base20;
+    ns11_IlFunction* _sm_base3;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base4;
     Str* _sm_base7, * _sm_base9, * _sm_base11, * _sm_base14, * _sm_base15, * _sm_base17, * _sm_base23,
         * _sm_base25, * staticType;
@@ -61217,8 +60911,7 @@ Int ns11_nameOf(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
     L1:;
     text = __sm_stringTable[1455];
     ns2_xmlEmptyNode(&captureNode);
-    _sm_base5 = simse_addressOf(self->fn);
-    _sm_base4 = simse_addressOf(_sm_base5->captureTypes);
+    _sm_base4 = simse_addressOf(_sm_base3->captureTypes);
     capturedType = simse_dict_getPtr((*_sm_base4), name);
     _sm_expr1 = capturedType != nullptr;
     if (_sm_expr1) goto L3;
@@ -61271,8 +60964,7 @@ Int ns11_nameOf(ns11_IlExtractor* self, ns3_AstXmlNode* e) {
     if (_sm_expr1) goto L11;
     goto L12;
     L11:;
-    _sm_base20 = simse_addressOf(self->fn);
-    _sm_base19 = simse_addressOf(_sm_base20->statics);
+    _sm_base19 = simse_addressOf(_sm_base3->statics);
     staticType = simse_dict_getPtr((*_sm_base19), name);
     _sm_expr1 = staticType != nullptr;
     if (_sm_expr1) goto L13;
@@ -61327,9 +61019,9 @@ Int ns11_ilConcatDst(ns11_IlOp* op) {
 // src/linear/MergeConcat.kt
 void ns11_ilConcatUseCounts(List<Int>* _sm_out, ns11_IlBody* il) {
     List<ns11_IlVar>* _sm_base1;
-    List<ns11_IlOp>* _sm_base2, * _sm_base4;
+    List<ns11_IlOp>* _sm_base2;
     ns11_IlOp* _sm_base3, * op;
-    List<Int>* _sm_base5, * _sm_base6, * _sm_base7;
+    List<Int>* _sm_base5, * _sm_base6;
     Int _sm_base8, _sm_base9, i, _sm_expr1, dst, j, operand;
     List<Int> counts;
     Bool _sm_expr2, read;
@@ -61353,8 +61045,7 @@ void ns11_ilConcatUseCounts(List<Int>* _sm_out, ns11_IlBody* il) {
     _sm_expr1 = simse_lenOf((*_sm_base2));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L4;
-    _sm_base4 = simse_addressOf(il->ops);
-    _sm_base3 = simse_addressOf((*_sm_base4)[i]);
+    _sm_base3 = simse_addressOf((*_sm_base2)[i]);
     op = _sm_base3;
     _sm_expr5 = op->kind;
     _sm_expr6 = ns11_IlOpKind::Declare;
@@ -61404,8 +61095,7 @@ void ns11_ilConcatUseCounts(List<Int>* _sm_out, ns11_IlBody* il) {
     if (read) goto L16;
     goto L19;
     L16:;
-    _sm_base7 = simse_addressOf(op->operands);
-    operand = (*_sm_base7)[j];
+    operand = (*_sm_base6)[j];
     _sm_expr2 = operand >= 0;
     if (_sm_expr2) goto L20;
     goto L19;
@@ -61737,7 +61427,7 @@ Bool ns11_ilConcatDstOk(Int dst, List<Int>* parts) {
 }
 // src/linear/MergeConcat.kt
 Int ns11_ilConcatPoolIndex(ns11_IlBody* il, Str text) {
-    List<Str>* _sm_base1, * _sm_base2, * _sm_base3;
+    List<Str>* _sm_base1;
     Int i, _sm_expr1, _sm_expr6;
     Bool _sm_expr2;
     Str _sm_expr3;
@@ -61747,8 +61437,7 @@ Int ns11_ilConcatPoolIndex(ns11_IlBody* il, Str text) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base2 = simse_addressOf(il->pool);
-    _sm_expr3 = (*_sm_base2)[i];
+    _sm_expr3 = (*_sm_base1)[i];
     _sm_expr2 = equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_expr3))), simse_spanOfStr(simse_addressOf(text)));
     if (_sm_expr2) goto L3;
     goto L4;
@@ -61758,9 +61447,8 @@ Int ns11_ilConcatPoolIndex(ns11_IlBody* il, Str text) {
     i = i + 1;
     goto L1;
     L2:;
-    _sm_base3 = simse_addressOf(il->pool);
-    simse_list_append((*_sm_base3), text);
-    _sm_expr1 = simse_lenOf((*_sm_base3));
+    simse_list_append((*_sm_base1), text);
+    _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr6 = _sm_expr1 - 1;
     return _sm_expr6;
 }
@@ -61838,8 +61526,8 @@ ns11_IlOp ns11_take(ns11_IlConcatFuser* self) {
 }
 // src/linear/MergeConcat.kt
 void ns11_rollback(ns11_IlConcatFuser* self, Int opsAt, Int linesAt) {
-    List<ns11_IlOp>* _sm_base1, * _sm_base2, * _sm_base7, * _sm_base8, * _sm_base10;
-    List<Int>* _sm_base4, * _sm_base5, * _sm_base11, * _sm_base13;
+    List<ns11_IlOp>* _sm_base1, * _sm_base7, * _sm_base8, * _sm_base10;
+    List<Int>* _sm_base4, * _sm_base11, * _sm_base13;
     ns11_IlOp _sm_base9;
     Int _sm_base12, _sm_expr1, _sm_expr3, _sm_expr6, t;
     List<ns11_IlOp> _sm_base14;
@@ -61851,9 +61539,8 @@ void ns11_rollback(ns11_IlConcatFuser* self, Int opsAt, Int linesAt) {
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base2 = simse_addressOf(self->ops);
-    _sm_expr3 = simse_lenOf((*_sm_base2));
-    simse_list_removeRange((*_sm_base2), opsAt, _sm_expr3);
+    _sm_expr3 = simse_lenOf((*_sm_base1));
+    simse_list_removeRange((*_sm_base1), opsAt, _sm_expr3);
     L2:;
     _sm_base4 = simse_addressOf(self->lines);
     _sm_expr1 = simse_lenOf((*_sm_base4));
@@ -61861,9 +61548,8 @@ void ns11_rollback(ns11_IlConcatFuser* self, Int opsAt, Int linesAt) {
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base5 = simse_addressOf(self->lines);
-    _sm_expr6 = simse_lenOf((*_sm_base5));
-    simse_list_removeRange((*_sm_base5), linesAt, _sm_expr6);
+    _sm_expr6 = simse_lenOf((*_sm_base4));
+    simse_list_removeRange((*_sm_base4), linesAt, _sm_expr6);
     L4:;
     _sm_base7 = simse_addressOf(self->taken);
     _sm_expr1 = simse_lenOf((*_sm_base7));
@@ -61891,7 +61577,7 @@ void ns11_rollback(ns11_IlConcatFuser* self, Int opsAt, Int linesAt) {
 void ns11_absorb(ns11_IlConcatFuser* self, List<Int>* parts) {
     ns11_IlOp* _sm_base1;
     Dictionary<Int, Bool>* _sm_base2;
-    List<Int>* _sm_base3, * _sm_base5;
+    List<Int>* _sm_base3;
     Int _sm_base4, _sm_expr1, i, _sm_expr2;
     ns11_IlOp last;
     Bool _sm_expr3;
@@ -61906,8 +61592,7 @@ void ns11_absorb(ns11_IlConcatFuser* self, List<Int>* parts) {
     _sm_expr2 = simse_lenOf((*_sm_base3));
     _sm_expr3 = i < _sm_expr2;
     if (!(_sm_expr3)) goto L2;
-    _sm_base5 = simse_addressOf(last.operands);
-    _sm_base4 = (*_sm_base5)[i];
+    _sm_base4 = (*_sm_base3)[i];
     simse_list_append((*parts), _sm_base4);
     i = i + 1;
     goto L1;
@@ -61927,7 +61612,7 @@ void ns11_absorbToString(ns11_IlConcatFuser* self, Int receiver) {
 }
 // src/linear/MergeConcat.kt
 Int ns11_foldReceiver(ns11_IlConcatFuser* self, ns11_IlOp* op) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base10, * _sm_base11;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base10;
     List<ns11_IlMethod>* _sm_base4, * _sm_base6;
     ns11_IlBody* _sm_base5, * _sm_base7, * _sm_base12;
     Str* _sm_base8, * _sm_base9;
@@ -61990,8 +61675,7 @@ Int ns11_foldReceiver(ns11_IlConcatFuser* self, ns11_IlOp* op) {
     _sm_expr4 = -1;
     return _sm_expr4;
     L11:;
-    _sm_base11 = simse_addressOf(op->operands);
-    _sm_base10 = _sm_base11;
+    _sm_base10 = _sm_base3;
     receiver = ns11_ilOperandAt(_sm_base10, 2);
     _sm_base12 = self->il;
     _sm_expr3 = ns11_ilConcatFoldOk(_sm_base12, receiver);
@@ -62006,8 +61690,8 @@ Int ns11_foldReceiver(ns11_IlConcatFuser* self, ns11_IlOp* op) {
 }
 // src/linear/MergeConcat.kt
 Bool ns11_appendOperand(ns11_IlConcatFuser* self, Int operand, List<Int>* parts) {
-    List<Int>* _sm_base1, * _sm_base2;
-    List<ns11_IlOp>* _sm_base3, * _sm_base4;
+    List<Int>* _sm_base1;
+    List<ns11_IlOp>* _sm_base3;
     ns11_IlOp* _sm_base6, * _sm_base7, * _sm_base8;
     ns11_IlBody* _sm_base9;
     Bool _sm_expr1, _sm_expr19;
@@ -62024,8 +61708,7 @@ Bool ns11_appendOperand(ns11_IlConcatFuser* self, Int operand, List<Int>* parts)
     if (_sm_expr1) goto L4;
     goto L12;
     L4:;
-    _sm_base2 = simse_addressOf(self->uses);
-    _sm_expr2 = (*_sm_base2)[operand];
+    _sm_expr2 = (*_sm_base1)[operand];
     _sm_expr1 = _sm_expr2 == 1;
     if (_sm_expr1) goto L3;
     goto L12;
@@ -62036,10 +61719,9 @@ Bool ns11_appendOperand(ns11_IlConcatFuser* self, Int operand, List<Int>* parts)
     if (_sm_expr1) goto L1;
     goto L12;
     L1:;
-    _sm_base4 = simse_addressOf(self->ops);
-    _sm_expr2 = simse_lenOf((*_sm_base4));
+    _sm_expr2 = simse_lenOf((*_sm_base3));
     _sm_expr9 = _sm_expr2 - 1;
-    last = (*_sm_base4)[_sm_expr9];
+    last = (*_sm_base3)[_sm_expr9];
     _sm_expr10 = last.kind;
     _sm_expr11 = ns11_IlOpKind::Concat;
     _sm_expr1 = _sm_expr10 == _sm_expr11;
@@ -62084,8 +61766,8 @@ Bool ns11_appendOperand(ns11_IlConcatFuser* self, Int operand, List<Int>* parts)
 }
 // src/linear/MergeConcat.kt
 void ns11_plusParts(List<Int>* _sm_out, ns11_IlConcatFuser* self, ns11_IlOp* op) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base15, * _sm_base16, * _sm_base17,
-        * _sm_base18, * _sm_base19, * _sm_base20, * _sm_base21, * _sm_base22;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base15, * _sm_base16, * _sm_base18,
+        * _sm_base19, * _sm_base21, * _sm_base22;
     ns11_IlBody* _sm_base4, * _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12;
     List<ns11_IlVar>* _sm_base5, * _sm_base10;
     Int _sm_base8, _sm_expr4, _sm_expr6, dst, opsAt, linesAt, _sm_expr15, _sm_expr17;
@@ -62163,16 +61845,14 @@ void ns11_plusParts(List<Int>* _sm_out, ns11_IlConcatFuser* self, ns11_IlOp* op)
     opsAt = simse_lenOf((*_sm_base14));
     _sm_base15 = simse_addressOf(self->lines);
     linesAt = simse_lenOf((*_sm_base15));
-    _sm_base17 = simse_addressOf(op->operands);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base3;
     _sm_expr15 = ns11_ilOperandAt(_sm_base16, 2);
     _sm_base18 = &parts;
     _sm_expr3 = ns11_appendOperand(self, _sm_expr15, _sm_base18);
     if (_sm_expr3) goto L15;
     goto L13;
     L15:;
-    _sm_base20 = simse_addressOf(op->operands);
-    _sm_base19 = _sm_base20;
+    _sm_base19 = _sm_base3;
     _sm_expr17 = ns11_ilOperandAt(_sm_base19, 3);
     _sm_base21 = &parts;
     _sm_expr3 = ns11_appendOperand(self, _sm_expr17, _sm_base21);
@@ -62214,9 +61894,8 @@ void ns11_fmtStrWithParts(List<Int>* _sm_out, ns11_IlConcatFuser* self, ns11_IlO
 // src/linear/MergeConcat.kt
 List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSeparator) {
     Char* __sm_catP;
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base7, * _sm_base17, * _sm_base18, * _sm_base24,
-        * _sm_base25, * _sm_base26, * _sm_base40, * _sm_base41, * _sm_base42, * _sm_base43, * _sm_base44,
-        * _sm_base45, * _sm_base47, * _sm_base48, * _sm_base51, * _sm_base57, * _sm_base59;
+    List<Int>* _sm_base1, * _sm_base2, * _sm_base17, * _sm_base24, * _sm_base26, * _sm_base40,
+        * _sm_base41, * _sm_base42, * _sm_base44, * _sm_base47, * _sm_base48, * _sm_base57, * _sm_base59;
     List<ns11_IlMethod>* _sm_base3, * _sm_base5;
     ns11_IlBody* _sm_base4, * _sm_base6, * _sm_base9, * _sm_base10, * _sm_base14, * _sm_base15,
         * _sm_base20, * _sm_base23, * _sm_base29, * _sm_base31, * _sm_base49, * _sm_base55, * _sm_base58;
@@ -62228,7 +61907,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     ns3_AstXmlNode* _sm_base16;
     List<Str>* _sm_base19, * _sm_base22, * _sm_base28, * _sm_base30;
     Str* _sm_base21, * _sm_base32, * _sm_base46, * _sm_base52, * sepText;
-    List<ns11_IlOp>* _sm_base33, * _sm_base34;
+    List<ns11_IlOp>* _sm_base33;
     ns11_IlOp* _sm_base38, * _sm_base39;
     Dictionary<Int, Bool>* _sm_base60;
     List<Int> parts, _sm_expr104;
@@ -62298,8 +61977,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     L11:;
     return parts;
     L12:;
-    _sm_base7 = simse_addressOf(op->operands);
-    _sm_expr5 = simse_lenOf((*_sm_base7));
+    _sm_expr5 = simse_lenOf((*_sm_base2));
     _sm_expr15 = listAt + 1;
     _sm_expr3 = _sm_expr5 < _sm_expr15;
     if (_sm_expr3) goto L13;
@@ -62343,8 +62021,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     if (withSeparator) goto L22;
     goto L23;
     L22:;
-    _sm_base18 = simse_addressOf(op->operands);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base2;
     sepOperand = ns11_ilOperandAt(_sm_base17, 2);
     _sm_expr3 = sepOperand >= 0;
     if (_sm_expr3) goto L24;
@@ -62384,10 +62061,9 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     L30:;
     separator = (*sepText)[1];
     L23:;
-    _sm_base25 = simse_addressOf(op->operands);
-    _sm_base24 = _sm_base25;
+    _sm_base24 = _sm_base2;
     fmtOperand = ns11_ilOperandAt(_sm_base24, templateAt);
-    _sm_base26 = _sm_base25;
+    _sm_base26 = _sm_base2;
     listOperand = ns11_ilOperandAt(_sm_base26, listAt);
     _sm_expr3 = fmtOperand >= 0;
     if (_sm_expr3) goto L33;
@@ -62429,13 +62105,12 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     L41:;
     return parts;
     L42:;
-    _sm_base34 = simse_addressOf(self->ops);
-    _sm_expr5 = simse_lenOf((*_sm_base34));
+    _sm_expr5 = simse_lenOf((*_sm_base33));
     _sm_expr15 = _sm_expr5 - 1;
-    deref = (*_sm_base34)[_sm_expr15];
-    _sm_expr46 = simse_lenOf((*_sm_base34));
+    deref = (*_sm_base33)[_sm_expr15];
+    _sm_expr46 = simse_lenOf((*_sm_base33));
     _sm_expr47 = _sm_expr46 - 2;
-    pack = (*_sm_base34)[_sm_expr47];
+    pack = (*_sm_base33)[_sm_expr47];
     _sm_expr1 = deref.kind;
     _sm_expr2 = ns11_IlOpKind::Deref;
     _sm_expr3 = _sm_expr1 != _sm_expr2;
@@ -62471,8 +62146,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     _sm_expr5 = simse_lenOf((*_sm_base42));
     _sm_expr3 = derefDst >= _sm_expr5;
     if (_sm_expr3) goto L49;
-    _sm_base43 = simse_addressOf(self->uses);
-    _sm_expr5 = simse_lenOf((*_sm_base43));
+    _sm_expr5 = simse_lenOf((*_sm_base42));
     _sm_expr3 = packDst >= _sm_expr5;
     if (_sm_expr3) goto L49;
     goto L50;
@@ -62483,8 +62157,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     _sm_expr5 = (*_sm_base44)[derefDst];
     _sm_expr3 = _sm_expr5 != 1;
     if (_sm_expr3) goto L54;
-    _sm_base45 = simse_addressOf(self->uses);
-    _sm_expr5 = (*_sm_base45)[packDst];
+    _sm_expr5 = (*_sm_base44)[packDst];
     _sm_expr3 = _sm_expr5 != 1;
     if (_sm_expr3) goto L54;
     goto L55;
@@ -62526,8 +62199,7 @@ List<Int> ns11_fmtParts(ns11_IlConcatFuser* self, ns11_IlOp* op, Bool withSepara
     _sm_expr3 = i < _sm_expr5;
     if (!(_sm_expr3)) goto L64;
     _sm_base49 = self->il;
-    _sm_base51 = simse_addressOf(pack.operands);
-    _sm_base50 = (*_sm_base51)[i];
+    _sm_base50 = (*_sm_base48)[i];
     _sm_expr3 = ns11_ilConcatPartOk(_sm_base49, _sm_base50);
     _sm_expr41 = !_sm_expr3;
     if (_sm_expr41) goto L65;
@@ -62757,7 +62429,7 @@ void ns11_ilConcatWrittenSlots(List<Bool>* _sm_out, List<ns11_IlOp>* ops, Int co
 // src/linear/MergeConcat.kt
 Bool ns11_ilFuseConcat(ns11_IlBody* il) {
     List<ns11_IlVar>* _sm_base1;
-    List<ns11_IlOp>* _sm_base2, * _sm_base3, * _sm_base5, * _sm_base6;
+    List<ns11_IlOp>* _sm_base2, * _sm_base3, * _sm_base5;
     List<Bool>* _sm_base4;
     List<Int>* _sm_base7, * _sm_base8, * _sm_base11;
     Dictionary<Int, Bool>* _sm_base9;
@@ -62807,8 +62479,7 @@ Bool ns11_ilFuseConcat(ns11_IlBody* il) {
     _sm_expr11 = simse_lenOf((*_sm_base5));
     _sm_expr1 = i < _sm_expr11;
     if (!(_sm_expr1)) goto L6;
-    _sm_base6 = simse_addressOf(fuser.ops);
-    op = (*_sm_base6)[i];
+    op = (*_sm_base5)[i];
     _sm_expr13 = op.kind;
     _sm_expr14 = ns11_IlOpKind::Declare;
     _sm_expr1 = _sm_expr13 == _sm_expr14;
@@ -62899,7 +62570,7 @@ Bool ns11_ilPromoteIsBase(ns11_IlOp* op, Int j) {
 }
 // src/linear/PromoteRefs.kt
 Bool ns11_ilPromoteUseSafe(ns11_IlBody* il, ns11_IlOp* op, Int j, List<Bool>* argEscape) {
-    List<Int>* _sm_base1, * _sm_base3, * _sm_base6, * _sm_base7, * _sm_base9;
+    List<Int>* _sm_base1, * _sm_base3, * _sm_base7, * _sm_base9;
     Int _sm_base2, _sm_base8, _sm_expr5, dst, base, at;
     ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base10, * _sm_base11;
     List<ns11_IlMethod>* _sm_base12, * _sm_base14;
@@ -62948,8 +62619,7 @@ Bool ns11_ilPromoteUseSafe(ns11_IlBody* il, ns11_IlOp* op, Int j, List<Bool>* ar
     L8:;
     return false;
     L9:;
-    _sm_base6 = simse_addressOf(op->operands);
-    dst = (*_sm_base6)[0];
+    dst = (*_sm_base3)[0];
     _sm_expr1 = dst >= 0;
     _sm_expr11 = _sm_expr1;
     if (!(_sm_expr11)) goto _sm_sc1;
@@ -63073,7 +62743,7 @@ Bool ns11_ilPromoteUseSafe(ns11_IlBody* il, ns11_IlOp* op, Int j, List<Bool>* ar
 }
 // src/linear/PromoteRefs.kt
 Bool ns11_ilPromoteNullTest(ns11_IlOp* op, Int j, List<Bool>* nulls) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base3;
+    List<Int>* _sm_base1, * _sm_base2;
     ns11_IlOpKind _sm_expr1, _sm_expr2;
     Bool _sm_expr3, _sm_expr8;
     Int _sm_expr5, other;
@@ -63097,8 +62767,7 @@ Bool ns11_ilPromoteNullTest(ns11_IlOp* op, Int j, List<Bool>* nulls) {
     if (_sm_expr3) goto L5;
     goto L6;
     L5:;
-    _sm_base3 = simse_addressOf(op->operands);
-    other = (*_sm_base3)[3];
+    other = (*_sm_base2)[3];
     L6:;
     _sm_expr3 = other >= 0;
     _sm_expr8 = _sm_expr3;
@@ -63114,11 +62783,11 @@ Bool ns11_ilPromoteNullTest(ns11_IlOp* op, Int j, List<Bool>* nulls) {
 }
 // src/linear/PromoteRefs.kt
 Int ns11_ilPromoteInitReceiver(ns11_IlOp* op, ns11_IlBody* il) {
-    List<ns11_IlMethod>* _sm_base1, * _sm_base5, * _sm_base7;
+    List<ns11_IlMethod>* _sm_base1, * _sm_base5;
     Str* _sm_base2, * _sm_base3;
-    ns11_IlMethod* _sm_base4, * _sm_base6, * method;
+    ns11_IlMethod* _sm_base4, * method;
     ns11_IlOpKind _sm_base8, _sm_expr1, _sm_expr2;
-    List<Int>* _sm_base9, * _sm_base10;
+    List<Int>* _sm_base9;
     Bool _sm_expr3;
     Int _sm_expr7, at, base;
     Span<Char> _sm_expr12;
@@ -63162,9 +62831,7 @@ Int ns11_ilPromoteInitReceiver(ns11_IlOp* op, ns11_IlBody* il) {
     _sm_expr7 = -1;
     return _sm_expr7;
     L8:;
-    _sm_base7 = simse_addressOf(il->methods);
-    _sm_base6 = simse_addressOf((*_sm_base7)[at]);
-    method = _sm_base6;
+    method = _sm_base4;
     _sm_expr15 = method->kind;
     _sm_expr16 = ns11_IlMethodKind::Method;
     _sm_expr3 = _sm_expr15 != _sm_expr16;
@@ -63186,8 +62853,7 @@ Int ns11_ilPromoteInitReceiver(ns11_IlOp* op, ns11_IlBody* il) {
     _sm_expr7 = -1;
     return _sm_expr7;
     L13:;
-    _sm_base10 = simse_addressOf(op->operands);
-    _sm_expr7 = (*_sm_base10)[base];
+    _sm_expr7 = (*_sm_base9)[base];
     return _sm_expr7;
 }
 // src/linear/PromoteRefs.kt
@@ -63358,8 +63024,7 @@ Int ns11_ilPromoteFind(ns11_IlBody* il, List<Bool>* bad, List<Int>* defCount, Li
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base8, * _sm_base12, * _sm_expr17, * _sm_expr30;
     ns11_IlOp* _sm_base4, * def;
     List<ns11_IlOp>* _sm_base5;
-    List<Int>* _sm_base6, * _sm_base7, * _sm_base10, * _sm_base11, * _sm_base14, * _sm_base15,
-        * _sm_base16;
+    List<Int>* _sm_base6, * _sm_base10, * _sm_base14;
     ns3_AstNodeKind _sm_base9, _sm_base13;
     Int slots, firstBlockEnd, c, _sm_expr3, at, src, inits, otherUses, _sm_expr45;
     Bool _sm_expr1, _sm_expr19, _sm_expr44, built;
@@ -63407,8 +63072,7 @@ Int ns11_ilPromoteFind(ns11_IlBody* il, List<Bool>* bad, List<Int>* defCount, Li
     if (_sm_expr1) goto L12;
     goto L15;
     L12:;
-    _sm_base7 = simse_addressOf(def->operands);
-    _sm_expr3 = (*_sm_base7)[0];
+    _sm_expr3 = (*_sm_base6)[0];
     _sm_expr1 = _sm_expr3 == c;
     if (_sm_expr1) goto L11;
     goto L15;
@@ -63439,8 +63103,7 @@ Int ns11_ilPromoteFind(ns11_IlBody* il, List<Bool>* bad, List<Int>* defCount, Li
     if (_sm_expr1) goto L22;
     goto L17;
     L22:;
-    _sm_base11 = simse_addressOf(def->operands);
-    _sm_expr3 = (*_sm_base11)[0];
+    _sm_expr3 = (*_sm_base10)[0];
     _sm_expr1 = _sm_expr3 == c;
     if (_sm_expr1) goto L21;
     goto L17;
@@ -63474,14 +63137,12 @@ Int ns11_ilPromoteFind(ns11_IlBody* il, List<Bool>* bad, List<Int>* defCount, Li
     if (_sm_expr1) goto L26;
     goto L39;
     L26:;
-    _sm_base15 = simse_addressOf(def->operands);
-    _sm_expr3 = (*_sm_base15)[0];
+    _sm_expr3 = (*_sm_base14)[0];
     _sm_expr1 = _sm_expr3 == c;
     if (_sm_expr1) goto L24;
     goto L39;
     L24:;
-    _sm_base16 = simse_addressOf(def->operands);
-    src = (*_sm_base16)[1];
+    src = (*_sm_base14)[1];
     _sm_expr1 = src >= 0;
     if (_sm_expr1) goto L32;
     goto L39;
@@ -63598,18 +63259,17 @@ Bool ns11_ilFreshTwinMethod(ns11_IlBody* il, ns11_IlOp* op, Dictionary<Str, Bool
 void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     Char* __sm_catP;
     ns11_IlOp* _sm_base1, * _sm_base26, * def, * op;
-    List<ns11_IlOp>* _sm_base2, * _sm_base25, * _sm_base27;
+    List<ns11_IlOp>* _sm_base2, * _sm_base25;
     ns3_AstXmlNode* _sm_base3, * _sm_base7, * _sm_base10, * _sm_base12, * inner;
     ns3_AstNodeKind _sm_base4, _sm_base5;
     List<Str>* _sm_base6;
     List<ns3_AstXmlNode>* _sm_base9;
     ns11_IlVar* _sm_base15;
-    List<ns11_IlVar>* _sm_base16, * _sm_base22;
+    List<ns11_IlVar>* _sm_base16;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base17;
     Str _sm_base18, _sm_base43, _sm_expr3, _sm_expr4, _sm_expr5, _sm_expr25, _sm_expr26;
-    List<Int>* _sm_base21, * _sm_base28, * _sm_base29, * _sm_base32, * _sm_base35, * _sm_base46,
-        * _sm_base48, * _sm_base51, * _sm_base55, * _sm_base57, * _sm_base60, * _sm_base64, * _sm_base65,
-        * _sm_base67, * _sm_base70, * _sm_base74;
+    List<Int>* _sm_base21, * _sm_base28, * _sm_base32, * _sm_base35, * _sm_base46, * _sm_base51,
+        * _sm_base55, * _sm_base60, * _sm_base64, * _sm_base70, * _sm_base74;
     ns11_IlVarKind _sm_base23;
     ns11_IlOpKind _sm_base30, _sm_base33, _sm_base49, _sm_base52, _sm_base58, _sm_base61, _sm_base68,
         _sm_base71, _sm_base75, _sm_expr1, _sm_expr2;
@@ -63668,12 +63328,11 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     stack = (*_sm_base21)[1];
     goto L3;
     L2:;
-    _sm_base22 = simse_addressOf(il->vars);
-    stack = simse_lenOf((*_sm_base22));
+    stack = simse_lenOf((*_sm_base16));
     ns11_ilPromoteStackName(&_sm_expr5, il, c);
     _sm_base23 = ns11_IlVarKind::Local;
     _sm_expr6 = ns11_IlVar{_sm_expr5, valueType, _sm_base23};
-    simse_list_append((*_sm_base22), _sm_expr6);
+    simse_list_append((*_sm_base16), _sm_expr6);
     L3:;
     ops = List<ns11_IlOp>();
     lines = List<Int>();
@@ -63684,8 +63343,7 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     ptrType = simse_lenOf((*_sm_base25));
     _sm_expr8 = i < ptrType;
     if (!(_sm_expr8)) goto L5;
-    _sm_base27 = simse_addressOf(il->ops);
-    _sm_base26 = simse_addressOf((*_sm_base27)[i]);
+    _sm_base26 = simse_addressOf((*_sm_base25)[i]);
     op = _sm_base26;
     if (declared) goto L7;
     _sm_expr1 = op->kind;
@@ -63700,8 +63358,7 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     if (_sm_expr8) goto L8;
     goto L7;
     L8:;
-    _sm_base29 = simse_addressOf(op->operands);
-    ptrType = (*_sm_base29)[0];
+    ptrType = (*_sm_base28)[0];
     _sm_expr8 = ptrType == c;
     if (_sm_expr8) goto L6;
     goto L7;
@@ -63770,8 +63427,7 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     ptrType = simse_lenOf((*_sm_base46));
     _sm_expr8 = a < ptrType;
     if (!(_sm_expr8)) goto L21;
-    _sm_base48 = simse_addressOf(op->operands);
-    _sm_base47 = (*_sm_base48)[a];
+    _sm_base47 = (*_sm_base46)[a];
     simse_list_append(called, _sm_base47);
     a = a + 1;
     goto L20;
@@ -63799,8 +63455,7 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     ptrType = simse_lenOf((*_sm_base55));
     _sm_expr8 = j < ptrType;
     if (!(_sm_expr8)) goto L24;
-    _sm_base57 = simse_addressOf(op->operands);
-    _sm_base56 = (*_sm_base57)[j];
+    _sm_base56 = (*_sm_base55)[j];
     simse_list_append(built, _sm_base56);
     j = j + 1;
     goto L23;
@@ -63833,14 +63488,12 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
     if (_sm_expr8) goto L27;
     goto L26;
     L27:;
-    _sm_base65 = simse_addressOf(op->operands);
-    ptrType = (*_sm_base65)[1];
+    ptrType = (*_sm_base64)[1];
     _sm_expr8 = ptrType == c;
     if (_sm_expr8) goto L25;
     goto L26;
     L25:;
-    _sm_base67 = simse_addressOf(op->operands);
-    _sm_base66 = (*_sm_base67)[0];
+    _sm_base66 = (*_sm_base64)[0];
     ns11_ilOps2(&_sm_expr45, _sm_base66, c);
     _sm_base68 = ns11_IlOpKind::SetVar;
     _sm_expr46 = ns11_IlOp{_sm_base68, _sm_expr45};
@@ -63875,12 +63528,12 @@ void ns11_ilPromoteApply(ns11_IlBody* il, Int c, Int at) {
 // src/linear/PromoteRefs.kt
 Bool ns11_ilPromoteRefs(ns11_IlBody* il, ns18_SemFacts* facts, Dictionary<Str, Bool>* fresh) {
     List<ns11_IlVar>* _sm_base1;
-    List<ns11_IlOp>* _sm_base2, * _sm_base3, * _sm_base4, * _sm_base14, * _sm_base16;
+    List<ns11_IlOp>* _sm_base2, * _sm_base3, * _sm_base4, * _sm_base14;
     List<ns11_IlMethod>* _sm_base5, * _sm_base13;
     ns11_IlOpKind _sm_base6, _sm_base19, _sm_expr8, _sm_expr9;
     List<Bool>* _sm_base7, * _sm_base27, * _sm_base28, * _sm_base29;
-    List<Int>* _sm_base8, * _sm_base9, * _sm_base20, * _sm_base21, * _sm_base30, * _sm_base31,
-        * _sm_base32, * _sm_base33, * _sm_base34;
+    List<Int>* _sm_base8, * _sm_base20, * _sm_base21, * _sm_base30, * _sm_base31, * _sm_base32,
+        * _sm_base33, * _sm_base34;
     Str* _sm_base10, * _sm_base11;
     ns11_IlMethod* _sm_base12;
     ns11_IlOp* _sm_base15, * aop, * op;
@@ -63963,8 +63616,7 @@ Bool ns11_ilPromoteRefs(ns11_IlBody* il, ns18_SemFacts* facts, Dictionary<Str, B
     _sm_expr2 = simse_lenOf((*_sm_base8));
     _sm_expr1 = j < _sm_expr2;
     if (!(_sm_expr1)) goto L6;
-    _sm_base9 = simse_addressOf(aop->operands);
-    slot = (*_sm_base9)[j];
+    slot = (*_sm_base8)[j];
     _sm_expr1 = slot >= 0;
     if (_sm_expr1) goto L19;
     goto L17;
@@ -63995,8 +63647,7 @@ Bool ns11_ilPromoteRefs(ns11_IlBody* il, ns18_SemFacts* facts, Dictionary<Str, B
     _sm_expr2 = simse_lenOf((*_sm_base14));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L21;
-    _sm_base16 = simse_addressOf(il->ops);
-    _sm_base15 = simse_addressOf((*_sm_base16)[i]);
+    _sm_base15 = simse_addressOf((*_sm_base14)[i]);
     op = _sm_base15;
     _sm_expr8 = op->kind;
     _sm_expr9 = ns11_IlOpKind::Declare;
@@ -64186,6 +63837,61 @@ Bool ns11_ilReuseCallOp(ns11_IlOpKind kind) {
     return _sm_expr1;
 }
 // src/linear/ReuseExprs.kt
+Bool ns11_ilReusePureCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure, ns11_IlOp* op) {
+    List<Int>* _sm_base1, * _sm_base3;
+    List<ns11_IlMethod>* _sm_base5, * _sm_base8;
+    Str _sm_base6;
+    ns11_IlMethod* _sm_base7;
+    Int methodIndex, _sm_expr4;
+    ns11_IlOpKind _sm_expr1, _sm_expr2;
+    Bool _sm_expr3;
+    methodIndex = -1;
+    _sm_expr1 = op->kind;
+    _sm_expr2 = ns11_IlOpKind::Call;
+    _sm_expr3 = _sm_expr1 == _sm_expr2;
+    if (_sm_expr3) goto L3;
+    goto L2;
+    L3:;
+    _sm_base1 = simse_addressOf(op->operands);
+    _sm_expr4 = simse_lenOf((*_sm_base1));
+    _sm_expr3 = _sm_expr4 > 1;
+    if (_sm_expr3) goto L1;
+    goto L2;
+    L1:;
+    methodIndex = (*_sm_base1)[1];
+    goto L6;
+    L2:;
+    _sm_expr1 = op->kind;
+    _sm_expr2 = ns11_IlOpKind::CallVoid;
+    _sm_expr3 = _sm_expr1 == _sm_expr2;
+    if (_sm_expr3) goto L7;
+    goto L6;
+    L7:;
+    _sm_base3 = simse_addressOf(op->operands);
+    _sm_expr4 = simse_lenOf((*_sm_base3));
+    _sm_expr3 = _sm_expr4 > 0;
+    if (_sm_expr3) goto L5;
+    goto L6;
+    L5:;
+    methodIndex = (*_sm_base3)[0];
+    L6:;
+    _sm_expr3 = methodIndex < 0;
+    if (_sm_expr3) goto L8;
+    _sm_base5 = simse_addressOf(il->methods);
+    _sm_expr4 = simse_lenOf((*_sm_base5));
+    _sm_expr3 = methodIndex >= _sm_expr4;
+    if (_sm_expr3) goto L8;
+    goto L9;
+    L8:;
+    return false;
+    L9:;
+    _sm_base8 = simse_addressOf(il->methods);
+    _sm_base7 = simse_addressOf((*_sm_base8)[methodIndex]);
+    _sm_base6 = _sm_base7->name;
+    _sm_expr3 = simse_dict_has((*pure), _sm_base6);
+    return _sm_expr3;
+}
+// src/linear/ReuseExprs.kt
 Bool ns11_ilReuseAddrOp(ns11_IlOpKind kind) {
     ns11_IlOpKind _sm_expr1;
     Bool _sm_expr2;
@@ -64219,10 +63925,152 @@ Bool ns11_ilReuseExprHas(ns11_IlBody* il) {
     return false;
 }
 // src/linear/ReuseExprs.kt
+void ns11_ilReuseLabelFacts(ns11_IlBody* il, Dictionary<Int, Int>* first, Dictionary<Int, Bool>* loops) {
+    List<ns11_IlOp>* _sm_base1, * _sm_base7;
+    ns11_IlOp* _sm_base2, * _sm_base8, * op, * _sm_op_2;
+    List<Int>* _sm_base4, * _sm_base10;
+    Int _sm_base5, i, _sm_expr1, labelOperand, target;
+    Dictionary<Int, Int> labelPos;
+    Bool _sm_expr2;
+    ns11_IlOpKind _sm_expr3, _sm_expr4, kind;
+    Int* at, * seen;
+    labelPos = Dictionary<Int, Int>();
+    i = 0;
+    L1:;
+    _sm_base1 = simse_addressOf(il->ops);
+    _sm_expr1 = simse_lenOf((*_sm_base1));
+    _sm_expr2 = i < _sm_expr1;
+    if (!(_sm_expr2)) goto L2;
+    _sm_base2 = simse_addressOf((*_sm_base1)[i]);
+    op = _sm_base2;
+    _sm_expr3 = op->kind;
+    _sm_expr4 = ns11_IlOpKind::Label;
+    _sm_expr2 = _sm_expr3 == _sm_expr4;
+    if (_sm_expr2) goto L5;
+    goto L4;
+    L5:;
+    _sm_base4 = simse_addressOf(op->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base4));
+    _sm_expr2 = _sm_expr1 > 0;
+    if (_sm_expr2) goto L3;
+    goto L4;
+    L3:;
+    _sm_base5 = (*_sm_base4)[0];
+    simse_dict_insert(labelPos, _sm_base5, i);
+    L4:;
+    i = i + 1;
+    goto L1;
+    L2:;
+    i = 0;
+    L6:;
+    _sm_base7 = simse_addressOf(il->ops);
+    _sm_expr1 = simse_lenOf((*_sm_base7));
+    _sm_expr2 = i < _sm_expr1;
+    if (!(_sm_expr2)) goto L7;
+    _sm_base8 = simse_addressOf((*_sm_base7)[i]);
+    _sm_op_2 = _sm_base8;
+    kind = _sm_op_2->kind;
+    labelOperand = -1;
+    _sm_expr3 = ns11_IlOpKind::Goto;
+    _sm_expr2 = kind == _sm_expr3;
+    if (_sm_expr2) goto L8;
+    goto L9;
+    L8:;
+    labelOperand = 0;
+    goto L12;
+    L9:;
+    _sm_expr3 = ns11_IlOpKind::IfTrue;
+    _sm_expr2 = kind == _sm_expr3;
+    if (_sm_expr2) goto L11;
+    _sm_expr3 = ns11_IlOpKind::IfFalse;
+    _sm_expr2 = kind == _sm_expr3;
+    if (_sm_expr2) goto L11;
+    goto L12;
+    L11:;
+    labelOperand = 1;
+    L12:;
+    _sm_expr2 = labelOperand >= 0;
+    if (_sm_expr2) goto L16;
+    goto L22;
+    L16:;
+    _sm_base10 = simse_addressOf(_sm_op_2->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base10));
+    _sm_expr2 = _sm_expr1 > labelOperand;
+    if (_sm_expr2) goto L14;
+    goto L22;
+    L14:;
+    target = (*_sm_base10)[labelOperand];
+    at = simse_dict_getPtr(labelPos, target);
+    _sm_expr2 = at != nullptr;
+    if (_sm_expr2) goto L17;
+    goto L22;
+    L17:;
+    _sm_expr1 = *at;
+    _sm_expr2 = _sm_expr1 < i;
+    if (_sm_expr2) goto L19;
+    goto L20;
+    L19:;
+    simse_dict_insert((*loops), target, true);
+    L20:;
+    seen = simse_dict_getPtr((*first), target);
+    _sm_expr2 = seen == nullptr;
+    if (_sm_expr2) goto L21;
+    _sm_expr1 = *seen;
+    _sm_expr2 = _sm_expr1 > i;
+    if (_sm_expr2) goto L21;
+    goto L22;
+    L21:;
+    simse_dict_insert((*first), target, i);
+    L22:;
+    i = i + 1;
+    goto L6;
+    L7:;
+}
+// src/linear/ReuseExprs.kt
+void ns11_ilReuseRegionDrop(Dictionary<Str, Int>* firstDst, Dictionary<Str, Int>* firstAt, Int after) {
+    List<Str>* _sm_base1, * _sm_base2;
+    List<Str> stale, _sm_expr1;
+    Span<Str> _sm_expr2, _sm_expr7;
+    Span_iterValues_yieldable<Str> _sm_for2, _sm_for3;
+    Bool _sm_expr3;
+    Str key, _sm_key_2;
+    Int* _sm_expr4;
+    Int _sm_expr5;
+    stale = List<Str>();
+    _sm_expr1 = simse_dict_keys((*firstAt));
+    _sm_base1 = &_sm_expr1;
+    _sm_expr2 = simse_spanOf(_sm_base1);
+    _sm_for2 = iterValues(simse_addressOf(_sm_expr2));
+    L1:;
+    _sm_expr3 = advance(&_sm_for2);
+    if (!(_sm_expr3)) goto L2;
+    key = _sm_for2.current;
+    _sm_expr4 = simse_dict_getPtr((*firstAt), key);
+    _sm_expr5 = *_sm_expr4;
+    _sm_expr3 = _sm_expr5 > after;
+    if (_sm_expr3) goto L3;
+    goto L1;
+    L3:;
+    simse_list_append(stale, key);
+    goto L1;
+    L2:;
+    _sm_base2 = &stale;
+    _sm_expr7 = simse_spanOf(_sm_base2);
+    _sm_for3 = iterValues(simse_addressOf(_sm_expr7));
+    L5:;
+    _sm_expr3 = advance(&_sm_for3);
+    if (!(_sm_expr3)) goto L6;
+    _sm_key_2 = _sm_for3.current;
+    simse_dict_remove((*firstAt), _sm_key_2);
+    simse_dict_remove((*firstDst), _sm_key_2);
+    goto L5;
+    L6:;
+}
+// src/linear/ReuseExprs.kt
 void ns11_ilReuseExprKey(Str* _sm_out, ns11_IlOp* op, List<Int>* lastWrite) {
     Char* __sm_catP;
     Int __sm_catC0;
-    List<Int>* _sm_base1, * _sm_base2;
+    List<Int>* _sm_base1;
     Int* _sm_base3;
     ns11_IlOpKind kind;
     Int _sm_expr1, j, _sm_expr2, operand;
@@ -64238,8 +64086,7 @@ void ns11_ilReuseExprKey(Str* _sm_out, ns11_IlOp* op, List<Int>* lastWrite) {
     _sm_expr2 = simse_lenOf((*_sm_base1));
     _sm_expr3 = j < _sm_expr2;
     if (!(_sm_expr3)) goto L2;
-    _sm_base2 = simse_addressOf(op->operands);
-    operand = (*_sm_base2)[j];
+    operand = (*_sm_base1)[j];
     ns11_ilReuseOperandKind(&operandKind, op, j);
     _sm_expr6 = ns11_IlOperandKind::Var;
     _sm_expr3 = operandKind == _sm_expr6;
@@ -64303,29 +64150,32 @@ void ns11_ilReuseExprKey(Str* _sm_out, ns11_IlOp* op, List<Int>* lastWrite) {
     return;
 }
 // src/linear/ReuseExprs.kt
-Bool ns11_ilReuseExprs(ns11_IlBody* il) {
+Bool ns11_ilReuseExprs(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     List<ns11_IlVar>* _sm_base1, * _sm_base3;
-    List<ns11_IlOp>* _sm_base2, * _sm_base4, * _sm_base5, * _sm_base9, * _sm_base11, * _sm_base17,
-        * _sm_base19;
-    List<Int>* _sm_base6, * _sm_base12, * _sm_base13, * _sm_base14, * _sm_base20, * _sm_base22,
-        * _sm_base23, * _sm_base24, * _sm_base28;
-    Int _sm_base7, _sm_base8, _sm_base16, _sm_base21, _sm_base27, _sm_expr1, slots, _sm_expr6, written0,
-        i, lastCallAt, dst, _sm_expr39, _sm_expr44, written, j, value;
-    ns11_IlOp* _sm_base10, * _sm_base18, * op0, * op, * _sm_op_2;
-    ns11_IlOpKind _sm_base26, kind, _sm_expr13, _sm_expr55;
-    Bool _sm_expr2, changed, progress;
+    List<ns11_IlOp>* _sm_base2, * _sm_base4, * _sm_base5, * _sm_base11, * _sm_base30;
+    List<Int>* _sm_base6, * _sm_base14, * _sm_base25, * _sm_base27, * _sm_base33, * _sm_base36,
+        * _sm_base41;
+    Int _sm_base7, _sm_base8, _sm_base15, _sm_base18, _sm_base23, _sm_base29, _sm_base34, _sm_base40,
+        _sm_expr1, slots, _sm_expr6, written0, i, lastCallAt, dst, _sm_expr37, _sm_expr42, written, j, value;
+    Dictionary<Int, Int>* _sm_base9;
+    Dictionary<Int, Bool>* _sm_base10;
+    ns11_IlOp* _sm_base12, * _sm_base31, * op0, * op, * _sm_op_2;
+    Dictionary<Str, Int>* _sm_base21, * _sm_base22;
+    Dictionary<Str, Bool>* _sm_base24;
+    ns11_IlOpKind _sm_base39, kind, _sm_expr13, _sm_expr53;
+    Bool _sm_expr2, changed, progress, _sm_expr23;
     List<Int> lastWrite, defCount, lines, operands;
     Span<ns11_IlOp> _sm_expr7;
-    Span_iter_yieldable<ns11_IlOp> _sm_for2;
+    Span_iter_yieldable<ns11_IlOp> _sm_for4;
     Span<Int> _sm_span93;
+    Dictionary<Int, Int> labelFirst, replace;
+    Dictionary<Int, Bool> labelLoops, drop;
     Dictionary<Str, Int> firstDst, firstAt;
-    Dictionary<Int, Bool> drop;
-    Dictionary<Int, Int> replace;
+    Int* earliest, * keep, * _sm_expr31, * _sm_expr41, * target;
     Str key;
-    Int* keep, * _sm_expr33, * _sm_expr43, * target;
     List<ns11_IlOp> ops;
-    ns11_IlOperandKind operandKind, _sm_expr65;
-    ns11_IlOp _sm_expr70;
+    ns11_IlOperandKind operandKind, _sm_expr63;
+    ns11_IlOp _sm_expr68;
     _sm_base1 = simse_addressOf(il->vars);
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = _sm_expr1 == 0;
@@ -64352,13 +64202,13 @@ Bool ns11_ilReuseExprs(ns11_IlBody* il) {
     _sm_base5 = simse_addressOf(il->ops);
     _sm_base4 = _sm_base5;
     _sm_expr7 = simse_spanOf(_sm_base4);
-    _sm_for2 = iter(simse_addressOf(_sm_expr7));
+    _sm_for4 = iter(simse_addressOf(_sm_expr7));
     _sm_base6 = &defCount;
     _sm_span93 = simse_spanOf(_sm_base6);
     L7:;
-    _sm_expr2 = advance(&_sm_for2);
+    _sm_expr2 = advance(&_sm_for4);
     if (!(_sm_expr2)) goto L8;
-    op0 = _sm_for2.current;
+    op0 = _sm_for4.current;
     written0 = ns11_ilReuseDst(op0);
     _sm_expr2 = written0 >= 0;
     if (_sm_expr2) goto L11;
@@ -64373,6 +64223,11 @@ Bool ns11_ilReuseExprs(ns11_IlBody* il) {
     _sm_span93.ptr[written0] = _sm_base8;
     goto L7;
     L8:;
+    labelFirst = Dictionary<Int, Int>();
+    labelLoops = Dictionary<Int, Bool>();
+    _sm_base9 = &labelFirst;
+    _sm_base10 = &labelLoops;
+    ns11_ilReuseLabelFacts(il, _sm_base9, _sm_base10);
     firstDst = Dictionary<Str, Int>();
     firstAt = Dictionary<Str, Int>();
     drop = Dictionary<Int, Bool>();
@@ -64380,132 +64235,148 @@ Bool ns11_ilReuseExprs(ns11_IlBody* il) {
     i = 0;
     lastCallAt = -1;
     L12:;
-    _sm_base9 = simse_addressOf(il->ops);
-    _sm_expr1 = simse_lenOf((*_sm_base9));
+    _sm_base11 = simse_addressOf(il->ops);
+    _sm_expr1 = simse_lenOf((*_sm_base11));
     _sm_expr2 = i < _sm_expr1;
     if (!(_sm_expr2)) goto L13;
-    _sm_base11 = simse_addressOf(il->ops);
-    _sm_base10 = simse_addressOf((*_sm_base11)[i]);
-    op = _sm_base10;
+    _sm_base12 = simse_addressOf((*_sm_base11)[i]);
+    op = _sm_base12;
     kind = op->kind;
     _sm_expr13 = ns11_IlOpKind::Label;
     _sm_expr2 = kind == _sm_expr13;
     if (_sm_expr2) goto L14;
-    _sm_expr13 = ns11_IlOpKind::Goto;
-    _sm_expr2 = kind == _sm_expr13;
-    if (_sm_expr2) goto L14;
-    _sm_expr13 = ns11_IlOpKind::IfTrue;
-    _sm_expr2 = kind == _sm_expr13;
-    if (_sm_expr2) goto L14;
-    _sm_expr13 = ns11_IlOpKind::IfFalse;
-    _sm_expr2 = kind == _sm_expr13;
-    if (_sm_expr2) goto L14;
-    _sm_expr13 = ns11_IlOpKind::Return;
-    _sm_expr2 = kind == _sm_expr13;
-    if (_sm_expr2) goto L14;
-    _sm_expr13 = ns11_IlOpKind::ReturnVoid;
-    _sm_expr2 = kind == _sm_expr13;
-    if (_sm_expr2) goto L14;
     goto L15;
     L14:;
+    _sm_base14 = simse_addressOf(op->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base14));
+    _sm_expr2 = _sm_expr1 > 0;
+    if (_sm_expr2) goto L18;
+    goto L17;
+    L18:;
+    _sm_base15 = (*_sm_base14)[0];
+    _sm_expr2 = simse_dict_has(labelLoops, _sm_base15);
+    if (_sm_expr2) goto L16;
+    goto L17;
+    L16:;
     firstDst = Dictionary<Str, Int>();
     firstAt = Dictionary<Str, Int>();
-    lastCallAt = -1;
-    goto L39;
+    goto L44;
+    L17:;
+    _sm_expr1 = simse_lenOf((*_sm_base14));
+    _sm_expr2 = _sm_expr1 > 0;
+    if (_sm_expr2) goto L20;
+    goto L44;
+    L20:;
+    _sm_base18 = (*_sm_base14)[0];
+    earliest = simse_dict_getPtr(labelFirst, _sm_base18);
+    _sm_expr2 = earliest != nullptr;
+    if (_sm_expr2) goto L22;
+    goto L44;
+    L22:;
+    _sm_base21 = &firstDst;
+    _sm_base22 = &firstAt;
+    _sm_base23 = *earliest;
+    ns11_ilReuseRegionDrop(_sm_base21, _sm_base22, _sm_base23);
+    goto L44;
     L15:;
     _sm_expr2 = ns11_ilReuseCallOp(kind);
-    if (_sm_expr2) goto L22;
-    goto L23;
-    L22:;
-    lastCallAt = i;
-    goto L39;
-    L23:;
-    _sm_expr2 = ns11_ilReuseExprOp(kind);
-    if (_sm_expr2) goto L27;
-    goto L39;
-    L27:;
-    _sm_base12 = simse_addressOf(op->operands);
-    _sm_expr1 = simse_lenOf((*_sm_base12));
-    _sm_expr2 = _sm_expr1 >= 2;
     if (_sm_expr2) goto L25;
-    goto L39;
+    goto L26;
     L25:;
-    _sm_base13 = simse_addressOf(op->operands);
-    dst = (*_sm_base13)[0];
-    _sm_expr2 = dst >= 0;
+    _sm_base24 = pure;
+    _sm_expr2 = ns11_ilReusePureCall(il, _sm_base24, op);
+    _sm_expr23 = !_sm_expr2;
+    if (_sm_expr23) goto L27;
+    goto L44;
+    L27:;
+    lastCallAt = i;
+    goto L44;
+    L26:;
+    _sm_expr2 = ns11_ilReuseExprOp(kind);
+    if (_sm_expr2) goto L32;
+    goto L44;
+    L32:;
+    _sm_base25 = simse_addressOf(op->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base25));
+    _sm_expr2 = _sm_expr1 >= 2;
     if (_sm_expr2) goto L30;
-    goto L39;
+    goto L44;
     L30:;
+    dst = (*_sm_base25)[0];
+    _sm_expr2 = dst >= 0;
+    if (_sm_expr2) goto L35;
+    goto L44;
+    L35:;
     _sm_expr2 = dst < slots;
-    if (_sm_expr2) goto L28;
-    goto L39;
-    L28:;
-    _sm_base14 = &lastWrite;
-    ns11_ilReuseExprKey(&key, op, _sm_base14);
+    if (_sm_expr2) goto L33;
+    goto L44;
+    L33:;
+    _sm_base27 = &lastWrite;
+    ns11_ilReuseExprKey(&key, op, _sm_base27);
     keep = simse_dict_getPtr(firstDst, key);
     _sm_expr2 = keep == nullptr;
-    if (_sm_expr2) goto L31;
-    goto L32;
-    L31:;
-    simse_dict_insert(firstDst, key, dst);
-    simse_dict_insert(firstAt, key, i);
-    goto L39;
-    L32:;
-    _sm_expr2 = ns11_ilReuseAddrOp(kind);
     if (_sm_expr2) goto L36;
-    goto L35;
+    goto L37;
     L36:;
-    _sm_expr33 = simse_dict_getPtr(firstAt, key);
-    _sm_expr1 = *_sm_expr33;
-    _sm_expr2 = _sm_expr1 < lastCallAt;
-    if (_sm_expr2) goto L34;
-    goto L35;
-    L34:;
     simse_dict_insert(firstDst, key, dst);
     simse_dict_insert(firstAt, key, i);
-    goto L39;
-    L35:;
+    goto L44;
+    L37:;
+    _sm_expr2 = ns11_ilReuseAddrOp(kind);
+    if (_sm_expr2) goto L41;
+    goto L40;
+    L41:;
+    _sm_expr31 = simse_dict_getPtr(firstAt, key);
+    _sm_expr1 = *_sm_expr31;
+    _sm_expr2 = _sm_expr1 < lastCallAt;
+    if (_sm_expr2) goto L39;
+    goto L40;
+    L39:;
+    simse_dict_insert(firstDst, key, dst);
+    simse_dict_insert(firstAt, key, i);
+    goto L44;
+    L40:;
     _sm_expr1 = defCount[dst];
     _sm_expr2 = _sm_expr1 == 1;
-    if (_sm_expr2) goto L41;
-    goto L39;
-    L41:;
+    if (_sm_expr2) goto L46;
+    goto L44;
+    L46:;
     _sm_expr1 = *keep;
-    _sm_expr39 = defCount[_sm_expr1];
-    _sm_expr2 = _sm_expr39 == 1;
-    if (_sm_expr2) goto L40;
-    goto L39;
-    L40:;
+    _sm_expr37 = defCount[_sm_expr1];
+    _sm_expr2 = _sm_expr37 == 1;
+    if (_sm_expr2) goto L45;
+    goto L44;
+    L45:;
     _sm_expr1 = *keep;
-    _sm_expr39 = lastWrite[_sm_expr1];
-    _sm_expr43 = simse_dict_getPtr(firstAt, key);
-    _sm_expr44 = *_sm_expr43;
-    _sm_expr2 = _sm_expr39 == _sm_expr44;
-    if (_sm_expr2) goto L38;
-    goto L39;
-    L38:;
+    _sm_expr37 = lastWrite[_sm_expr1];
+    _sm_expr41 = simse_dict_getPtr(firstAt, key);
+    _sm_expr42 = *_sm_expr41;
+    _sm_expr2 = _sm_expr37 == _sm_expr42;
+    if (_sm_expr2) goto L43;
+    goto L44;
+    L43:;
     simse_dict_insert(drop, i, true);
     _sm_expr1 = *keep;
     _sm_expr2 = dst != _sm_expr1;
-    if (_sm_expr2) goto L42;
-    goto L43;
-    L42:;
-    _sm_base16 = *keep;
-    simse_dict_insert(replace, dst, _sm_base16);
-    L43:;
+    if (_sm_expr2) goto L47;
+    goto L48;
+    L47:;
+    _sm_base29 = *keep;
+    simse_dict_insert(replace, dst, _sm_base29);
+    L48:;
     progress = true;
-    L39:;
+    L44:;
     written = ns11_ilReuseDst(op);
     _sm_expr2 = written >= 0;
-    if (_sm_expr2) goto L46;
-    goto L45;
-    L46:;
+    if (_sm_expr2) goto L51;
+    goto L50;
+    L51:;
     _sm_expr2 = written < slots;
-    if (_sm_expr2) goto L44;
-    goto L45;
-    L44:;
+    if (_sm_expr2) goto L49;
+    goto L50;
+    L49:;
     lastWrite[written] = i;
-    L45:;
+    L50:;
     i = i + 1;
     goto L12;
     L13:;
@@ -64514,84 +64385,81 @@ Bool ns11_ilReuseExprs(ns11_IlBody* il) {
     ops = List<ns11_IlOp>();
     lines = List<Int>();
     i = 0;
-    L49:;
-    _sm_base17 = simse_addressOf(il->ops);
-    _sm_expr1 = simse_lenOf((*_sm_base17));
-    _sm_expr2 = i < _sm_expr1;
-    if (!(_sm_expr2)) goto L50;
-    _sm_base19 = simse_addressOf(il->ops);
-    _sm_base18 = simse_addressOf((*_sm_base19)[i]);
-    _sm_op_2 = _sm_base18;
-    _sm_expr2 = simse_dict_has(drop, i);
-    if (_sm_expr2) goto L51;
-    goto L52;
-    L51:;
-    i = i + 1;
-    goto L49;
-    L52:;
-    _sm_expr13 = _sm_op_2->kind;
-    _sm_expr55 = ns11_IlOpKind::Declare;
-    _sm_expr2 = _sm_expr13 == _sm_expr55;
-    if (_sm_expr2) goto L56;
-    _sm_expr13 = _sm_op_2->kind;
-    _sm_expr55 = ns11_IlOpKind::DeclareInit;
-    _sm_expr2 = _sm_expr13 == _sm_expr55;
-    if (_sm_expr2) goto L56;
-    goto L54;
-    L56:;
-    _sm_base20 = simse_addressOf(_sm_op_2->operands);
-    _sm_expr1 = simse_lenOf((*_sm_base20));
-    _sm_expr2 = _sm_expr1 > 0;
-    if (_sm_expr2) goto L55;
-    goto L54;
-    L55:;
-    _sm_base22 = simse_addressOf(_sm_op_2->operands);
-    _sm_base21 = (*_sm_base22)[0];
-    _sm_expr2 = simse_dict_has(replace, _sm_base21);
-    if (_sm_expr2) goto L53;
-    goto L54;
-    L53:;
-    i = i + 1;
-    goto L49;
     L54:;
+    _sm_base30 = simse_addressOf(il->ops);
+    _sm_expr1 = simse_lenOf((*_sm_base30));
+    _sm_expr2 = i < _sm_expr1;
+    if (!(_sm_expr2)) goto L55;
+    _sm_base31 = simse_addressOf((*_sm_base30)[i]);
+    _sm_op_2 = _sm_base31;
+    _sm_expr2 = simse_dict_has(drop, i);
+    if (_sm_expr2) goto L56;
+    goto L57;
+    L56:;
+    i = i + 1;
+    goto L54;
+    L57:;
+    _sm_expr13 = _sm_op_2->kind;
+    _sm_expr53 = ns11_IlOpKind::Declare;
+    _sm_expr2 = _sm_expr13 == _sm_expr53;
+    if (_sm_expr2) goto L61;
+    _sm_expr13 = _sm_op_2->kind;
+    _sm_expr53 = ns11_IlOpKind::DeclareInit;
+    _sm_expr2 = _sm_expr13 == _sm_expr53;
+    if (_sm_expr2) goto L61;
+    goto L59;
+    L61:;
+    _sm_base33 = simse_addressOf(_sm_op_2->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base33));
+    _sm_expr2 = _sm_expr1 > 0;
+    if (_sm_expr2) goto L60;
+    goto L59;
+    L60:;
+    _sm_base34 = (*_sm_base33)[0];
+    _sm_expr2 = simse_dict_has(replace, _sm_base34);
+    if (_sm_expr2) goto L58;
+    goto L59;
+    L58:;
+    i = i + 1;
+    goto L54;
+    L59:;
     operands = List<Int>();
     j = 0;
-    L58:;
-    _sm_base23 = simse_addressOf(_sm_op_2->operands);
-    _sm_expr1 = simse_lenOf((*_sm_base23));
+    L63:;
+    _sm_base36 = simse_addressOf(_sm_op_2->operands);
+    _sm_expr1 = simse_lenOf((*_sm_base36));
     _sm_expr2 = j < _sm_expr1;
-    if (!(_sm_expr2)) goto L59;
-    _sm_base24 = simse_addressOf(_sm_op_2->operands);
-    value = (*_sm_base24)[j];
+    if (!(_sm_expr2)) goto L64;
+    value = (*_sm_base36)[j];
     ns11_ilReuseOperandKind(&operandKind, _sm_op_2, j);
-    _sm_expr65 = ns11_IlOperandKind::Var;
-    _sm_expr2 = operandKind == _sm_expr65;
-    if (_sm_expr2) goto L60;
-    _sm_expr65 = ns11_IlOperandKind::Value;
-    _sm_expr2 = operandKind == _sm_expr65;
-    if (_sm_expr2) goto L60;
-    goto L64;
-    L60:;
+    _sm_expr63 = ns11_IlOperandKind::Var;
+    _sm_expr2 = operandKind == _sm_expr63;
+    if (_sm_expr2) goto L65;
+    _sm_expr63 = ns11_IlOperandKind::Value;
+    _sm_expr2 = operandKind == _sm_expr63;
+    if (_sm_expr2) goto L65;
+    goto L69;
+    L65:;
     target = simse_dict_getPtr(replace, value);
     _sm_expr2 = target != nullptr;
-    if (_sm_expr2) goto L63;
-    goto L64;
-    L63:;
+    if (_sm_expr2) goto L68;
+    goto L69;
+    L68:;
     value = *target;
-    L64:;
+    L69:;
     simse_list_append(operands, value);
     j = j + 1;
-    goto L58;
-    L59:;
-    _sm_base26 = _sm_op_2->kind;
-    _sm_expr70 = ns11_IlOp{_sm_base26, operands};
-    simse_list_append(ops, _sm_expr70);
-    _sm_base28 = simse_addressOf(il->lines);
-    _sm_base27 = (*_sm_base28)[i];
-    simse_list_append(lines, _sm_base27);
+    goto L63;
+    L64:;
+    _sm_base39 = _sm_op_2->kind;
+    _sm_expr68 = ns11_IlOp{_sm_base39, operands};
+    simse_list_append(ops, _sm_expr68);
+    _sm_base41 = simse_addressOf(il->lines);
+    _sm_base40 = (*_sm_base41)[i];
+    simse_list_append(lines, _sm_base40);
     i = i + 1;
-    goto L49;
-    L50:;
+    goto L54;
+    L55:;
     il->ops = ops;
     il->lines = lines;
     changed = true;
@@ -64659,7 +64527,7 @@ Bool ns11_ilReuseIsCallLike(ns11_IlOpKind kind) {
 }
 // src/linear/ReusePure.kt
 Int ns11_ilReuseMethodIndex(ns11_IlOp* op) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4;
+    List<Int>* _sm_base1, * _sm_base3;
     ns11_IlOpKind _sm_expr1, _sm_expr2;
     Bool _sm_expr3;
     Int _sm_expr4;
@@ -64675,8 +64543,7 @@ Int ns11_ilReuseMethodIndex(ns11_IlOp* op) {
     if (_sm_expr3) goto L1;
     goto L2;
     L1:;
-    _sm_base2 = simse_addressOf(op->operands);
-    _sm_expr4 = (*_sm_base2)[1];
+    _sm_expr4 = (*_sm_base1)[1];
     return _sm_expr4;
     L2:;
     _sm_expr1 = op->kind;
@@ -64691,8 +64558,7 @@ Int ns11_ilReuseMethodIndex(ns11_IlOp* op) {
     if (_sm_expr3) goto L4;
     goto L5;
     L4:;
-    _sm_base4 = simse_addressOf(op->operands);
-    _sm_expr4 = (*_sm_base4)[0];
+    _sm_expr4 = (*_sm_base3)[0];
     return _sm_expr4;
     L5:;
     _sm_expr4 = -1;
@@ -64776,7 +64642,7 @@ Bool ns11_ilReuseArgSafe(ns11_IlBody* il, Dictionary<Str, Bool>* pure, Int metho
 }
 // src/linear/ReusePure.kt
 void ns11_ilReuseHit(ns11_IlReuseHit* _sm_out, ns11_IlBody* il, Dictionary<Str, Bool>* pure, ns11_IlOp* op) {
-    List<Int>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base12;
+    List<Int>* _sm_base1, * _sm_base2;
     List<ns11_IlMethod>* _sm_base3, * _sm_base5;
     ns11_IlMethod* _sm_base4, * method;
     Str* _sm_base6, * _sm_base7;
@@ -64831,8 +64697,7 @@ void ns11_ilReuseHit(ns11_IlReuseHit* _sm_out, ns11_IlBody* il, Dictionary<Str, 
     *_sm_out = _sm_expr8;
     return;
     L8:;
-    _sm_base8 = simse_addressOf(op->operands);
-    arg = (*_sm_base8)[2];
+    arg = (*_sm_base2)[2];
     _sm_expr3 = arg < 0;
     if (_sm_expr3) goto L9;
     _sm_base9 = simse_addressOf(il->vars);
@@ -64847,8 +64712,7 @@ void ns11_ilReuseHit(ns11_IlReuseHit* _sm_out, ns11_IlBody* il, Dictionary<Str, 
     return;
     L10:;
     _sm_base10 = method->name;
-    _sm_base12 = simse_addressOf(op->operands);
-    _sm_base11 = (*_sm_base12)[0];
+    _sm_base11 = (*_sm_base2)[0];
     _sm_expr8 = ns11_IlReuseHit{_sm_base10, arg, _sm_base11};
     *_sm_out = _sm_expr8;
     return;
@@ -64919,7 +64783,7 @@ void ns11_ilReuseKey(Str* _sm_out, Str* callee, Int arg) {
 }
 // src/linear/ReusePure.kt
 void ns11_ilReuseOperandKind(ns11_IlOperandKind* _sm_out, ns11_IlOp* op, Int index) {
-    Dictionary<Int, List<Str>>* _sm_base1, * _sm_base4;
+    Dictionary<Int, List<Str>>* _sm_base1;
     ns11_IlSignature* _sm_base3;
     ns11_IlOpKind kind;
     Int key;
@@ -64947,9 +64811,8 @@ void ns11_ilReuseOperandKind(ns11_IlOperandKind* _sm_out, ns11_IlOp* op, Int ind
     _sm_base3 = &_sm_expr3;
     ns11_ilOperandTokens(&built, _sm_base3);
     L4:;
-    _sm_base4 = &ns11_ilReuseTokenAt;
-    simse_dict_insert((*_sm_base4), key, built);
-    tokens = simse_dict_getPtr((*_sm_base4), key);
+    simse_dict_insert((*_sm_base1), key, built);
+    tokens = simse_dict_getPtr((*_sm_base1), key);
     L2:;
     ns11_ilOperandKindAt(&_sm_expr4, tokens, index);
     *_sm_out = _sm_expr4;
@@ -64958,8 +64821,8 @@ void ns11_ilReuseOperandKind(ns11_IlOperandKind* _sm_out, ns11_IlOp* op, Int ind
 // src/linear/ReusePure.kt
 Bool ns11_ilReuseHasCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     List<ns11_IlOp>* _sm_base1, * _sm_base2;
-    List<Int>* _sm_base3, * _sm_base4;
-    List<ns11_IlMethod>* _sm_base5, * _sm_base9;
+    List<Int>* _sm_base3;
+    List<ns11_IlMethod>* _sm_base5;
     Str* _sm_base6, * _sm_base7;
     ns11_IlMethod* _sm_base8;
     Span<ns11_IlOp> _sm_expr1;
@@ -64984,8 +64847,7 @@ Bool ns11_ilReuseHasCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     _sm_expr6 = simse_lenOf((*_sm_base3));
     _sm_expr2 = _sm_expr6 < 2;
     if (_sm_expr2) goto L1;
-    _sm_base4 = simse_addressOf(op->operands);
-    methodIndex = (*_sm_base4)[1];
+    methodIndex = (*_sm_base3)[1];
     _sm_expr2 = methodIndex >= 0;
     if (_sm_expr2) goto L9;
     goto L1;
@@ -64996,8 +64858,7 @@ Bool ns11_ilReuseHasCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     if (_sm_expr2) goto L8;
     goto L1;
     L8:;
-    _sm_base9 = simse_addressOf(il->methods);
-    _sm_base8 = simse_addressOf((*_sm_base9)[methodIndex]);
+    _sm_base8 = simse_addressOf((*_sm_base5)[methodIndex]);
     _sm_base7 = simse_addressOf(_sm_base8->name);
     _sm_base6 = _sm_base7;
     _sm_expr2 = ns11_ilReuseCall(pure, _sm_base6);
@@ -65011,10 +64872,10 @@ Bool ns11_ilReuseHasCall(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
 // src/linear/ReusePure.kt
 Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     List<ns11_IlVar>* _sm_base1;
-    List<ns11_IlOp>* _sm_base2, * _sm_base4, * _sm_base6, * _sm_base39, * _sm_base41;
-    List<Int>* _sm_base3, * _sm_base12, * _sm_base13, * _sm_base21, * _sm_base23, * _sm_base25,
-        * _sm_base26, * _sm_base30, * _sm_base31, * _sm_base35, * _sm_base36, * _sm_base37, * _sm_base42,
-        * _sm_base44, * _sm_base45, * _sm_base46, * _sm_base50;
+    List<ns11_IlOp>* _sm_base2, * _sm_base4, * _sm_base39;
+    List<Int>* _sm_base3, * _sm_base12, * _sm_base21, * _sm_base23, * _sm_base25, * _sm_base26,
+        * _sm_base30, * _sm_base31, * _sm_base35, * _sm_base36, * _sm_base37, * _sm_base42, * _sm_base45,
+        * _sm_base50;
     ns11_IlOp* _sm_base5, * _sm_base40, * op, * _sm_op_2;
     Int _sm_base7, _sm_base8, _sm_base14, _sm_base18, _sm_base19, _sm_base20, _sm_base27, _sm_base29,
         _sm_base34, _sm_base43, _sm_base49, count, _sm_expr2, firstBlockEnd, i, dst, methodIndex, base, j,
@@ -65071,8 +64932,7 @@ Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     _sm_expr2 = simse_lenOf((*_sm_base4));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L6;
-    _sm_base6 = simse_addressOf(il->ops);
-    _sm_base5 = simse_addressOf((*_sm_base6)[i]);
+    _sm_base5 = simse_addressOf((*_sm_base4)[i]);
     op = _sm_base5;
     dst = ns11_ilReuseDst(op);
     _sm_expr1 = dst >= 0;
@@ -65103,8 +64963,7 @@ Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     _sm_expr2 = simse_lenOf((*_sm_base12));
     _sm_expr1 = j < _sm_expr2;
     if (!(_sm_expr1)) goto L13;
-    _sm_base13 = simse_addressOf(op->operands);
-    slot = (*_sm_base13)[j];
+    slot = (*_sm_base12)[j];
     _sm_expr1 = slot >= 0;
     if (_sm_expr1) goto L17;
     goto L15;
@@ -65294,8 +65153,7 @@ Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     _sm_expr2 = simse_lenOf((*_sm_base39));
     _sm_expr1 = i < _sm_expr2;
     if (!(_sm_expr1)) goto L46;
-    _sm_base41 = simse_addressOf(il->ops);
-    _sm_base40 = simse_addressOf((*_sm_base41)[i]);
+    _sm_base40 = simse_addressOf((*_sm_base39)[i]);
     _sm_op_2 = _sm_base40;
     _sm_expr1 = simse_dict_has(dropped, i);
     if (_sm_expr1) goto L47;
@@ -65320,8 +65178,7 @@ Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     if (_sm_expr1) goto L51;
     goto L50;
     L51:;
-    _sm_base44 = simse_addressOf(_sm_op_2->operands);
-    _sm_base43 = (*_sm_base44)[0];
+    _sm_base43 = (*_sm_base42)[0];
     _sm_expr1 = simse_dict_has(replaced, _sm_base43);
     if (_sm_expr1) goto L49;
     goto L50;
@@ -65336,8 +65193,7 @@ Bool ns11_ilReusePure(ns11_IlBody* il, Dictionary<Str, Bool>* pure) {
     _sm_expr2 = simse_lenOf((*_sm_base45));
     _sm_expr1 = _sm_j_2 < _sm_expr2;
     if (!(_sm_expr1)) goto L55;
-    _sm_base46 = simse_addressOf(_sm_op_2->operands);
-    value = (*_sm_base46)[_sm_j_2];
+    value = (*_sm_base45)[_sm_j_2];
     ns11_ilReuseOperandKind(&kind, _sm_op_2, _sm_j_2);
     _sm_expr65 = ns11_IlOperandKind::Var;
     _sm_expr1 = kind == _sm_expr65;
@@ -65380,7 +65236,7 @@ Bool ns11_ilReuseUnit(ns11_IlUnit* unit, Dictionary<Str, Bool>* pure) {
     Span_iter_yieldable<ns11_IlBody> _sm_for3;
     _sm_base2 = simse_addressOf(unit->body);
     _sm_base1 = _sm_base2;
-    changed = ns11_ilReuseExprs(_sm_base1);
+    changed = ns11_ilReuseExprs(_sm_base1, pure);
     _sm_base3 = _sm_base2;
     _sm_expr1 = ns11_ilReusePure(_sm_base3, pure);
     if (_sm_expr1) goto L1;
@@ -65396,7 +65252,7 @@ Bool ns11_ilReuseUnit(ns11_IlUnit* unit, Dictionary<Str, Bool>* pure) {
     _sm_expr1 = advance(&_sm_for3);
     if (!(_sm_expr1)) goto L4;
     lambda = _sm_for3.current;
-    _sm_expr1 = ns11_ilReuseExprs(lambda);
+    _sm_expr1 = ns11_ilReuseExprs(lambda, pure);
     if (_sm_expr1) goto L5;
     goto L6;
     L5:;
@@ -66429,8 +66285,8 @@ void ns11_shadowName(Str* _sm_out, ns11_SimRenamer* self, Str* name) {
 // src/linear/SimplifyNames.kt
 void ns11_inList(List<ns3_AstXmlNode>* _sm_out, ns11_SimRenamer* self, List<ns3_AstXmlNode>* stmts) {
     ns3_AstNodeAttributeKind _sm_base1;
-    Dictionary<Str, Bool>* _sm_base2, * _sm_base5;
-    Str* _sm_base3, * _sm_base9, * _sm_base10, * _sm_base13, * _sm_base14;
+    Dictionary<Str, Bool>* _sm_base2;
+    Str* _sm_base3, * _sm_base9, * _sm_base10, * _sm_base13;
     Dictionary<Str, Str>* _sm_base4;
     List<ns11_SimRenameScope>* _sm_base6, * _sm_base15;
     ns3_AstXmlNode* _sm_base7, * _sm_base8, * _sm_base12, * stmt;
@@ -66476,8 +66332,7 @@ void ns11_inList(List<ns3_AstXmlNode>* _sm_out, ns11_SimRenamer* self, List<ns3_
     _sm_base4 = simse_addressOf(scope.renamed);
     simse_dict_insert((*_sm_base4), original, name);
     L6:;
-    _sm_base5 = simse_addressOf(self->used);
-    simse_dict_insert((*_sm_base5), name, true);
+    simse_dict_insert((*_sm_base2), name, true);
     L4:;
     simse_list_append(emitted, name);
     goto L1;
@@ -66501,8 +66356,7 @@ void ns11_inList(List<ns3_AstXmlNode>* _sm_out, ns11_SimRenamer* self, List<ns3_
     goto L10;
     L9:;
     _sm_base12 = &_sm_stmt_2;
-    _sm_base14 = simse_addressOf(emitted[i]);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base10;
     ns11_simNameAttrs(&_sm_base11, _sm_base12, _sm_base13);
     _sm_stmt_2.attributes = _sm_base11;
     L10:;
@@ -67330,7 +67184,7 @@ void ns11_fail(ns11_TskMachinery* self, Str message) {
 }
 // src/linear/Task.kt
 void ns11_addField(ns11_TskMachinery* self, Str name, ns3_AstXmlNode typeNode) {
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base1, * _sm_base2;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base1;
     Dictionary<Str, Int>* _sm_base3;
     Int _sm_base4, _sm_base5, _sm_base6;
     List<Str>* _sm_base7;
@@ -67342,8 +67196,7 @@ void ns11_addField(ns11_TskMachinery* self, Str name, ns3_AstXmlNode typeNode) {
     L1:;
     return;
     L2:;
-    _sm_base2 = simse_addressOf(self->fieldTypes);
-    simse_dict_insert((*_sm_base2), name, typeNode);
+    simse_dict_insert((*_sm_base1), name, typeNode);
     _sm_base3 = simse_addressOf(self->fieldIds);
     _sm_base4 = self->nextField;
     simse_dict_insert((*_sm_base3), name, _sm_base4);
@@ -67355,7 +67208,7 @@ void ns11_addField(ns11_TskMachinery* self, Str name, ns3_AstXmlNode typeNode) {
 }
 // src/linear/Task.kt
 Str ns11_member(ns11_TskMachinery* self, Str name) {
-    Dictionary<Str, Int>* _sm_base1, * _sm_base2;
+    Dictionary<Str, Int>* _sm_base1;
     Int _sm_base3;
     Bool _sm_expr1, _sm_expr2;
     Int* _sm_expr3;
@@ -67368,8 +67221,7 @@ Str ns11_member(ns11_TskMachinery* self, Str name) {
     L1:;
     return __sm_stringTable[1475];
     L2:;
-    _sm_base2 = simse_addressOf(self->fieldIds);
-    _sm_expr3 = simse_dict_getPtr((*_sm_base2), name);
+    _sm_expr3 = simse_dict_getPtr((*_sm_base1), name);
     _sm_base3 = *_sm_expr3;
     ns11_tskFieldMember(&_sm_expr4, _sm_base3);
     return _sm_expr4;
@@ -67378,10 +67230,10 @@ Str ns11_member(ns11_TskMachinery* self, Str name) {
 ns11_TskTask ns11_run(ns11_TskMachinery* self, List<ns3_AstXmlNode>* body) {
     Char* __sm_catP;
     List<ns3_AstXmlNode> _sm_base1, _sm_base4, _sm_base5, _sm_expr2;
-    Str* _sm_base2, * _sm_base6;
+    Str* _sm_base2;
     Str _sm_base3, _sm_base7, _sm_base11, fieldName, fieldOrderText, _sm_expr12;
     List<Str>* _sm_base8, * _sm_base9;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base10, * _sm_base14;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base10;
     ns3_AstXmlNode _sm_base15;
     List<ns11_TskField>* _sm_base16;
     List<ns11_TskField> _sm_expr1;
@@ -67411,8 +67263,7 @@ ns11_TskTask ns11_run(ns11_TskMachinery* self, List<ns3_AstXmlNode>* body) {
     _sm_base5 = *(body);
     _sm_base4 = ns11_method(self, _sm_base5);
     task.body = _sm_base4;
-    _sm_base6 = simse_addressOf(self->error);
-    _sm_expr4 = isEmpty(_sm_base6);
+    _sm_expr4 = isEmpty(_sm_base2);
     _sm_expr5 = !_sm_expr4;
     if (_sm_expr5) goto L3;
     goto L4;
@@ -67446,8 +67297,7 @@ ns11_TskTask ns11_run(ns11_TskMachinery* self, List<ns3_AstXmlNode>* body) {
     task.error = _sm_base11;
     return task;
     L8:;
-    _sm_base14 = simse_addressOf(self->fieldTypes);
-    fieldType = simse_dict_getPtr((*_sm_base14), fieldName);
+    fieldType = simse_dict_getPtr((*_sm_base10), fieldName);
     _sm_expr12 = ns11_member(self, fieldName);
     _sm_base15 = *fieldType;
     _sm_expr13 = ns11_TskField{fieldName, _sm_expr12, _sm_base15};
@@ -68889,7 +68739,7 @@ void ns11_fail(ns11_YldMachinery* self, Str message) {
 ns11_Yielded ns11_run(ns11_YldMachinery* self, List<ns3_AstXmlNode>* body) {
     List<ns3_AstXmlNode> _sm_base1, _sm_base7;
     ns11_Yielded* _sm_base2;
-    Str* _sm_base3, * _sm_base5, * _sm_base9;
+    Str* _sm_base3, * _sm_base5;
     Str _sm_base4, _sm_base6, _sm_base10;
     List<ns11_YldMethod>* _sm_base8;
     List<ns11_YldField> _sm_expr1;
@@ -68925,8 +68775,7 @@ ns11_Yielded ns11_run(ns11_YldMachinery* self, List<ns3_AstXmlNode>* body) {
     _sm_base8 = simse_addressOf(yielded.methods);
     simse_list_append((*_sm_base8), _sm_expr7);
     L4:;
-    _sm_base9 = simse_addressOf(self->error);
-    _sm_expr3 = isEmpty(_sm_base9);
+    _sm_expr3 = isEmpty(_sm_base3);
     _sm_expr4 = !_sm_expr3;
     if (_sm_expr4) goto L5;
     goto L6;
@@ -68942,8 +68791,8 @@ void ns11_collectFields(ns11_YldMachinery* self, List<ns3_AstXmlNode> body, ns11
     Str* _sm_base1, * _sm_base16, * _sm_base17, * _sm_base22, * _sm_base25, * _sm_base27;
     Str _sm_base2, _sm_expr1, _sm_expr3, _sm_expr4, _sm_expr5, _sm_expr8, _sm_expr10, name, _sm_expr15,
         _sm_expr18, _sm_expr19, _sm_expr20, fieldName;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base3, * _sm_base10, * _sm_base18, * _sm_base23, * _sm_base30;
-    List<Str>* _sm_base4, * _sm_base11, * _sm_base26, * _sm_base28, * _sm_base29;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base3, * _sm_base18, * _sm_base30;
+    List<Str>* _sm_base4, * _sm_base26, * _sm_base28, * _sm_base29;
     ns3_AstXmlNode _sm_base6, _sm_base24, _sm_base31, _sm_expr2, _sm_expr9;
     ns3_AstXmlNode* _sm_base8, * _sm_base12, * _sm_base14, * receiver, * param, * typeNode, * fieldType;
     ns3_AstNodeKind _sm_base9, _sm_base13, _sm_base19;
@@ -68980,11 +68829,9 @@ void ns11_collectFields(ns11_YldMachinery* self, List<ns3_AstXmlNode> body, ns11
     L1:;
     ns11_yldReceiverField(&_sm_expr8);
     ns11_ilReceiverTypeNode(&_sm_expr9, receiver);
-    _sm_base10 = simse_addressOf(self->fieldTypes);
-    simse_dict_insert((*_sm_base10), _sm_expr8, _sm_expr9);
+    simse_dict_insert((*_sm_base3), _sm_expr8, _sm_expr9);
     ns11_yldReceiverField(&_sm_expr10);
-    _sm_base11 = simse_addressOf(self->fieldOrder);
-    simse_list_append((*_sm_base11), _sm_expr10);
+    simse_list_append((*_sm_base4), _sm_expr10);
     L2:;
     _sm_base12 = self->decl;
     _sm_base13 = ns3_AstNodeKind::Param;
@@ -69031,9 +68878,8 @@ void ns11_collectFields(ns11_YldMachinery* self, List<ns3_AstXmlNode> body, ns11
     L10:;
     _sm_base22 = &name;
     ns11_yldFieldName(&_sm_expr19, _sm_base22);
-    _sm_base23 = simse_addressOf(self->fieldTypes);
     _sm_base24 = *(typeNode);
-    simse_dict_insert((*_sm_base23), _sm_expr19, _sm_base24);
+    simse_dict_insert((*_sm_base18), _sm_expr19, _sm_base24);
     _sm_base25 = &name;
     ns11_yldFieldName(&_sm_expr20, _sm_base25);
     _sm_base26 = simse_addressOf(self->fieldOrder);
@@ -69072,7 +68918,7 @@ void ns11_collectLocals(ns11_YldMachinery* self, List<ns3_AstXmlNode> body) {
     ns3_AstXmlNode* _sm_base1, * stmt, * typeNode;
     Str* _sm_base2, * _sm_base4, * _sm_base5, * _sm_base8, * _sm_base12, * _sm_base15;
     ns3_AstNodeAttributeKind _sm_base3;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base6, * _sm_base13;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base6;
     ns3_AstNodeKind _sm_base7, _sm_base17, _sm_base18, _sm_base19;
     Str _sm_base9, name, _sm_expr9, message, _sm_expr13, _sm_expr14, _sm_expr15;
     ns3_AstXmlNode _sm_base14;
@@ -69143,9 +68989,8 @@ void ns11_collectLocals(ns11_YldMachinery* self, List<ns3_AstXmlNode> body) {
     L11:;
     _sm_base12 = &name;
     ns11_yldFieldName(&_sm_expr14, _sm_base12);
-    _sm_base13 = simse_addressOf(self->fieldTypes);
     _sm_base14 = *(typeNode);
-    simse_dict_insert((*_sm_base13), _sm_expr14, _sm_base14);
+    simse_dict_insert((*_sm_base6), _sm_expr14, _sm_base14);
     _sm_base15 = &name;
     ns11_yldFieldName(&_sm_expr15, _sm_base15);
     _sm_base16 = simse_addressOf(self->fieldOrder);
@@ -70068,7 +69913,7 @@ Bool ns13_foldCompareOp(Str* op) {
 }
 // src/optimizations/FoldExprs.kt
 void ns13_foldExprsUnder(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* node, List<Func<ns3_AstXmlNode(ns3_AstXmlNode*)>>* rules, ns13_FoldState* state) {
-    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base4, * _sm_base6;
+    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base6;
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base8, * _sm_base9, * _sm_base10;
     ns3_AstXmlNode _sm_base5, rewritten, here, after;
     List<ns3_AstXmlNode>* _sm_base7;
@@ -70124,8 +69969,7 @@ void ns13_foldExprsUnder(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* node, List<Fun
     _sm_expr3 = i < _sm_expr18;
     if (!(_sm_expr3)) goto L12;
     _sm_expr3 = state->changed;
-    _sm_base4 = simse_addressOf(node->Children);
-    _sm_base3 = simse_addressOf((*_sm_base4)[i]);
+    _sm_base3 = simse_addressOf((*_sm_base1)[i]);
     _sm_base2 = _sm_base3;
     ns13_foldExprsUnder(&rewritten, _sm_base2, rules, state);
     _sm_expr20 = state->changed;
@@ -70758,7 +70602,7 @@ void ns13_foldGlobalScanBodies(ns3_AstXmlNode* module) {
 // src/optimizations/FoldGlobals.kt
 void ns13_linConstGlobalsBuild() {
     List<ns13_FoldGlobalConst>* _sm_base1, * _sm_base2;
-    ns13_FoldGlobalScan* _sm_base3, * _sm_base5, * _sm_base9, * _sm_base11, * _sm_base13;
+    ns13_FoldGlobalScan* _sm_base3, * _sm_base5;
     List<Str>* _sm_base4;
     Dictionary<Str, Bool>* _sm_base6, * _sm_base8, * _sm_base10, * _sm_base12;
     Dictionary<Str, ns13_FoldGlobalConst>* _sm_base14;
@@ -70788,8 +70632,7 @@ void ns13_linConstGlobalsBuild() {
     ok = !_sm_expr2;
     _sm_expr4 = ok;
     if (!(_sm_expr4)) goto _sm_sc1;
-    _sm_base9 = &ns13_linGlobalScan;
-    _sm_base8 = simse_addressOf(_sm_base9->addressed);
+    _sm_base8 = simse_addressOf(_sm_base5->addressed);
     _sm_expr2 = simse_dict_has((*_sm_base8), name);
     _sm_expr6 = !_sm_expr2;
     _sm_expr4 = _sm_expr6;
@@ -70797,8 +70640,7 @@ void ns13_linConstGlobalsBuild() {
     ok = _sm_expr4;
     _sm_expr7 = ok;
     if (!(_sm_expr7)) goto _sm_sc2;
-    _sm_base11 = &ns13_linGlobalScan;
-    _sm_base10 = simse_addressOf(_sm_base11->bound);
+    _sm_base10 = simse_addressOf(_sm_base5->bound);
     _sm_expr2 = simse_dict_has((*_sm_base10), name);
     _sm_expr6 = !_sm_expr2;
     _sm_expr7 = _sm_expr6;
@@ -70806,8 +70648,7 @@ void ns13_linConstGlobalsBuild() {
     ok = _sm_expr7;
     _sm_expr10 = ok;
     if (!(_sm_expr10)) goto _sm_sc3;
-    _sm_base13 = &ns13_linGlobalScan;
-    _sm_base12 = simse_addressOf(_sm_base13->borrowed);
+    _sm_base12 = simse_addressOf(_sm_base5->borrowed);
     _sm_expr2 = simse_dict_has((*_sm_base12), name);
     _sm_expr6 = !_sm_expr2;
     _sm_expr10 = _sm_expr6;
@@ -71915,7 +71756,7 @@ Bool ns13_linFoldConstBody(List<ns3_AstXmlNode>* stmts, Ref<ns13_LinUseDefs> use
     Dictionary<Str, Int>* _sm_base2;
     Dictionary<Str, Bool>* _sm_base4;
     Dictionary<Str, ns13_FoldGlobalConst> _sm_base6, _sm_base8, singles;
-    Dictionary<Str, ns13_FoldGlobalConst>* _sm_base9, * _sm_base17;
+    Dictionary<Str, ns13_FoldGlobalConst>* _sm_base9;
     List<Func<ns3_AstXmlNode(ns3_AstXmlNode*)>>* _sm_base12;
     ns13_FoldState* _sm_base13;
     ns13_FoldGlobalConst _sm_base18, _sm_expr19;
@@ -72045,9 +71886,8 @@ Bool ns13_linFoldConstBody(List<ns3_AstXmlNode>* stmts, Ref<ns13_LinUseDefs> use
     L23:;
     _sm_expr6 = simse_optValue(simse_addressOf(_sm_write_2));
     _sm_expr34 = _sm_expr6.name;
-    _sm_base17 = &ns13_linFoldConstAvailable;
     _sm_base18 = *single;
-    simse_dict_insert((*_sm_base17), _sm_expr34, _sm_base18);
+    simse_dict_insert((*_sm_base9), _sm_expr34, _sm_base18);
     L24:;
     i = i + 1;
     goto L12;
@@ -73967,7 +73807,7 @@ void ns13_linUseDefWrites(ns3_AstXmlNode* stmt, List<Str>* names) {
 }
 // src/optimizations/usedef/UseDefs.kt
 Ref<ns13_LinUseDefs> ns13_linUseDefsFor(Str* signature) {
-    Dictionary<Str, ns13_LinUseDefCache>* _sm_base1, * _sm_base4;
+    Dictionary<Str, ns13_LinUseDefCache>* _sm_base1;
     Str _sm_base2, _sm_base5;
     ns13_LinUseDefCache* found;
     Bool _sm_expr1;
@@ -73985,9 +73825,8 @@ Ref<ns13_LinUseDefs> ns13_linUseDefsFor(Str* signature) {
     L2:;
     fresh = ns13_linEmptyUseDefs();
     _sm_expr3 = ns13_LinUseDefCache{fresh};
-    _sm_base4 = &ns13_linUseDefCaches;
     _sm_base5 = *(signature);
-    simse_dict_insert((*_sm_base4), _sm_base5, _sm_expr3);
+    simse_dict_insert((*_sm_base1), _sm_base5, _sm_expr3);
     return fresh;
 }
 // src/optimizations/usedef/UseDefs.kt
@@ -75068,7 +74907,7 @@ Int ns14_bpClassifyPlace(ns3_AstXmlNode* node, Dictionary<Str, Bool>* fresh, Dic
     ns3_AstNodeAttributeKind _sm_base2, _sm_base10;
     ns3_AstNodeKind _sm_base5, _sm_base6, _sm_base7, _sm_base24, _sm_base32, _sm_base35;
     Dictionary<Str, Str>* _sm_base11;
-    Dictionary<Str, Bool>* _sm_base12, * _sm_base16;
+    Dictionary<Str, Bool>* _sm_base12;
     Str* _sm_base17, * _sm_base20, * provenance;
     Str _sm_base21, name, calleeName, posText, _sm_expr36;
     List<Str>* _sm_base22;
@@ -75198,8 +75037,7 @@ Int ns14_bpClassifyPlace(ns3_AstXmlNode* node, Dictionary<Str, Bool>* fresh, Dic
     if (_sm_expr1) goto L29;
     goto L28;
     L29:;
-    _sm_base16 = &ns14_bpResultTrusted;
-    _sm_expr1 = simse_dict_has((*_sm_base16), calleeName);
+    _sm_expr1 = simse_dict_has((*_sm_base12), calleeName);
     if (_sm_expr1) goto L28;
     _sm_base17 = provenance;
     _sm_expr32 = simse_spanOfStr(_sm_base17);
@@ -75404,10 +75242,10 @@ void ns14_bpCallSlots(List<Int>* _sm_out, ns3_AstXmlNode* node, ns3_AstXmlNode* 
 void ns14_bpPureWalk(ns3_AstXmlNode* node, ns14_BpPure* out, Dictionary<Str, Bool>* statics, Dictionary<Str, Bool>* types, Dictionary<Str, Bool>* reads, Dictionary<Str, Bool>* callables, Dictionary<Str, Int>* params) {
     ns3_AstNodeAttributeKind _sm_base1, _sm_base17, _sm_base19, _sm_base30, _sm_base32;
     ns3_AstNodeKind _sm_base2, _sm_base10, _sm_base20, _sm_base29;
-    Dictionary<Str, Bool>* _sm_base3, * _sm_base4, * _sm_base8, * _sm_base11, * _sm_base12, * _sm_base21,
+    Dictionary<Str, Bool>* _sm_base3, * _sm_base4, * _sm_base11, * _sm_base12, * _sm_base21,
         * _sm_base22, * _sm_base33, * _sm_base34;
-    Dictionary<Str, Int>* _sm_base5, * _sm_base6, * _sm_base9, * _sm_base13, * _sm_base14, * _sm_base23,
-        * _sm_base24, * _sm_base25, * _sm_base27, * _sm_base35, * _sm_base36;
+    Dictionary<Str, Int>* _sm_base5, * _sm_base6, * _sm_base13, * _sm_base14, * _sm_base23, * _sm_base24,
+        * _sm_base35, * _sm_base36;
     Int _sm_base7, _sm_base15, _sm_base26, _sm_base28, cls, _sm_cls_2, _sm_cls_3;
     Dictionary<Int, Bool>* _sm_base16;
     Str _sm_base18, _sm_base31, _sm_base37, declared, targetName;
@@ -75446,16 +75284,14 @@ void ns14_bpPureWalk(ns3_AstXmlNode* node, ns14_BpPure* out, Dictionary<Str, Boo
     if (_sm_expr2) goto L5;
     goto L6;
     L5:;
-    _sm_base8 = simse_addressOf(out->fresh);
-    simse_dict_insert((*_sm_base8), declared, true);
+    simse_dict_insert((*_sm_base4), declared, true);
     goto L9;
     L6:;
     _sm_expr2 = cls >= 0;
     if (_sm_expr2) goto L8;
     goto L9;
     L8:;
-    _sm_base9 = simse_addressOf(out->alias);
-    simse_dict_insert((*_sm_base9), declared, cls);
+    simse_dict_insert((*_sm_base6), declared, cls);
     L9:;
     _sm_expr1 = ns3_AstNodeCategory::StmtAssign;
     _sm_expr2 = kind == _sm_expr1;
@@ -75514,8 +75350,7 @@ void ns14_bpPureWalk(ns3_AstXmlNode* node, ns14_BpPure* out, Dictionary<Str, Boo
     if (_sm_expr2) goto L23;
     goto L24;
     L23:;
-    _sm_base25 = simse_addressOf(out->alias);
-    simse_dict_insert((*_sm_base25), targetName, _sm_cls_3);
+    simse_dict_insert((*_sm_base24), targetName, _sm_cls_3);
     goto L27;
     L24:;
     _sm_base26 = ns14_bpSlotOther;
@@ -75523,9 +75358,8 @@ void ns14_bpPureWalk(ns3_AstXmlNode* node, ns14_BpPure* out, Dictionary<Str, Boo
     if (_sm_expr2) goto L26;
     goto L27;
     L26:;
-    _sm_base27 = simse_addressOf(out->alias);
     _sm_base28 = ns14_bpSlotOther;
-    simse_dict_insert((*_sm_base27), targetName, _sm_base28);
+    simse_dict_insert((*_sm_base24), targetName, _sm_base28);
     L27:;
     _sm_expr1 = ns3_AstNodeCategory::ExprCall;
     _sm_expr2 = kind == _sm_expr1;
@@ -77119,12 +76953,12 @@ Bool ns14_slotsSafe(ns14_BpFacts* self, ns3_AstXmlNode* call, ns3_AstXmlNode* ca
 // src/parser/BorrowParams.kt
 void ns14_walk(ns14_BpFacts* self, ns3_AstXmlNode* node) {
     ns3_AstNodeAttributeKind _sm_base1, _sm_base16, _sm_base31, _sm_base38;
-    Dictionary<Str, Bool>* _sm_base2, * _sm_base3, * _sm_base5, * _sm_base6, * _sm_base11, * _sm_base13,
-        * _sm_base17, * _sm_base18, * _sm_base20, * _sm_base21, * _sm_base26, * _sm_base30, * _sm_base32,
-        * _sm_base34, * _sm_base35;
+    Dictionary<Str, Bool>* _sm_base2, * _sm_base3, * _sm_base5, * _sm_base6, * _sm_base11, * _sm_base17,
+        * _sm_base18, * _sm_base20, * _sm_base21, * _sm_base26, * _sm_base30, * _sm_base32, * _sm_base34,
+        * _sm_base35;
     ns3_AstNodeKind _sm_base4, _sm_base15, _sm_base19, _sm_base29;
-    Dictionary<Str, Int>* _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base14, * _sm_base22,
-        * _sm_base23, * _sm_base24, * _sm_base25, * _sm_base28;
+    Dictionary<Str, Int>* _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base22, * _sm_base23,
+        * _sm_base24, * _sm_base25;
     Int _sm_base12, _sm_base27, cls, _sm_cls_2;
     Str* _sm_base33, * sig, * _sm_expr39;
     Dictionary<Str, Str>* _sm_base36;
@@ -77167,16 +77001,14 @@ void ns14_walk(ns14_BpFacts* self, ns3_AstXmlNode* node) {
     if (_sm_expr2) goto L5;
     goto L6;
     L5:;
-    _sm_base13 = simse_addressOf(self->fresh);
-    simse_dict_insert((*_sm_base13), declared, true);
+    simse_dict_insert((*_sm_base6), declared, true);
     goto L9;
     L6:;
     _sm_expr2 = cls >= 0;
     if (_sm_expr2) goto L8;
     goto L9;
     L8:;
-    _sm_base14 = simse_addressOf(self->alias);
-    simse_dict_insert((*_sm_base14), declared, cls);
+    simse_dict_insert((*_sm_base8), declared, cls);
     L9:;
     _sm_expr1 = ns3_AstNodeCategory::StmtAssign;
     _sm_expr2 = kind == _sm_expr1;
@@ -77223,8 +77055,7 @@ void ns14_walk(ns14_BpFacts* self, ns3_AstXmlNode* node) {
     if (_sm_expr2) goto L18;
     goto L19;
     L18:;
-    _sm_base28 = simse_addressOf(self->alias);
-    simse_dict_insert((*_sm_base28), targetName, _sm_cls_2);
+    simse_dict_insert((*_sm_base23), targetName, _sm_cls_2);
     L19:;
     _sm_expr1 = ns3_AstNodeCategory::ExprCall;
     _sm_expr2 = kind == _sm_expr1;
@@ -77891,7 +77722,7 @@ Bool ns14_bpLoopReadOnly(List<ns3_AstXmlNode>* body, Str* name) {
 // src/parser/BorrowParams.kt
 Bool ns14_bpPlaceReadOnly(List<ns3_AstXmlNode>* body, Str* name, Str* root) {
     Dictionary<Str, Bool>* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base8, * _sm_base10, * _sm_base12,
-        * _sm_base14, * _sm_base16, * _sm_base18;
+        * _sm_base16, * _sm_base18;
     Dictionary<Str, Str>* _sm_base4;
     Str _sm_base5, _sm_base7, _sm_base9, _sm_base11, _sm_base13, _sm_base15, _sm_base17, _sm_base19,
         declName;
@@ -77966,9 +77797,8 @@ Bool ns14_bpPlaceReadOnly(List<ns3_AstXmlNode>* body, Str* name, Str* root) {
     L10:;
     return false;
     L11:;
-    _sm_base14 = simse_addressOf(facts.written);
     _sm_base15 = *root;
-    _sm_expr10 = simse_dict_has((*_sm_base14), _sm_base15);
+    _sm_expr10 = simse_dict_has((*_sm_base8), _sm_base15);
     if (_sm_expr10) goto L14;
     _sm_base16 = simse_addressOf(facts.taken);
     _sm_base17 = *root;
@@ -77992,7 +77822,7 @@ void ns14_bpSpanWalk(ns3_AstXmlNode* node, Str* root, ns14_BpSpan* facts) {
         posText, _sm_expr46;
     Dictionary<Str, Bool>* _sm_base8, * _sm_base11, * _sm_base12;
     Str* _sm_base10, * _sm_base18, * _sm_expr6, * sig;
-    Dictionary<Str, Str>* _sm_base16, * _sm_base17;
+    Dictionary<Str, Str>* _sm_base16;
     List<Str>* _sm_base20;
     Array<ns3_AstXmlNode>* _sm_base25, * _sm_base26;
     ns3_AstNodeCategory kind, _sm_expr1, _sm_expr4, ck;
@@ -78145,8 +77975,7 @@ void ns14_bpSpanWalk(ns3_AstXmlNode* node, Str* root, ns14_BpSpan* facts) {
     if (_sm_expr2) goto L32;
     goto L51;
     L32:;
-    _sm_base17 = &ns14_bpWritesNames;
-    sig = simse_dict_getPtr((*_sm_base17), calleeName);
+    sig = simse_dict_getPtr((*_sm_base16), calleeName);
     _sm_expr1 = ns3_AstNodeCategory::ExprMember;
     memberCall = ck == _sm_expr1;
     first = 0;
@@ -81213,8 +81042,8 @@ void ns14_walk(ns14_EpScan* self, ns3_AstXmlNode* node, ns14_EpCtx ctx, Str call
     Str name;
     ns3_AstXmlNode* _sm_expr8, * _sm_expr12, * _sm_expr20, * _sm_expr23, * child, * _sm_expr40,
         * declared, * init, * target, * rhs, * _sm_expr53, * _sm_expr57, * _sm_expr61, * _sm_child_2;
-    Int _sm_expr9, _sm_expr13, _sm_expr24, _sm_expr33, _sm_expr41, _sm_expr46, _sm_expr54, _sm_expr58,
-        _sm_expr62, _sm_expr63, _sm_expr64, _sm_expr67;
+    Int _sm_expr9, _sm_expr13, _sm_expr24, _sm_expr33, _sm_expr41, _sm_expr46, _sm_expr54, _sm_expr62,
+        _sm_expr63, _sm_expr64, _sm_expr67;
     Span<ns3_AstXmlNode> _sm_expr31, _sm_expr65;
     Span_iter_yieldable<ns3_AstXmlNode> _sm_for8, _sm_for9;
     _sm_expr1 = ns2_xmlIsEmpty(node);
@@ -81401,9 +81230,8 @@ void ns14_walk(ns14_EpScan* self, ns3_AstXmlNode* node, ns14_EpCtx ctx, Str call
     L39:;
     _sm_base24 = ns3_AstNodeKind::Index;
     _sm_expr57 = ns2_xmlChildPtr(target, _sm_base24);
-    _sm_expr58 = -1;
     _sm_base25 = ns14_EpCtx::Read;
-    ns14_walk(self, _sm_expr57, _sm_base25, __sm_stringTable[1475], _sm_expr58);
+    ns14_walk(self, _sm_expr57, _sm_base25, __sm_stringTable[1475], _sm_expr54);
     goto L44;
     L37:;
     _sm_expr2 = ns3_AstNodeCategory::ExprDeref;
@@ -81606,7 +81434,7 @@ void ns14_epCollectModule(ns3_AstXmlNode* module, List<ns14_EpDecl>* out, Dictio
 }
 // src/parser/EscapeParams.kt
 void ns14_epPreScanDecls(List<ns14_EpDecl>* decls, Dictionary<Str, Bool>* types) {
-    List<Str>* _sm_base1, * _sm_base4, * _sm_base6;
+    List<Str>* _sm_base1, * _sm_base4;
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base14, * stmt;
     Str _sm_base5, _sm_base7;
     Bool _sm_base9, _sm_expr2;
@@ -81645,10 +81473,9 @@ void ns14_epPreScanDecls(List<ns14_EpDecl>* decls, Dictionary<Str, Bool>* types)
     _sm_expr3 = simse_lenOf((*_sm_base4));
     _sm_expr2 = k < _sm_expr3;
     if (!(_sm_expr2)) goto L7;
-    _sm_base6 = simse_addressOf(decl->params);
-    _sm_base5 = (*_sm_base6)[k];
+    _sm_base5 = (*_sm_base4)[k];
     simse_dict_insert(params, _sm_base5, true);
-    _sm_base7 = (*_sm_base6)[k];
+    _sm_base7 = (*_sm_base4)[k];
     _sm_base10 = simse_addressOf(decl->handles);
     _sm_base9 = (*_sm_base10)[k];
     simse_dict_insert(handles, _sm_base7, _sm_base9);
@@ -81689,15 +81516,15 @@ void ns14_epAnalyze(List<ns3_AstXmlNode> preludeModules, List<ns3_AstXmlNode> mo
     List<ns3_AstXmlNode>* _sm_base4, * _sm_base7;
     List<ns14_EpDecl>* _sm_base5, * _sm_base8, * _sm_base10, * _sm_base12;
     Dictionary<Str, Bool>* _sm_base6, * _sm_base9, * _sm_base11, * _sm_base38;
-    List<Str>* _sm_base13, * _sm_base16, * _sm_base17, * _sm_base24, * _sm_base25, * _sm_base36,
-        * _sm_base37, * _sm_base45, * _sm_base53, * _sm_base56, * _sm_base58, * _sm_base73;
+    List<Str>* _sm_base13, * _sm_base16, * _sm_base24, * _sm_base25, * _sm_base36, * _sm_base37,
+        * _sm_base45, * _sm_base53, * _sm_base56, * _sm_base58, * _sm_base73;
     ns3_AstXmlNode* _sm_base14, * _sm_base15, * pre, * mod;
     Dictionary<Str, List<Bool>>* _sm_base18, * _sm_base21, * _sm_base26, * _sm_base39, * _sm_base42,
         * _sm_base47, * _sm_base48, * _sm_base49, * _sm_base50, * _sm_base51, * _sm_base52, * _sm_base55,
         * _sm_base59, * _sm_base61;
-    Str* _sm_base19, * _sm_base20, * _sm_base22, * _sm_base23, * _sm_base27, * _sm_base28, * _sm_base31,
-        * _sm_base32, * _sm_base40, * _sm_base41, * _sm_base43, * _sm_base44, * _sm_base69, * name,
-        * _sm_name_2, * _sm_name_3, * _sm_name_4, * _sm_name_5;
+    Str* _sm_base19, * _sm_base20, * _sm_base22, * _sm_base27, * _sm_base28, * _sm_base31, * _sm_base32,
+        * _sm_base40, * _sm_base41, * _sm_base43, * _sm_base44, * _sm_base69, * name, * _sm_name_2,
+        * _sm_name_3, * _sm_name_4, * _sm_name_5;
     List<ns14_EpEvent>* _sm_base29, * _sm_base30;
     Int _sm_base33, guard, _sm_expr9, _sm_k_2, k, _sm_k_3, count, _sm_k_4, _sm_k_5;
     Str _sm_base34, _sm_base35, _sm_base46, _sm_base54, _sm_base57, _sm_base60, _sm_base62, _sm_base68,
@@ -81799,8 +81626,7 @@ void ns14_epAnalyze(List<ns3_AstXmlNode> preludeModules, List<ns3_AstXmlNode> mo
     goto L14;
     L13:;
     _sm_k_2 = 0;
-    _sm_base17 = simse_addressOf(decl->params);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base13;
     _sm_expr12 = simse_spanOf(_sm_base16);
     _sm_for18 = iterValues(simse_addressOf(_sm_expr12));
     L15:;
@@ -81816,8 +81642,7 @@ void ns14_epAnalyze(List<ns3_AstXmlNode> preludeModules, List<ns3_AstXmlNode> mo
     goto L18;
     L17:;
     _sm_base21 = &roundBad;
-    _sm_base23 = simse_addressOf(decl->name);
-    _sm_base22 = _sm_base23;
+    _sm_base22 = _sm_base20;
     ns14_epMarkOr(_sm_base21, _sm_base22, _sm_k_2);
     L18:;
     _sm_k_2 = _sm_k_2 + 1;
@@ -83885,7 +83710,7 @@ void ns14_fmFoldDivAt(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* e, ns14_FmState* 
 }
 // src/parser/FoldMath.kt
 void ns14_fmRewrite(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* node, Dictionary<Str, Bool>* seen, Dictionary<Str, Bool>* refused, ns14_FmState* state) {
-    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base4, * _sm_base9;
+    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base9;
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base10, * _sm_base12, * _sm_base16;
     Dictionary<Str, Bool>* _sm_base5, * _sm_base6, * _sm_base13, * _sm_base14;
     ns14_FmState* _sm_base7, * _sm_base15, * _sm_base17;
@@ -83930,8 +83755,7 @@ void ns14_fmRewrite(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* node, Dictionary<St
     _sm_expr2 = i < _sm_expr14;
     if (!(_sm_expr2)) goto L9;
     childState = ns14_FmState{false};
-    _sm_base4 = simse_addressOf(node->Children);
-    _sm_base3 = simse_addressOf((*_sm_base4)[i]);
+    _sm_base3 = simse_addressOf((*_sm_base1)[i]);
     _sm_base2 = _sm_base3;
     _sm_base5 = seen;
     _sm_base6 = refused;
@@ -84048,7 +83872,7 @@ void ns14_fmFoldMath(List<ns3_AstXmlNode>* _sm_out, List<ns3_AstXmlNode> prelude
 }
 // src/parser/Parser.kt
 void ns14_peek(ns10_Token* _sm_out, ns14_Parser* self, Int offset) {
-    Span<ns10_Token>* _sm_base1, * _sm_base2, * _sm_base3;
+    Span<ns10_Token>* _sm_base1, * _sm_base2;
     Bool _sm_expr1, _sm_expr4;
     ns10_Token _sm_expr2;
     Span<ns10_Token> rest;
@@ -84073,22 +83897,20 @@ void ns14_peek(ns10_Token* _sm_out, ns14_Parser* self, Int offset) {
     *_sm_out = _sm_expr2;
     return;
     L4:;
-    _sm_base3 = simse_addressOf(self->cursor);
-    _sm_expr6 = size(_sm_base3);
+    _sm_expr6 = size(_sm_base2);
     _sm_expr7 = _sm_expr6 - 1;
-    _sm_expr2 = get(_sm_base3, _sm_expr7);
+    _sm_expr2 = get(_sm_base2, _sm_expr7);
     *_sm_out = _sm_expr2;
     return;
 }
 // src/parser/Parser.kt
 void ns14_advance(ns10_Token* _sm_out, ns14_Parser* self) {
-    Span<ns10_Token>* _sm_base1, * _sm_base4;
+    Span<ns10_Token>* _sm_base1;
     Span<ns10_Token> _sm_base3;
-    Str* _sm_base5, * _sm_base6, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base14,
-        * _sm_base15, * _sm_base16, * _sm_base17, * _sm_base18, * _sm_base19;
+    Str* _sm_base5, * _sm_base6, * _sm_base7, * _sm_base9, * _sm_base14, * _sm_base16, * _sm_base18;
     ns2_SourcePos _sm_base11;
     Str _sm_base12;
-    List<ns14_OpenBracket>* _sm_base13, * _sm_base20, * _sm_base21;
+    List<ns14_OpenBracket>* _sm_base13, * _sm_base20;
     ns10_Token token;
     Int _sm_expr1, _sm_expr19;
     Bool _sm_expr2;
@@ -84101,8 +83923,7 @@ void ns14_advance(ns10_Token* _sm_out, ns14_Parser* self) {
     if (_sm_expr2) goto L1;
     goto L2;
     L1:;
-    _sm_base4 = simse_addressOf(self->cursor);
-    _sm_base3 = slice(_sm_base4, 1);
+    _sm_base3 = slice(_sm_base1, 1);
     self->cursor = _sm_base3;
     L2:;
     _sm_base6 = simse_addressOf(token.text);
@@ -84110,13 +83931,11 @@ void ns14_advance(ns10_Token* _sm_out, ns14_Parser* self) {
     _sm_expr3 = simse_spanOfStr(_sm_base5);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1440]);
     if (_sm_expr2) goto L3;
-    _sm_base8 = simse_addressOf(token.text);
-    _sm_base7 = _sm_base8;
+    _sm_base7 = _sm_base6;
     _sm_expr3 = simse_spanOfStr(_sm_base7);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1464]);
     if (_sm_expr2) goto L3;
-    _sm_base10 = simse_addressOf(token.text);
-    _sm_base9 = _sm_base10;
+    _sm_base9 = _sm_base6;
     _sm_expr3 = simse_spanOfStr(_sm_base9);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1472]);
     if (_sm_expr2) goto L3;
@@ -84129,18 +83948,15 @@ void ns14_advance(ns10_Token* _sm_out, ns14_Parser* self) {
     simse_list_append((*_sm_base13), _sm_expr9);
     goto L13;
     L4:;
-    _sm_base15 = simse_addressOf(token.text);
-    _sm_base14 = _sm_base15;
+    _sm_base14 = _sm_base6;
     _sm_expr3 = simse_spanOfStr(_sm_base14);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1441]);
     if (_sm_expr2) goto L8;
-    _sm_base17 = simse_addressOf(token.text);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base6;
     _sm_expr3 = simse_spanOfStr(_sm_base16);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1465]);
     if (_sm_expr2) goto L8;
-    _sm_base19 = simse_addressOf(token.text);
-    _sm_base18 = _sm_base19;
+    _sm_base18 = _sm_base6;
     _sm_expr3 = simse_spanOfStr(_sm_base18);
     _sm_expr2 = equals(simse_addressOf(_sm_expr3), __sm_stringTable[1474]);
     if (_sm_expr2) goto L8;
@@ -84152,17 +83968,16 @@ void ns14_advance(ns10_Token* _sm_out, ns14_Parser* self) {
     if (_sm_expr2) goto L12;
     goto L13;
     L12:;
-    _sm_base21 = simse_addressOf(self->openers);
-    _sm_expr1 = simse_lenOf((*_sm_base21));
+    _sm_expr1 = simse_lenOf((*_sm_base20));
     _sm_expr19 = _sm_expr1 - 1;
-    simse_list_removeAt((*_sm_base21), _sm_expr19);
+    simse_list_removeAt((*_sm_base20), _sm_expr19);
     L13:;
     *_sm_out = token;
     return;
 }
 // src/parser/Parser.kt
 void ns14_trimOpeners(ns14_Parser* self, Int depth) {
-    List<ns14_OpenBracket>* _sm_base1, * _sm_base2;
+    List<ns14_OpenBracket>* _sm_base1;
     Int _sm_expr1, _sm_expr4;
     Bool _sm_expr2;
     L1:;
@@ -84170,10 +83985,9 @@ void ns14_trimOpeners(ns14_Parser* self, Int depth) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = _sm_expr1 > depth;
     if (!(_sm_expr2)) goto L2;
-    _sm_base2 = simse_addressOf(self->openers);
-    _sm_expr1 = simse_lenOf((*_sm_base2));
+    _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr4 = _sm_expr1 - 1;
-    simse_list_removeAt((*_sm_base2), _sm_expr4);
+    simse_list_removeAt((*_sm_base1), _sm_expr4);
     goto L1;
     L2:;
 }
@@ -84312,7 +84126,7 @@ void ns14_foundTokenText(Str* _sm_out, ns14_Parser* self) {
 // src/parser/Parser.kt
 Bool ns14_expectText(ns14_Parser* self, Str* text) {
     Char* __sm_catP;
-    List<ns14_OpenBracket>* _sm_base1, * _sm_base2;
+    List<ns14_OpenBracket>* _sm_base1;
     Str* _sm_base4, * _sm_base10, * _sm_base14, * _sm_base15, * _sm_base16, * openerText;
     Str _sm_base6, _sm_base7, _sm_base12, _sm_found_2, _sm_expr12, found, _sm_expr15, _sm_expr16;
     ns2_SourcePos _sm_base9, _sm_expr14;
@@ -84344,10 +84158,9 @@ Bool ns14_expectText(ns14_Parser* self, Str* text) {
     if (_sm_expr1) goto L3;
     goto L4;
     L3:;
-    _sm_base2 = simse_addressOf(self->openers);
-    _sm_expr8 = simse_lenOf((*_sm_base2));
+    _sm_expr8 = simse_lenOf((*_sm_base1));
     _sm_expr11 = _sm_expr8 - 1;
-    opener = (*_sm_base2)[_sm_expr11];
+    opener = (*_sm_base1)[_sm_expr11];
     _sm_base4 = simse_addressOf(opener.text);
     openerText = _sm_base4;
     ns14_foundTokenText(&_sm_found_2, self);
@@ -84393,8 +84206,7 @@ Bool ns14_expectText(ns14_Parser* self, Str* text) {
 void ns14_expectName(Str* _sm_out, ns14_Parser* self) {
     Char* __sm_catP;
     ns10_TokenKind _sm_base1;
-    Str* _sm_base2, * _sm_base3, * _sm_base4, * _sm_base9, * _sm_base10, * _sm_base12, * _sm_base13,
-        * tokenText;
+    Str* _sm_base2, * _sm_base3, * _sm_base9, * _sm_base10, * _sm_base12, * _sm_base13, * tokenText;
     Str _sm_base6, _sm_base11, _sm_expr4, _sm_expr5, found, _sm_expr8;
     ns2_SourcePos _sm_base8, _sm_expr7;
     Bool _sm_expr1;
@@ -84413,8 +84225,7 @@ void ns14_expectName(Str* _sm_out, ns14_Parser* self) {
     L5:;
     _sm_expr1 = self->failed;
     if (_sm_expr1) goto L4;
-    _sm_base4 = simse_addressOf(token.text);
-    tokenText = _sm_base4;
+    tokenText = _sm_base3;
     _sm_base6 = *(tokenText);
     _sm_expr4.resize(41 + _sm_base6.size());
     __sm_catP = simse_str_data(&_sm_expr4);
@@ -84776,8 +84587,7 @@ void ns14_parseModule(Res<ns3_AstXmlNode>* _sm_out, Span<ns10_Token> cursor, Str
 }
 // src/parser/Parser.kt
 void ns14_parseModule(Res<ns3_AstXmlNode>* _sm_out, List<ns10_Token>* tokens, Str* fileName) {
-    Str* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4, * _sm_base5, * _sm_base6, * _sm_base7,
-        * _sm_base8;
+    Str* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base5, * _sm_base7;
     ns10_Token* _sm_base9;
     ns10_TokenKind _sm_base10, _sm_expr3, _sm_expr4;
     List<ns10_Token>* _sm_base11;
@@ -84809,8 +84619,7 @@ void ns14_parseModule(Res<ns3_AstXmlNode>* _sm_out, List<ns10_Token>* tokens, St
     _sm_expr6 = simse_spanOfStr(_sm_base1);
     _sm_expr2 = equals(simse_addressOf(_sm_expr6), __sm_stringTable[1440]);
     if (_sm_expr2) goto L5;
-    _sm_base4 = simse_addressOf(token.text);
-    _sm_base3 = _sm_base4;
+    _sm_base3 = _sm_base2;
     _sm_expr6 = simse_spanOfStr(_sm_base3);
     _sm_expr2 = equals(simse_addressOf(_sm_expr6), __sm_stringTable[1464]);
     if (_sm_expr2) goto L5;
@@ -84819,13 +84628,11 @@ void ns14_parseModule(Res<ns3_AstXmlNode>* _sm_out, List<ns10_Token>* tokens, St
     bracketed = bracketed + 1;
     goto L13;
     L6:;
-    _sm_base6 = simse_addressOf(token.text);
-    _sm_base5 = _sm_base6;
+    _sm_base5 = _sm_base2;
     _sm_expr6 = simse_spanOfStr(_sm_base5);
     _sm_expr2 = equals(simse_addressOf(_sm_expr6), __sm_stringTable[1441]);
     if (_sm_expr2) goto L9;
-    _sm_base8 = simse_addressOf(token.text);
-    _sm_base7 = _sm_base8;
+    _sm_base7 = _sm_base2;
     _sm_expr6 = simse_spanOfStr(_sm_base7);
     _sm_expr2 = equals(simse_addressOf(_sm_expr6), __sm_stringTable[1465]);
     if (_sm_expr2) goto L9;
@@ -86197,7 +86004,7 @@ void ns14_parseStaticVar(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     Int _sm_base10, _sm_base11;
     ns3_AstNodeAttributeKind _sm_base12, _sm_base13;
     ns3_AstNodeCategory _sm_base15;
-    ns3_AstXmlNode* _sm_base16, * _sm_base17, * _sm_base18, * _sm_base20, * _sm_base21;
+    ns3_AstXmlNode* _sm_base16, * _sm_base17, * _sm_base18, * _sm_base20;
     ns10_Token _sm_expr1;
     ns2_SourcePos pos;
     Bool isVar, _sm_expr2, _sm_expr4;
@@ -86298,8 +86105,7 @@ void ns14_parseStaticVar(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     L15:;
     _sm_base18 = &node;
     _sm_base19 = ns3_AstNodeKind::Init;
-    _sm_base21 = simse_addressOf(init.node);
-    _sm_base20 = _sm_base21;
+    _sm_base20 = _sm_base17;
     ns14_attach(self, _sm_base18, _sm_base19, _sm_base20);
     L16:;
     *_sm_out = node;
@@ -87423,7 +87229,7 @@ void ns14_parseExpr(ns14_ExprNode* _sm_out, ns14_Parser* self, Int minBindingPow
     ns14_ExprNode* _sm_base13, * _sm_base15, * _sm_base18, * _sm_base21, * _sm_base25, * _sm_base35,
         * _sm_base44;
     ns3_AstXmlNode* _sm_base27, * _sm_base28, * _sm_base29, * _sm_base30, * _sm_base36, * _sm_base37,
-        * _sm_base38, * _sm_base39, * _sm_base50, * _sm_base52, * _sm_base53, * _sm_base55;
+        * _sm_base38, * _sm_base50, * _sm_base52, * _sm_base53, * _sm_base55;
     Int _sm_base31, _sm_base32, _sm_base40, _sm_base41, _sm_base45, _sm_base46, _sm_base56, _sm_base57,
         newlines, lookaheadBP, k, bp, _sm_expr29;
     ns3_AstNodeAttributeKind _sm_base47;
@@ -87474,8 +87280,8 @@ void ns14_parseExpr(ns14_ExprNode* _sm_out, ns14_Parser* self, Int minBindingPow
     _sm_expr1 = k < newlines;
     if (!(_sm_expr1)) goto L13;
     {
-        ns10_Token _sm_sret122;
-        ns14_advance(&_sm_sret122, self);
+        ns10_Token _sm_sret121;
+        ns14_advance(&_sm_sret121, self);
     }
     k = k + 1;
     goto L12;
@@ -87535,8 +87341,8 @@ void ns14_parseExpr(ns14_ExprNode* _sm_out, ns14_Parser* self, Int minBindingPow
     _sm_expr1 = bp < minBindingPower;
     if (_sm_expr1) goto L4;
     {
-        ns10_Token _sm_sret180;
-        ns14_advance(&_sm_sret180, self);
+        ns10_Token _sm_sret179;
+        ns14_advance(&_sm_sret179, self);
     }
     _sm_base11 = &op;
     _sm_expr16 = simse_spanOfStr(_sm_base11);
@@ -87545,8 +87351,8 @@ void ns14_parseExpr(ns14_ExprNode* _sm_out, ns14_Parser* self, Int minBindingPow
     goto L26;
     L25:;
     {
-        ns10_Token _sm_sret187;
-        ns14_advance(&_sm_sret187, self);
+        ns10_Token _sm_sret186;
+        ns14_advance(&_sm_sret186, self);
     }
     L26:;
     ns14_skipNewlines(self);
@@ -87640,8 +87446,7 @@ void ns14_parseExpr(ns14_ExprNode* _sm_out, ns14_Parser* self, Int minBindingPow
     if (_sm_expr1) goto L44;
     goto L43;
     L44:;
-    _sm_base39 = simse_addressOf(right.node);
-    _sm_base38 = _sm_base39;
+    _sm_base38 = _sm_base28;
     _sm_expr1 = ns14_whenSubjectIsPlace(self, _sm_base38);
     if (_sm_expr1) goto L42;
     goto L43;
@@ -89894,7 +89699,7 @@ void ns14_parseInterpolatedQuoted(ns14_ExprNode* _sm_out, ns14_Parser* self, Str
 void ns14_interpFragmentExpr(ns3_AstXmlNode* _sm_out, ns14_Parser* self, Str* fragment, ns2_SourcePos at) {
     Int _sm_base1, _sm_base2;
     Str _sm_base3, _sm_base4, _sm_base11, _sm_base12, _sm_base14;
-    ns10_Token* _sm_base5, * _sm_base6, * _sm_base7;
+    ns10_Token* _sm_base5;
     ns10_Token _sm_base8, _sm_expr13;
     ns10_TokenKind _sm_base9, _sm_expr4, _sm_expr5;
     List<ns10_Token>* _sm_base10;
@@ -89932,15 +89737,13 @@ void ns14_interpFragmentExpr(ns3_AstXmlNode* _sm_out, ns14_Parser* self, Str* fr
     _sm_expr5 = ns10_TokenKind::Eof;
     _sm_expr1 = _sm_expr4 == _sm_expr5;
     if (_sm_expr1) goto L2;
-    _sm_base6 = simse_addressOf(result.Value);
-    _sm_expr4 = _sm_base6->kind;
+    _sm_expr4 = _sm_base5->kind;
     _sm_expr5 = ns10_TokenKind::Space;
     _sm_expr1 = _sm_expr4 != _sm_expr5;
     if (_sm_expr1) goto L9;
     goto L1;
     L9:;
-    _sm_base7 = simse_addressOf(result.Value);
-    _sm_expr4 = _sm_base7->kind;
+    _sm_expr4 = _sm_base5->kind;
     _sm_expr5 = ns10_TokenKind::Comment;
     _sm_expr1 = _sm_expr4 != _sm_expr5;
     if (_sm_expr1) goto L7;
@@ -90025,7 +89828,7 @@ void ns14_varDeclNode(ns3_AstXmlNode* _sm_out, ns14_Parser* self, Str* name, Boo
     Str _sm_base4, _sm_expr2;
     ns3_AstNodeKind _sm_base6, _sm_base12, _sm_expr5, _sm_expr6;
     ns3_AstNodeCategory _sm_base7;
-    ns3_AstXmlNode* _sm_base8, * _sm_base10, * _sm_base11, * _sm_base13, * _sm_base14;
+    ns3_AstXmlNode* _sm_base8, * _sm_base10, * _sm_base11, * _sm_base13;
     ns3_AstXmlNode _sm_base9, node;
     List<ns3_AstNodeAttribute> attrs;
     ns3_AstNodeAttribute _sm_expr1, _sm_expr3;
@@ -90065,8 +89868,7 @@ void ns14_varDeclNode(ns3_AstXmlNode* _sm_out, ns14_Parser* self, Str* name, Boo
     L3:;
     _sm_base11 = &node;
     _sm_base12 = ns3_AstNodeKind::Init;
-    _sm_base14 = simse_addressOf(init->node);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base10;
     ns14_attach(self, _sm_base11, _sm_base12, _sm_base13);
     L4:;
     *_sm_out = node;
@@ -91884,7 +91686,7 @@ void ns14_parseVarDecl(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     Int _sm_base10, _sm_base11;
     ns3_AstNodeAttributeKind _sm_base12, _sm_base13;
     ns3_AstNodeCategory _sm_base15;
-    ns3_AstXmlNode* _sm_base16, * _sm_base17, * _sm_base18, * _sm_base20, * _sm_base21;
+    ns3_AstXmlNode* _sm_base16, * _sm_base17, * _sm_base18, * _sm_base20;
     ns10_Token _sm_expr1;
     ns2_SourcePos pos;
     Bool isVar, _sm_expr2, _sm_expr4;
@@ -91988,8 +91790,7 @@ void ns14_parseVarDecl(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     L17:;
     _sm_base18 = &node;
     _sm_base19 = ns3_AstNodeKind::Init;
-    _sm_base21 = simse_addressOf(init.node);
-    _sm_base20 = _sm_base21;
+    _sm_base20 = _sm_base17;
     ns14_attach(self, _sm_base18, _sm_base19, _sm_base20);
     L18:;
     *_sm_out = node;
@@ -92352,7 +92153,7 @@ void ns14_parseWhile(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
 void ns14_parseReturn(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     Str* _sm_base1;
     Str _sm_base2;
-    ns3_AstXmlNode* _sm_base3, * _sm_base8, * _sm_base9, * _sm_base11, * _sm_base12;
+    ns3_AstXmlNode* _sm_base3, * _sm_base8, * _sm_base9, * _sm_base11;
     Int _sm_base4, _sm_base5;
     ns3_AstNodeKind _sm_base6, _sm_base10, _sm_expr11, _sm_expr12;
     ns3_AstNodeCategory _sm_base7;
@@ -92366,8 +92167,8 @@ void ns14_parseReturn(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     ns14_peek(&_sm_expr1, self, 0);
     pos = _sm_expr1.pos;
     {
-        ns10_Token _sm_sret26;
-        ns14_advance(&_sm_sret26, self);
+        ns10_Token _sm_sret25;
+        ns14_advance(&_sm_sret25, self);
     }
     ns14_emptyExpr(&value, self);
     _sm_expr2 = ns14_atStmtEnd(self);
@@ -92420,8 +92221,7 @@ void ns14_parseReturn(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
     L10:;
     _sm_base9 = &node;
     _sm_base10 = ns3_AstNodeKind::Value;
-    _sm_base12 = simse_addressOf(value.node);
-    _sm_base11 = _sm_base12;
+    _sm_base11 = _sm_base8;
     ns14_attach(self, _sm_base9, _sm_base10, _sm_base11);
     L11:;
     *_sm_out = node;
@@ -92429,7 +92229,7 @@ void ns14_parseReturn(ns3_AstXmlNode* _sm_out, ns14_Parser* self) {
 }
 // src/parser/ParserStmt.kt
 Bool ns14_ctorReturnable(ns14_Parser* self) {
-    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base4;
+    ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3;
     Bool _sm_expr1, _sm_expr2;
     ns3_AstNodeCategory kind, _sm_expr3;
     _sm_base2 = simse_addressOf(self->returnTypeCtx);
@@ -92440,8 +92240,7 @@ Bool ns14_ctorReturnable(ns14_Parser* self) {
     L1:;
     return false;
     L2:;
-    _sm_base4 = simse_addressOf(self->returnTypeCtx);
-    _sm_base3 = _sm_base4;
+    _sm_base3 = _sm_base2;
     ns2_xmlKind(&kind, _sm_base3);
     _sm_expr3 = ns3_AstNodeCategory::TypeNamed;
     _sm_expr1 = kind == _sm_expr3;
@@ -95591,7 +95390,7 @@ void ns14_propCollectLocals(ns14_PropState* state, List<ns3_AstXmlNode>* stmts) 
     ns3_AstNodeAttributeKind _sm_base1;
     ns3_AstNodeKind _sm_base2, _sm_base7, _sm_base9, _sm_base11;
     ns3_AstXmlNode* _sm_base3, * stmt;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base4, * _sm_base6;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base4;
     List<Str>* _sm_base5;
     List<ns3_AstXmlNode>* _sm_base8, * _sm_base10, * _sm_base12;
     Span<ns3_AstXmlNode> _sm_expr1;
@@ -95631,8 +95430,7 @@ void ns14_propCollectLocals(ns14_PropState* state, List<ns3_AstXmlNode>* stmts) 
     _sm_base5 = simse_addressOf(state->ambiguous);
     simse_list_append((*_sm_base5), name);
     L8:;
-    _sm_base6 = simse_addressOf(state->locals);
-    simse_dict_insert((*_sm_base6), name, declared);
+    simse_dict_insert((*_sm_base4), name, declared);
     L6:;
     _sm_base7 = ns3_AstNodeKind::Body;
     ns14_propRegionStmts(&_sm_expr9, stmt, _sm_base7);
@@ -95656,7 +95454,7 @@ void ns14_propCollectParams(ns14_PropState* state, ns3_AstXmlNode* decl) {
     ns3_AstNodeAttributeKind _sm_base3;
     ns3_AstXmlNode* _sm_base5, * param;
     Str* _sm_base6;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base7, * _sm_base9;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base7;
     List<Str>* _sm_base8;
     List<ns3_AstXmlNode> params;
     Span<ns3_AstXmlNode> _sm_expr1;
@@ -95693,8 +95491,7 @@ void ns14_propCollectParams(ns14_PropState* state, ns3_AstXmlNode* decl) {
     _sm_base8 = simse_addressOf(state->ambiguous);
     simse_list_append((*_sm_base8), name);
     L7:;
-    _sm_base9 = simse_addressOf(state->locals);
-    simse_dict_insert((*_sm_base9), name, declared);
+    simse_dict_insert((*_sm_base7), name, declared);
     goto L1;
     L2:;
 }
@@ -96216,7 +96013,7 @@ void ns14_propRewriteLambdaBody(Str* _sm_out, ns3_AstXmlNode* lambda, ns3_AstXml
     ns3_AstXmlNode* _sm_base3, * body;
     ns14_PropState* _sm_base5, * _sm_base8;
     List<ns3_AstXmlNode>* _sm_base6, * _sm_base9, * _sm_base10;
-    Str* _sm_base11, * _sm_base14, * stateErrorText;
+    Str* _sm_base11, * stateErrorText;
     Int* _sm_base12, * _sm_base13;
     Str _sm_base16, _sm_base17, errorLineText, errorColumnText, _sm_expr9;
     Array<ns3_AstXmlNode> _sm_base19;
@@ -96269,8 +96066,7 @@ void ns14_propRewriteLambdaBody(Str* _sm_out, ns3_AstXmlNode* lambda, ns3_AstXml
     errorLineText = toString(_sm_base12);
     _sm_base13 = simse_addressOf(state.errorColumn);
     errorColumnText = toString(_sm_base13);
-    _sm_base14 = simse_addressOf(state.error);
-    stateErrorText = _sm_base14;
+    stateErrorText = _sm_base11;
     _sm_base16 = *(fileName);
     _sm_base17 = *(stateErrorText);
     _sm_expr9.resize(5 + _sm_base16.size() + errorLineText.size() + errorColumnText.size() + _sm_base17.size());
@@ -96435,7 +96231,7 @@ void ns14_propRewriteLambdas(Str* _sm_out, ns3_AstXmlNode* node, Str* fileName, 
 void ns14_propRewriteBody(Str* _sm_out, ns3_AstXmlNode* decl, Str* fileName, List<ns3_AstXmlNode>* declarations) {
     Char* __sm_catP;
     ns3_AstNodeKind _sm_base1, _sm_base5, _sm_base18, _sm_base21;
-    Str* _sm_base2, * _sm_base25, * _sm_base28, * stateErrorText2;
+    Str* _sm_base2, * _sm_base25, * stateErrorText2;
     ns3_AstXmlNode _sm_base3, found, inner;
     ns3_AstXmlNode* _sm_base4, * _sm_base6, * _sm_base7, * _sm_base11, * _sm_base12, * _sm_base13,
         * body, * returnType;
@@ -96573,8 +96369,7 @@ void ns14_propRewriteBody(Str* _sm_out, ns3_AstXmlNode* decl, Str* fileName, Lis
     errorLineText2 = toString(_sm_base26);
     _sm_base27 = simse_addressOf(state.errorColumn);
     errorColumnText2 = toString(_sm_base27);
-    _sm_base28 = simse_addressOf(state.error);
-    stateErrorText2 = _sm_base28;
+    stateErrorText2 = _sm_base25;
     _sm_base30 = *(fileName);
     _sm_base31 = *(stateErrorText2);
     _sm_expr8.resize(5 + _sm_base30.size() + errorLineText2.size() + errorColumnText2.size() + _sm_base31.size());
@@ -97967,7 +97762,7 @@ void ns18_asyncDump(List<ns3_AstXmlNode> functions, List<Str> asyncNames, List<S
     Char* __sm_catP;
     Int __sm_catAt;
     Int __sm_catC0;
-    Str* _sm_base1, * _sm_base5, * _sm_base6, * _sm_base7, * nameText, * reasonText, * _sm_line_2;
+    Str* _sm_base1, * _sm_base5, * _sm_base6, * nameText, * reasonText, * _sm_line_2;
     Str _sm_base3, _sm_base9, _sm_base10, _sm_base14, line, _sm_expr9, _sm_expr12;
     List<Str>* _sm_base13;
     List<ns3_AstXmlNode>* _sm_base15;
@@ -98007,8 +97802,7 @@ void ns18_asyncDump(List<ns3_AstXmlNode> functions, List<Str> asyncNames, List<S
     std::memcpy(__sm_catP, "  (declared suspend)", 20);
     goto L5;
     L4:;
-    _sm_base7 = simse_addressOf(reasons[i]);
-    reasonText = _sm_base7;
+    reasonText = _sm_base6;
     _sm_base9 = *(nameText);
     _sm_base10 = *(reasonText);
     line.resize(13 + _sm_base9.size() + _sm_base10.size());
@@ -100935,7 +100729,7 @@ void ns18_analyzeFunction(ns18_Analyzer* self, ns3_AstXmlNode* decl) {
 void ns18_collectCurrentConstraints(ns18_Analyzer* self, ns3_AstXmlNode* decl) {
     Dictionary<Str, List<Str>> _sm_base1;
     List<ns18_ProtocolConstraint>* _sm_base2;
-    Dictionary<Str, List<Str>>* _sm_base3, * _sm_base8;
+    Dictionary<Str, List<Str>>* _sm_base3;
     Str _sm_base4, _sm_base6, _sm_base7, _sm_base9;
     List<ns18_ProtocolConstraint> _sm_expr1;
     Span<ns18_ProtocolConstraint> _sm_expr2;
@@ -100968,9 +100762,8 @@ void ns18_collectCurrentConstraints(ns18_Analyzer* self, ns3_AstXmlNode* decl) {
     fresh = List<Str>();
     _sm_base7 = constraint->protocol;
     simse_list_append(fresh, _sm_base7);
-    _sm_base8 = simse_addressOf(self->currentConstraints);
     _sm_base9 = constraint->param;
-    simse_dict_insert((*_sm_base8), _sm_base9, fresh);
+    simse_dict_insert((*_sm_base3), _sm_base9, fresh);
     goto L1;
     L2:;
 }
@@ -101095,8 +100888,8 @@ void ns18_checkProtocolConstraints(ns18_Analyzer* self, ns3_AstXmlNode* decl) {
     Str* _sm_base4, * _sm_base8, * _sm_base21, * _sm_base22, * _sm_base24, * _sm_base26, * _sm_base33,
         * paramNameText, * firstName, * secondName;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base5, * _sm_base11;
-    ns18_ProtocolConstraint* _sm_base9, * _sm_base10, * _sm_base13, * _sm_base16, * _sm_base23,
-        * _sm_base27, * constraint;
+    ns18_ProtocolConstraint* _sm_base9, * _sm_base10, * _sm_base16, * _sm_base23, * _sm_base27,
+        * constraint;
     Str _sm_base12, _sm_base15, _sm_base29, _sm_base30, _sm_base31, paramName, protocolName, _sm_expr7,
         _sm_expr10, _sm_expr15, _sm_expr16, method, _sm_expr24;
     ns3_AstXmlNode* _sm_base19, * _sm_base20, * first, * second;
@@ -101183,8 +100976,7 @@ void ns18_checkProtocolConstraints(ns18_Analyzer* self, ns3_AstXmlNode* decl) {
     goto L19;
     L13:;
     _sm_base11 = simse_addressOf(self->globalProtocols);
-    _sm_base13 = simse_addressOf(constraints[i]);
-    _sm_base12 = _sm_base13->protocol;
+    _sm_base12 = _sm_base9->protocol;
     first = simse_dict_getPtr((*_sm_base11), _sm_base12);
     _sm_base16 = simse_addressOf(constraints[j]);
     _sm_base15 = _sm_base16->protocol;
@@ -101912,7 +101704,7 @@ void ns18_analyzeDestructuring(ns18_Analyzer* self, ns3_AstXmlNode* stmt, ns3_As
     ns3_AstXmlNode* _sm_base5, * _sm_base7, * _sm_base9, * _sm_base10, * _sm_base11, * _sm_base12,
         * _sm_base13, * _sm_base17, * _sm_base22, * _sm_base41, * _sm_base47, * _sm_base49, * _sm_base50,
         * decl, * fieldType;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base19, * _sm_base24, * _sm_base39, * _sm_base40;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base19, * _sm_base24, * _sm_base39;
     ns3_AstNodeKind _sm_base51, _sm_expr25, _sm_expr26;
     Bool _sm_expr1, _sm_expr2, isVar;
     List<Str> binders, _sm_expr36;
@@ -102078,8 +101870,7 @@ void ns18_analyzeDestructuring(ns18_Analyzer* self, ns3_AstXmlNode* stmt, ns3_As
     ns18_diag(self, _sm_expr39, _sm_expr40, _sm_base38);
     return;
     L20:;
-    _sm_base40 = simse_addressOf(self->types);
-    _sm_base39 = _sm_base40;
+    _sm_base39 = _sm_base19;
     _sm_base41 = decl;
     ns18_semAllFields(&fields, _sm_base39, _sm_base41);
     binderCount = simse_lenOf(binders);
@@ -103401,7 +103192,7 @@ void ns18_checkCallArity(ns18_Analyzer* self, ns3_AstXmlNode* call) {
     Str* _sm_base3, * _sm_base9, * _sm_base14, * _sm_base15, * _sm_base16, * _sm_base17, * _sm_base20,
         * _sm_base25, * _sm_base28, * _sm_base35, * _sm_base40, * _sm_base41, * _sm_base42, * _sm_base45,
         * _sm_expr11;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base5, * _sm_base10, * _sm_base11;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base5, * _sm_base10;
     Str _sm_base8, name, _sm_expr17, counts, _sm_expr39, _sm_expr40, _sm_expr41, _sm_expr44;
     Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base18;
     ns3_AstXmlNode* _sm_base26, * _sm_base27, * _sm_base29, * _sm_base30, * _sm_base32, * _sm_base33,
@@ -103470,8 +103261,7 @@ void ns18_checkCallArity(ns18_Analyzer* self, ns3_AstXmlNode* call) {
     ns18_checkUnionConstruction(self, call, _sm_base9, decl, argCount);
     return;
     L13:;
-    _sm_base11 = simse_addressOf(self->types);
-    _sm_base10 = _sm_base11;
+    _sm_base10 = _sm_base5;
     ns18_semAllFields(&_sm_expr13, _sm_base10, decl);
     fieldCount = simse_lenOf(_sm_expr13);
     _sm_expr1 = fieldCount != argCount;
@@ -104474,7 +104264,7 @@ void ns18_unionResolveAlias(ns3_AstXmlNode* _sm_out, ns18_Analyzer* self, ns3_As
 Bool ns18_semaSameType(ns3_AstXmlNode* a, ns3_AstXmlNode* b) {
     ns3_AstNodeAttributeKind _sm_base1, _sm_base2, _sm_base5, _sm_base6;
     Str _sm_base3, _sm_base4, _sm_base7, _sm_base8;
-    Array<ns3_AstXmlNode>* _sm_base9, * _sm_base10, * _sm_base11, * _sm_base14, * _sm_base17;
+    Array<ns3_AstXmlNode>* _sm_base9, * _sm_base10, * _sm_base11, * _sm_base17;
     ns3_AstXmlNode* _sm_base12, * _sm_base13, * _sm_base15, * _sm_base16;
     ns3_AstNodeCategory _sm_expr1, _sm_expr2;
     Bool _sm_expr3, _sm_expr16;
@@ -104520,8 +104310,7 @@ Bool ns18_semaSameType(ns3_AstXmlNode* a, ns3_AstXmlNode* b) {
     _sm_expr10 = simse_array_count((*_sm_base11));
     _sm_expr3 = i < _sm_expr10;
     if (!(_sm_expr3)) goto L8;
-    _sm_base14 = simse_addressOf(a->Children);
-    _sm_base13 = simse_addressOf((*_sm_base14)[i]);
+    _sm_base13 = simse_addressOf((*_sm_base11)[i]);
     _sm_base12 = _sm_base13;
     _sm_base17 = simse_addressOf(b->Children);
     _sm_base16 = simse_addressOf((*_sm_base17)[i]);
@@ -104780,7 +104569,7 @@ void ns18_exprType(ns3_AstXmlNode* _sm_out, ns18_Analyzer* self, ns3_AstXmlNode*
 void ns18_semaFieldType(ns3_AstXmlNode* _sm_out, ns18_Analyzer* self, ns3_AstXmlNode* base, Str* member) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base9, * _sm_base10, * decl;
     ns3_AstNodeAttributeKind _sm_base3;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base4, * _sm_base7, * _sm_base8;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base4, * _sm_base7;
     Str _sm_base5;
     ns3_AstNodeKind _sm_base11, _sm_expr8, _sm_expr9;
     ns3_AstXmlNode outer, _sm_expr5, _sm_expr12;
@@ -104822,8 +104611,7 @@ void ns18_semaFieldType(ns3_AstXmlNode* _sm_out, ns18_Analyzer* self, ns3_AstXml
     *_sm_out = _sm_expr5;
     return;
     L5:;
-    _sm_base8 = simse_addressOf(self->types);
-    _sm_base7 = _sm_base8;
+    _sm_base7 = _sm_base4;
     _sm_base9 = decl;
     ns18_semFindField(&_sm_expr12, _sm_base7, _sm_base9, member);
     _sm_base10 = &_sm_expr12;
@@ -105741,7 +105529,7 @@ Int ns18_forWalkAt(ns18_Analyzer* self, ns3_AstXmlNode* container, List<ns3_AstX
     ns3_AstNodeCategory _sm_expr1, _sm_expr2, _sm_expr82, _sm_expr87, _sm_expr123;
     Bool _sm_expr3, _sm_expr15, isRange, _sm_expr54, indexed;
     Int id, _sm_expr8, loopIndex, elementAt, _sm_expr63, _sm_expr66, at, _sm_expr86, _sm_expr89,
-        _sm_expr91, line, column, _sm_expr98, _sm_expr118, _sm_expr121, _sm_expr124;
+        _sm_expr91, line, column, _sm_expr98, _sm_expr121;
     ns3_AstXmlNode receiverType, outer, machine, element, spanType, spanInit, _sm_expr100, _sm_expr101,
         _sm_expr102, _sm_expr103, _sm_expr104, _sm_expr105, indexRead, elementType, _sm_elementType_2,
         _sm_expr112, _sm_expr113, _sm_expr114, _sm_expr115, _sm_expr116, _sm_expr117, _sm_expr119;
@@ -106255,11 +106043,10 @@ Int ns18_forWalkAt(ns18_Analyzer* self, ns3_AstXmlNode* container, List<ns3_AstX
     ns18_semaWalkBinaryExpr(&_sm_expr116, __sm_stringTable[1443], _sm_expr114, _sm_expr115, line, column);
     ns18_semaWalkAssignStmt(&_sm_expr117, _sm_expr113, _sm_expr116, line, column);
     ns18_semaStmtInsertAfter(realBody, 0, _sm_expr117);
-    _sm_expr118 = index + shift;
     _sm_base76 = &stepName;
     _sm_base77 = &walkName;
     ns18_semaWalkCounterDecl(&_sm_expr119, _sm_base76, isRange, _sm_base77, line, column);
-    ns18_semaStmtInsertAfter(container, _sm_expr118, _sm_expr119);
+    ns18_semaStmtInsertAfter(container, _sm_expr89, _sm_expr119);
     L87:;
     _sm_base79 = __sm_stringTable[1281];
     _sm_base78 = &_sm_base79;
@@ -106277,8 +106064,7 @@ Int ns18_forWalkAt(ns18_Analyzer* self, ns3_AstXmlNode* container, List<ns3_AstX
     _sm_expr122 = ns2_xmlChildPtr(realDecl, _sm_base82);
     ns2_xmlKind(&_sm_expr123, _sm_expr122);
     ns2_xmlKindText(&afterInitDiag, _sm_expr123);
-    _sm_expr124 = index + shift;
-    ns18_semaWalkContainerChildName(&afterContainerDiag, container, _sm_expr124);
+    ns18_semaWalkContainerChildName(&afterContainerDiag, container, _sm_expr89);
     _sm_expr125.resize(56 + _sm_fileDiag_2.size() + afterNameDiag.size() + afterContainerDiag.size() + afterKidsDiag.size() + afterInitDiag.size());
     __sm_catP = simse_str_data(&_sm_expr125);
     std::memcpy(__sm_catP, "forWalk after file=", 19);
@@ -106706,7 +106492,7 @@ void ns18_semaWalkRenameNames(ns3_AstXmlNode* node, Str from, Str to) {
 }
 // src/sema/SemaCall.kt
 void ns18_semaWalkSetChild(ns3_AstXmlNode* node, ns3_AstNodeKind role, ns3_AstXmlNode child) {
-    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base3, * _sm_base4;
+    Array<ns3_AstXmlNode>* _sm_base1;
     ns3_AstXmlNode* _sm_base2;
     ns3_AstXmlNode named;
     Int at, _sm_expr1;
@@ -106720,15 +106506,13 @@ void ns18_semaWalkSetChild(ns3_AstXmlNode* node, ns3_AstNodeKind role, ns3_AstXm
     _sm_expr1 = simse_array_count((*_sm_base1));
     _sm_expr2 = at < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(node->Children);
-    _sm_base2 = simse_addressOf((*_sm_base3)[at]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[at]);
     _sm_expr3 = _sm_base2->name;
     _sm_expr2 = _sm_expr3 == role;
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base4 = simse_addressOf(node->Children);
-    (*_sm_base4)[at] = named;
+    (*_sm_base1)[at] = named;
     return;
     L4:;
     at = at + 1;
@@ -107968,8 +107752,7 @@ void ns18_promotePlaceAt(ns18_Analyzer* self, List<ns3_AstXmlNode>* stmts, Int i
     ns3_AstXmlNode _sm_base14, elementType, place, wrap, pointee, pointer;
     List<ns3_AstXmlNode>* _sm_base15;
     ns3_AstNodeCategory _sm_base20, _sm_expr1, _sm_expr2, initKind;
-    Array<ns3_AstXmlNode>* _sm_base23, * _sm_base25, * _sm_base26, * _sm_base29, * _sm_base31,
-        * _sm_base32;
+    Array<ns3_AstXmlNode>* _sm_base23, * _sm_base29;
     Bool _sm_expr3, _sm_expr24, replaced, swapped;
     Span<Char> _sm_expr6;
     Int _sm_expr18, _sm_expr19, j, at, atType;
@@ -108104,16 +107887,14 @@ void ns18_promotePlaceAt(ns18_Analyzer* self, List<ns3_AstXmlNode>* stmts, Int i
     _sm_expr18 = simse_array_count((*_sm_base23));
     _sm_expr3 = at < _sm_expr18;
     if (!(_sm_expr3)) goto L25;
-    _sm_base25 = simse_addressOf(decl->Children);
-    _sm_base24 = simse_addressOf((*_sm_base25)[at]);
+    _sm_base24 = simse_addressOf((*_sm_base23)[at]);
     _sm_expr29 = _sm_base24->name;
     _sm_expr30 = ns3_AstNodeKind::Init;
     _sm_expr3 = _sm_expr29 == _sm_expr30;
     if (_sm_expr3) goto L26;
     goto L27;
     L26:;
-    _sm_base26 = simse_addressOf(decl->Children);
-    (*_sm_base26)[at] = wrap;
+    (*_sm_base23)[at] = wrap;
     replaced = true;
     goto L25;
     L27:;
@@ -108153,16 +107934,14 @@ void ns18_promotePlaceAt(ns18_Analyzer* self, List<ns3_AstXmlNode>* stmts, Int i
     _sm_expr18 = simse_array_count((*_sm_base29));
     _sm_expr3 = atType < _sm_expr18;
     if (!(_sm_expr3)) goto L36;
-    _sm_base31 = simse_addressOf(decl->Children);
-    _sm_base30 = simse_addressOf((*_sm_base31)[atType]);
+    _sm_base30 = simse_addressOf((*_sm_base29)[atType]);
     _sm_expr29 = _sm_base30->name;
     _sm_expr30 = ns3_AstNodeKind::Type;
     _sm_expr3 = _sm_expr29 == _sm_expr30;
     if (_sm_expr3) goto L37;
     goto L38;
     L37:;
-    _sm_base32 = simse_addressOf(decl->Children);
-    (*_sm_base32)[atType] = pointer;
+    (*_sm_base29)[atType] = pointer;
     swapped = true;
     goto L36;
     L38:;
@@ -108861,8 +108640,7 @@ void ns18_semaSpanCollectIndexRoots(ns3_AstXmlNode node, List<Str>* roots) {
 }
 // src/sema/SemaCall.kt
 void ns18_semaSpanRewrite(ns18_Analyzer* self, ns3_AstXmlNode* node, Str root, Str conversion, Str slot) {
-    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base2, * _sm_base8, * _sm_base16, * _sm_base18, * _sm_base19,
-        * _sm_base20, * _sm_base21;
+    Array<ns3_AstXmlNode>* _sm_base1, * _sm_base16, * _sm_base20, * _sm_base21;
     ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base17, * callee, * _sm_receiver_2, * child;
     ns3_AstNodeAttributeKind _sm_base5, _sm_base10, _sm_base13;
     Str _sm_base6, _sm_base11, _sm_base14;
@@ -108889,8 +108667,7 @@ void ns18_semaSpanRewrite(ns18_Analyzer* self, ns3_AstXmlNode* node, Str root, S
     _sm_expr6 = simse_array_count((*_sm_base1));
     _sm_expr5 = at < _sm_expr6;
     if (!(_sm_expr5)) goto L4;
-    _sm_base2 = simse_addressOf(node->Children);
-    receiver = (*_sm_base2)[at];
+    receiver = (*_sm_base1)[at];
     _sm_expr8 = receiver.name;
     _sm_expr9 = ns3_AstNodeKind::Receiver;
     _sm_expr5 = _sm_expr8 == _sm_expr9;
@@ -108914,8 +108691,7 @@ void ns18_semaSpanRewrite(ns18_Analyzer* self, ns3_AstXmlNode* node, Str root, S
     L5:;
     _sm_base7 = ns3_AstNodeKind::Receiver;
     buffer.name = _sm_base7;
-    _sm_base8 = simse_addressOf(node->Children);
-    (*_sm_base8)[at] = buffer;
+    (*_sm_base1)[at] = buffer;
     goto L4;
     L6:;
     at = at + 1;
@@ -108969,16 +108745,14 @@ void ns18_semaSpanRewrite(ns18_Analyzer* self, ns3_AstXmlNode* node, Str root, S
     _sm_expr6 = simse_array_count((*_sm_base16));
     _sm_expr5 = atC < _sm_expr6;
     if (!(_sm_expr5)) goto L18;
-    _sm_base18 = simse_addressOf(callee->Children);
-    _sm_base17 = simse_addressOf((*_sm_base18)[atC]);
+    _sm_base17 = simse_addressOf((*_sm_base16)[atC]);
     _sm_expr8 = _sm_base17->name;
     _sm_expr9 = ns3_AstNodeKind::Receiver;
     _sm_expr5 = _sm_expr8 == _sm_expr9;
     if (_sm_expr5) goto L19;
     goto L20;
     L19:;
-    _sm_base19 = simse_addressOf(callee->Children);
-    (*_sm_base19)[atC] = second;
+    (*_sm_base16)[atC] = second;
     swapped = true;
     goto L18;
     L20:;
@@ -109700,7 +109474,7 @@ Bool ns18_hasOperatorFn(ns18_Analyzer* self, Str* name, ns3_AstXmlNode actual) {
 // src/sema/SemaCollect.kt
 void ns18_collectUninitTypes(ns18_Analyzer* self) {
     Char* __sm_catP;
-    List<ns18_SemaInput>* _sm_base1, * _sm_base3;
+    List<ns18_SemaInput>* _sm_base1;
     ns18_SemaInput* _sm_base2, * input;
     ns3_AstXmlNode* _sm_base4, * _sm_base5, * decl, * method, * ret;
     List<ns3_AstXmlNode>* _sm_base6, * _sm_base9;
@@ -109720,8 +109494,7 @@ void ns18_collectUninitTypes(ns18_Analyzer* self) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = n < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base3 = simse_addressOf(self->inputs);
-    _sm_base2 = simse_addressOf((*_sm_base3)[n]);
+    _sm_base2 = simse_addressOf((*_sm_base1)[n]);
     input = _sm_base2;
     _sm_base5 = simse_addressOf(input->module);
     _sm_base4 = _sm_base5;
@@ -110086,7 +109859,7 @@ void ns18_packageOf(Str* _sm_out, ns18_Analyzer* self, ns3_AstXmlNode* module) {
 }
 // src/sema/SemaCollect.kt
 void ns18_appendGlobalFunction(ns18_Analyzer* self, Str* key, ns3_AstXmlNode* decl) {
-    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1, * _sm_base6;
+    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1;
     Str _sm_base2, _sm_base7;
     ns3_AstXmlNode _sm_base4, _sm_base5;
     List<ns3_AstXmlNode>* existing;
@@ -110106,14 +109879,13 @@ void ns18_appendGlobalFunction(ns18_Analyzer* self, Str* key, ns3_AstXmlNode* de
     fresh = List<ns3_AstXmlNode>();
     _sm_base5 = *(decl);
     simse_list_append(fresh, _sm_base5);
-    _sm_base6 = simse_addressOf(self->globalFunctions);
     _sm_base7 = *(key);
-    simse_dict_insert((*_sm_base6), _sm_base7, fresh);
+    simse_dict_insert((*_sm_base1), _sm_base7, fresh);
     L3:;
 }
 // src/sema/SemaCollect.kt
 void ns18_appendPackageDecl(ns18_Analyzer* self, Str* pkg, ns3_AstXmlNode* decl) {
-    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1, * _sm_base6;
+    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1;
     Str _sm_base2, _sm_base7;
     ns3_AstXmlNode _sm_base4, _sm_base5;
     List<ns3_AstXmlNode>* existing;
@@ -110133,14 +109905,13 @@ void ns18_appendPackageDecl(ns18_Analyzer* self, Str* pkg, ns3_AstXmlNode* decl)
     fresh = List<ns3_AstXmlNode>();
     _sm_base5 = *(decl);
     simse_list_append(fresh, _sm_base5);
-    _sm_base6 = simse_addressOf(self->packageDecls);
     _sm_base7 = *(pkg);
-    simse_dict_insert((*_sm_base6), _sm_base7, fresh);
+    simse_dict_insert((*_sm_base1), _sm_base7, fresh);
     L3:;
 }
 // src/sema/SemaCollect.kt
 void ns18_appendVisibleFunction(ns18_Analyzer* self, Str* name, ns3_AstXmlNode* decl) {
-    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1, * _sm_base6;
+    Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base1;
     Str _sm_base2, _sm_base7;
     ns3_AstXmlNode _sm_base4, _sm_base5;
     List<ns3_AstXmlNode>* existing;
@@ -110160,9 +109931,8 @@ void ns18_appendVisibleFunction(ns18_Analyzer* self, Str* name, ns3_AstXmlNode* 
     fresh = List<ns3_AstXmlNode>();
     _sm_base5 = *(decl);
     simse_list_append(fresh, _sm_base5);
-    _sm_base6 = simse_addressOf(self->functions);
     _sm_base7 = *(name);
-    simse_dict_insert((*_sm_base6), _sm_base7, fresh);
+    simse_dict_insert((*_sm_base1), _sm_base7, fresh);
     L3:;
 }
 // src/sema/SemaCollect.kt
@@ -110295,15 +110065,14 @@ void ns18_checkPreludeTypeNames(ns18_Analyzer* self) {
 // src/sema/SemaCollect.kt
 void ns18_collectGlobal(ns18_Analyzer* self) {
     Char* __sm_catP;
-    List<ns18_SemaInput>* _sm_base1, * _sm_base2;
+    List<ns18_SemaInput>* _sm_base1;
     Str _sm_base3, pkg, name, key, protocolName, _sm_expr12, _sm_expr23, _sm_expr26, _sm_expr29;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base9, * _sm_base10, * _sm_base12,
-        * _sm_base13, * _sm_base14, * _sm_base17, * _sm_base18, * _sm_base28, * _sm_base29, * _sm_base34,
-        * _sm_base35, * _sm_base36, * _sm_base41, * _sm_base42, * _sm_base48;
-    List<Str>* _sm_base6, * _sm_base7;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base8, * _sm_base10, * _sm_base12, * _sm_base13,
+        * _sm_base14, * _sm_base17, * _sm_base18, * _sm_base28, * _sm_base29, * _sm_base34, * _sm_base35,
+        * _sm_base36, * _sm_base41, * _sm_base42, * _sm_base48;
+    List<Str>* _sm_base6;
     ns3_AstNodeAttributeKind _sm_base11, _sm_base15;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base16, * _sm_base22, * _sm_base23, * _sm_base25, * _sm_base26,
-        * _sm_base27, * _sm_base40, * _sm_base46;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base16, * _sm_base23, * _sm_base25, * _sm_base27, * _sm_base40;
     Str* _sm_base21, * _sm_base32, * _sm_base33, * _sm_base39, * _sm_base45, * _sm_base47;
     Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base24;
     Int n, _sm_expr1, i, _sm_expr10, _sm_expr11, _sm_expr21, _sm_expr22, _sm_expr24, _sm_expr25,
@@ -110319,8 +110088,7 @@ void ns18_collectGlobal(ns18_Analyzer* self) {
     _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr2 = n < _sm_expr1;
     if (!(_sm_expr2)) goto L2;
-    _sm_base2 = simse_addressOf(self->inputs);
-    input = (*_sm_base2)[n];
+    input = (*_sm_base1)[n];
     _sm_base3 = input.fileName;
     self->file = _sm_base3;
     _sm_base5 = simse_addressOf(input.module);
@@ -110332,11 +110100,9 @@ void ns18_collectGlobal(ns18_Analyzer* self) {
     if (_sm_expr4) goto L3;
     goto L4;
     L3:;
-    _sm_base7 = simse_addressOf(self->declaredPackages);
-    simse_list_append((*_sm_base7), pkg);
+    simse_list_append((*_sm_base6), pkg);
     L4:;
-    _sm_base9 = simse_addressOf(input.module);
-    _sm_base8 = _sm_base9;
+    _sm_base8 = _sm_base5;
     ns2_xmlDecls(&decls, _sm_base8);
     i = 0;
     L5:;
@@ -110384,8 +110150,7 @@ void ns18_collectGlobal(ns18_Analyzer* self) {
     ns18_diag(self, _sm_expr10, _sm_expr11, _sm_base21);
     goto L11;
     L10:;
-    _sm_base22 = simse_addressOf(self->globalProtocols);
-    simse_dict_insert((*_sm_base22), protocolName, decl);
+    simse_dict_insert((*_sm_base16), protocolName, decl);
     L11:;
     i = i + 1;
     goto L5;
@@ -110410,8 +110175,7 @@ void ns18_collectGlobal(ns18_Analyzer* self) {
     if (isFunction) goto L12;
     goto L13;
     L12:;
-    _sm_base26 = simse_addressOf(self->globalTypes);
-    _sm_expr2 = simse_dict_has((*_sm_base26), key);
+    _sm_expr2 = simse_dict_has((*_sm_base23), key);
     if (_sm_expr2) goto L14;
     _sm_base27 = simse_addressOf(self->globalStatics);
     _sm_expr2 = simse_dict_has((*_sm_base27), key);
@@ -110481,8 +110245,7 @@ void ns18_collectGlobal(ns18_Analyzer* self) {
     ns18_diag(self, _sm_expr27, _sm_expr28, _sm_base45);
     goto L27;
     L26:;
-    _sm_base46 = simse_addressOf(self->globalTypes);
-    simse_dict_insert((*_sm_base46), key, decl);
+    simse_dict_insert((*_sm_base23), key, decl);
     L27:;
     _sm_base47 = &pkg;
     _sm_base48 = &decl;
@@ -110558,7 +110321,7 @@ void ns18_buildVisible(ns18_Analyzer* self, ns3_AstXmlNode* module) {
     List<Str>* _sm_base9;
     Dictionary<Str, List<ns3_AstXmlNode>>* _sm_base10;
     Str* _sm_base16, * _sm_base24, * _sm_expr4, * _sm_expr19;
-    Dictionary<Str, ns3_AstXmlNode>* _sm_base25, * _sm_base26;
+    Dictionary<Str, ns3_AstXmlNode>* _sm_base25;
     List<Str> packages, seen;
     List<ns3_AstXmlNode> imports;
     Int _sm_expr2, importAt;
@@ -110664,8 +110427,7 @@ void ns18_buildVisible(ns18_Analyzer* self, ns3_AstXmlNode* module) {
     if (_sm_expr8) goto L19;
     goto L9;
     L19:;
-    _sm_base26 = simse_addressOf(self->types);
-    simse_dict_insert((*_sm_base26), name, decl);
+    simse_dict_insert((*_sm_base25), name, decl);
     goto L9;
     L4:;
 }
@@ -110705,7 +110467,7 @@ void ns18_popTypeScope(ns18_Analyzer* self) {
 }
 // src/sema/SemaCollect.kt
 void ns18_declareType(ns18_Analyzer* self, Str* name) {
-    List<List<Str>>* _sm_base1, * _sm_base2;
+    List<List<Str>>* _sm_base1;
     List<Str>* _sm_base3;
     Str _sm_base5;
     Int _sm_expr1, _sm_expr4;
@@ -110718,16 +110480,15 @@ void ns18_declareType(ns18_Analyzer* self, Str* name) {
     L1:;
     return;
     L2:;
-    _sm_base2 = simse_addressOf(self->typeScopes);
-    _sm_expr1 = simse_lenOf((*_sm_base2));
+    _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr4 = _sm_expr1 - 1;
-    _sm_base3 = simse_addressOf((*_sm_base2)[_sm_expr4]);
+    _sm_base3 = simse_addressOf((*_sm_base1)[_sm_expr4]);
     _sm_base5 = *(name);
     simse_list_append((*_sm_base3), _sm_base5);
 }
 // src/sema/SemaCollect.kt
 void ns18_declareValue(ns18_Analyzer* self, Str* name, Bool isMutable, Bool checkAssign, ns3_AstXmlNode* type) {
-    List<Dictionary<Str, ns18_ValueBinding>>* _sm_base1, * _sm_base2;
+    List<Dictionary<Str, ns18_ValueBinding>>* _sm_base1;
     ns3_AstXmlNode _sm_base3;
     Dictionary<Str, ns18_ValueBinding>* _sm_base4;
     Str _sm_base6;
@@ -110742,18 +110503,17 @@ void ns18_declareValue(ns18_Analyzer* self, Str* name, Bool isMutable, Bool chec
     L1:;
     return;
     L2:;
-    _sm_base2 = simse_addressOf(self->scopes);
-    _sm_expr1 = simse_lenOf((*_sm_base2));
+    _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr4 = _sm_expr1 - 1;
     _sm_base3 = *(type);
     _sm_expr5 = ns18_ValueBinding{isMutable, checkAssign, _sm_base3};
-    _sm_base4 = simse_addressOf((*_sm_base2)[_sm_expr4]);
+    _sm_base4 = simse_addressOf((*_sm_base1)[_sm_expr4]);
     _sm_base6 = *(name);
     simse_dict_insert((*_sm_base4), _sm_base6, _sm_expr5);
 }
 // src/sema/SemaCollect.kt
 void ns18_lookupValue(Opt<ns18_ValueBinding>* _sm_out, ns18_Analyzer* self, Str* name) {
-    List<Dictionary<Str, ns18_ValueBinding>>* _sm_base1, * _sm_base3, * _sm_base6;
+    List<Dictionary<Str, ns18_ValueBinding>>* _sm_base1, * _sm_base3;
     Dictionary<Str, ns18_ValueBinding>* _sm_base2, * _sm_base5;
     Str _sm_base4, _sm_base7;
     Int _sm_expr1, i;
@@ -110772,8 +110532,7 @@ void ns18_lookupValue(Opt<ns18_ValueBinding>* _sm_out, ns18_Analyzer* self, Str*
     if (_sm_expr2) goto L3;
     goto L4;
     L3:;
-    _sm_base6 = simse_addressOf(self->scopes);
-    _sm_base5 = simse_addressOf((*_sm_base6)[i]);
+    _sm_base5 = simse_addressOf((*_sm_base3)[i]);
     _sm_base7 = *(name);
     _sm_expr4 = simse_dict_get((*_sm_base5), _sm_base7);
     *_sm_out = _sm_expr4;
@@ -113217,7 +112976,7 @@ void ns18_semMachineType(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* ret, ns18_SemF
     List<Str>* _sm_base1, * _sm_base2;
     ns3_AstXmlNode _sm_base4, _sm_expr7, _sm_expr10, node;
     ns3_AstNodeKind _sm_base5, _sm_base9, _sm_base19;
-    ns3_AstXmlNode* _sm_base6, * _sm_base7, * _sm_base8, * _sm_base10, * _sm_base11, * bound;
+    ns3_AstXmlNode* _sm_base6, * _sm_base7, * _sm_base8, * _sm_base10, * bound;
     Str* _sm_base14, * _sm_base15, * fnNameText2;
     Str _sm_base17, _sm_base24, templateParam, outer, fnNameText, machine, _sm_expr13;
     List<ns3_AstXmlNode>* _sm_base20;
@@ -113280,8 +113039,7 @@ void ns18_semMachineType(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* ret, ns18_SemF
     ns18_semReRole(&_sm_expr10, receiver, _sm_base9);
     simse_list_append(args, _sm_expr10);
     L8:;
-    _sm_base11 = simse_addressOf(fn->receiver);
-    _sm_base10 = _sm_base11;
+    _sm_base10 = _sm_base7;
     ns18_semOuterTypeName(&outer, _sm_base10);
     fnNameText = fn->name;
     machine.resize(10 + fnNameText.size());
@@ -113565,9 +113323,9 @@ void ns18_semInferTypes(List<ns3_AstXmlNode>* _sm_out, List<ns3_AstXmlNode>* bod
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base10, * _sm_base11, * _sm_base16, * _sm_base17,
         * param, * paramType, * _sm_expr15, * provenType;
     ns3_AstNodeKind _sm_base4, _sm_base6;
-    List<ns3_AstXmlNode>* _sm_base5, * _sm_base9, * _sm_base12, * _sm_base18;
+    List<ns3_AstXmlNode>* _sm_base5, * _sm_base9;
     ns3_AstNodeAttributeKind _sm_base7;
-    List<Str>* _sm_base8, * _sm_base15, * _sm_base20, * _sm_base26;
+    List<Str>* _sm_base8, * _sm_base20, * _sm_base26;
     Str* _sm_base13, * _sm_base14, * _sm_base23, * _sm_expr7;
     Str _sm_base22, _sm_base24, _sm_base28, _sm_base29;
     ns3_AstXmlNode _sm_base30;
@@ -113622,16 +113380,13 @@ void ns18_semInferTypes(List<ns3_AstXmlNode>* _sm_out, List<ns3_AstXmlNode>* bod
     if (_sm_expr4) goto L9;
     goto L8;
     L9:;
-    _sm_base12 = simse_addressOf(ctx->paramTypes);
-    _sm_base11 = simse_addressOf((*_sm_base12)[i]);
+    _sm_base11 = simse_addressOf((*_sm_base9)[i]);
     _sm_base10 = _sm_base11;
     _sm_expr4 = ns2_xmlIsEmpty(_sm_base10);
     if (_sm_expr4) goto L8;
-    _sm_base15 = simse_addressOf(ctx->paramNames);
-    _sm_base14 = simse_addressOf((*_sm_base15)[i]);
+    _sm_base14 = simse_addressOf((*_sm_base8)[i]);
     _sm_base13 = _sm_base14;
-    _sm_base18 = simse_addressOf(ctx->paramTypes);
-    _sm_base17 = simse_addressOf((*_sm_base18)[i]);
+    _sm_base17 = simse_addressOf((*_sm_base9)[i]);
     _sm_base16 = _sm_base17;
     ns18_mark(simse_addressOf(infer), _sm_base13, _sm_base16);
     L8:;
@@ -113685,9 +113440,9 @@ void ns18_semTypeOfExpr(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* expr, ns18_SemF
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base10, * _sm_base11, * _sm_base16, * _sm_base17,
         * param, * paramType, * _sm_expr15;
     ns3_AstNodeKind _sm_base4, _sm_base6;
-    List<ns3_AstXmlNode>* _sm_base5, * _sm_base9, * _sm_base12, * _sm_base18;
+    List<ns3_AstXmlNode>* _sm_base5, * _sm_base9;
     ns3_AstNodeAttributeKind _sm_base7;
-    List<Str>* _sm_base8, * _sm_base15, * _sm_base20;
+    List<Str>* _sm_base8, * _sm_base20;
     Str* _sm_base13, * _sm_base14, * _sm_base23, * _sm_expr7;
     Str _sm_base22, _sm_base24;
     List<Dictionary<Str, ns3_AstXmlNode>> _sm_expr1;
@@ -113742,16 +113497,13 @@ void ns18_semTypeOfExpr(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* expr, ns18_SemF
     if (_sm_expr4) goto L9;
     goto L8;
     L9:;
-    _sm_base12 = simse_addressOf(ctx->paramTypes);
-    _sm_base11 = simse_addressOf((*_sm_base12)[i]);
+    _sm_base11 = simse_addressOf((*_sm_base9)[i]);
     _sm_base10 = _sm_base11;
     _sm_expr4 = ns2_xmlIsEmpty(_sm_base10);
     if (_sm_expr4) goto L8;
-    _sm_base15 = simse_addressOf(ctx->paramNames);
-    _sm_base14 = simse_addressOf((*_sm_base15)[i]);
+    _sm_base14 = simse_addressOf((*_sm_base8)[i]);
     _sm_base13 = _sm_base14;
-    _sm_base18 = simse_addressOf(ctx->paramTypes);
-    _sm_base17 = simse_addressOf((*_sm_base18)[i]);
+    _sm_base17 = simse_addressOf((*_sm_base9)[i]);
     _sm_base16 = _sm_base17;
     ns18_mark(simse_addressOf(infer), _sm_base13, _sm_base16);
     L8:;
@@ -113785,7 +113537,7 @@ Bool ns18_semFnArgUnifies(ns18_SemFnFact* fn, List<ns3_AstXmlNode> argTypes) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base4, * _sm_base6, * _sm_base7, * _sm_base9,
         * _sm_base10, * _sm_base11, * _sm_base14, * _sm_base15, * _sm_base16, * paramType;
     ns3_AstNodeKind _sm_base3, _sm_base8;
-    List<Str>* _sm_base12, * _sm_base13, * _sm_base17, * _sm_base18;
+    List<Str>* _sm_base12, * _sm_base13, * _sm_base17;
     List<ns3_AstXmlNode> params;
     Int base, t, _sm_expr1, _sm_expr4;
     Bool _sm_expr2, _sm_expr10;
@@ -113843,8 +113595,7 @@ Bool ns18_semFnArgUnifies(ns18_SemFnFact* fn, List<ns3_AstXmlNode> argTypes) {
     if (_sm_expr2) goto L11;
     _sm_base15 = &pointee;
     _sm_base16 = &argType;
-    _sm_base18 = simse_addressOf(fn->templateParams);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base13;
     _sm_expr2 = ns18_semUnifyType(_sm_base15, _sm_base16, _sm_base17);
     if (_sm_expr2) goto L12;
     L11:;
@@ -114080,9 +113831,8 @@ void ns18_functionReturnOf(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Int i, 
     ns18_SemFnFact* _sm_base1, * fn;
     List<ns18_SemFnFact>* _sm_base2;
     ns18_SemFacts* _sm_base3;
-    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base10,
-        * _sm_base19, * _sm_base20, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_base32, * _sm_base33,
-        * ret;
+    ns3_AstXmlNode* _sm_base4, * _sm_base5, * _sm_base7, * _sm_base8, * _sm_base9, * _sm_base19,
+        * _sm_base20, * _sm_base22, * _sm_base23, * _sm_base24, * _sm_base32, * _sm_base33, * ret;
     ns3_AstNodeKind _sm_base6;
     List<Str>* _sm_base11, * _sm_base12, * _sm_base14, * _sm_base18, * _sm_base21, * _sm_base26,
         * _sm_base27, * _sm_base30, * _sm_base31;
@@ -114120,8 +113870,7 @@ void ns18_functionReturnOf(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Int i, 
     if (hasReceiver) goto L3;
     goto L6;
     L3:;
-    _sm_base10 = simse_addressOf(fn->receiver);
-    _sm_base9 = _sm_base10;
+    _sm_base9 = _sm_base8;
     _sm_base12 = simse_addressOf(fn->templateParams);
     _sm_base11 = _sm_base12;
     _sm_base13 = &bindings;
@@ -114451,8 +114200,8 @@ void ns18_resolveAlias(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlN
 // src/sema/TypeInferCall.kt
 void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlNode* recvExpr, ns3_AstXmlNode* indexNode) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base10, * _sm_base11, * _sm_base12,
-        * _sm_base13, * _sm_base16, * _sm_base17, * _sm_base19, * _sm_base20, * _sm_base21, * _sm_base22,
-        * _sm_base27, * _sm_base28, * _sm_base36, * _sm_base37, * ret;
+        * _sm_base13, * _sm_base16, * _sm_base19, * _sm_base21, * _sm_base22, * _sm_base27, * _sm_base36,
+        * _sm_base37, * ret;
     Dictionary<Str, List<Int>>* _sm_base4;
     ns18_SemFacts* _sm_base5, * _sm_base9;
     ns18_SemFnFact* _sm_base7, * fn;
@@ -114460,8 +114209,7 @@ void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_As
     ns3_AstNodeAttributeKind _sm_base14;
     Str _sm_base15;
     ns3_AstNodeKind _sm_base18;
-    List<Str>* _sm_base23, * _sm_base24, * _sm_base26, * _sm_base30, * _sm_base31, * _sm_base34,
-        * _sm_base35;
+    List<Str>* _sm_base23, * _sm_base24, * _sm_base30, * _sm_base34;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base25, * _sm_base32, * _sm_base33, * _sm_base38;
     List<ns3_AstXmlNode>* _sm_base29;
     ns3_AstXmlNode _sm_expr1, _sm_expr2, recv, _sm_expr4, _sm_expr16, _sm_expr21, _sm_expr22, result;
@@ -114524,15 +114272,13 @@ void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_As
     _sm_base15 = *(_sm_expr13);
     _sm_expr3 = (!equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_base15))), __sm_stringTable[1291]));
     if (_sm_expr3) goto L5;
-    _sm_base17 = simse_addressOf(fn->decl);
-    _sm_base16 = _sm_base17;
+    _sm_base16 = _sm_base13;
     _sm_base18 = ns3_AstNodeKind::ReturnType;
     ret = ns2_xmlChildPtr(_sm_base16, _sm_base18);
     _sm_expr3 = ns2_xmlIsEmpty(ret);
     if (_sm_expr3) goto L5;
     bindings = Dictionary<Str, ns3_AstXmlNode>();
-    _sm_base20 = simse_addressOf(fn->receiver);
-    _sm_base19 = _sm_base20;
+    _sm_base19 = _sm_base11;
     ns18_resolveAlias(&_sm_expr16, self, _sm_base19);
     _sm_base21 = &_sm_expr16;
     _sm_base22 = &recv;
@@ -114542,8 +114288,7 @@ void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_As
     _sm_expr3 = ns18_semBindTypes(_sm_base21, _sm_base22, _sm_base23, _sm_base25);
     _sm_expr18 = !_sm_expr3;
     if (_sm_expr18) goto L5;
-    _sm_base26 = simse_addressOf(fn->templateParams);
-    _sm_expr11 = simse_lenOf((*_sm_base26));
+    _sm_expr11 = simse_lenOf((*_sm_base24));
     _sm_expr3 = _sm_expr11 > 0;
     if (_sm_expr3) goto L17;
     goto L18;
@@ -114552,17 +114297,14 @@ void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_As
     _sm_expr21 = ns18_infer(self, indexNode);
     simse_list_append(argTypes, _sm_expr21);
     ns2_xmlEmptyNode(&_sm_expr22);
-    _sm_base28 = simse_addressOf(fn->decl);
-    _sm_base27 = _sm_base28;
+    _sm_base27 = _sm_base13;
     _sm_base29 = &argTypes;
-    _sm_base31 = simse_addressOf(fn->templateParams);
-    _sm_base30 = _sm_base31;
+    _sm_base30 = _sm_base24;
     _sm_base32 = &bindings;
     ns18_semBindCallArgs(_sm_base27, _sm_expr22, _sm_base29, _sm_base30, _sm_base32);
     L18:;
     _sm_base33 = &bindings;
-    _sm_base35 = simse_addressOf(fn->templateParams);
-    _sm_base34 = _sm_base35;
+    _sm_base34 = _sm_base24;
     ns18_semSubstitute(&result, ret, _sm_base33, _sm_base34);
     _sm_base36 = &result;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base36);
@@ -114583,8 +114325,8 @@ void ns18_operatorGetReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_As
 // src/sema/TypeInferCall.kt
 void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str* name, ns3_AstXmlNode* lhsExpr, ns3_AstXmlNode* rhsExpr) {
     ns3_AstXmlNode* _sm_base1, * _sm_base2, * _sm_base3, * _sm_base11, * _sm_base12, * _sm_base13,
-        * _sm_base14, * _sm_base17, * _sm_base18, * _sm_base20, * _sm_base21, * _sm_base22, * _sm_base23,
-        * _sm_base28, * _sm_base29, * _sm_base37, * _sm_base38, * ret;
+        * _sm_base14, * _sm_base17, * _sm_base20, * _sm_base22, * _sm_base23, * _sm_base28, * _sm_base37,
+        * _sm_base38, * ret;
     Dictionary<Str, List<Int>>* _sm_base4;
     ns18_SemFacts* _sm_base5, * _sm_base10;
     Str _sm_base6, _sm_base16;
@@ -114592,8 +114334,7 @@ void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str
     List<ns18_SemFnFact>* _sm_base9;
     ns3_AstNodeAttributeKind _sm_base15;
     ns3_AstNodeKind _sm_base19;
-    List<Str>* _sm_base24, * _sm_base25, * _sm_base27, * _sm_base31, * _sm_base32, * _sm_base35,
-        * _sm_base36;
+    List<Str>* _sm_base24, * _sm_base25, * _sm_base31, * _sm_base35;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base26, * _sm_base33, * _sm_base34, * _sm_base39;
     List<ns3_AstXmlNode>* _sm_base30;
     ns3_AstXmlNode _sm_expr1, _sm_expr2, recv, _sm_expr4, _sm_expr16, _sm_expr21, _sm_expr22, result;
@@ -114657,15 +114398,13 @@ void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str
     _sm_base16 = *(_sm_expr13);
     _sm_expr3 = (!equals(simse_addressOf(simse_spanOfStr(simse_addressOf(_sm_base16))), __sm_stringTable[1291]));
     if (_sm_expr3) goto L5;
-    _sm_base18 = simse_addressOf(fn->decl);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base14;
     _sm_base19 = ns3_AstNodeKind::ReturnType;
     ret = ns2_xmlChildPtr(_sm_base17, _sm_base19);
     _sm_expr3 = ns2_xmlIsEmpty(ret);
     if (_sm_expr3) goto L5;
     bindings = Dictionary<Str, ns3_AstXmlNode>();
-    _sm_base21 = simse_addressOf(fn->receiver);
-    _sm_base20 = _sm_base21;
+    _sm_base20 = _sm_base12;
     ns18_resolveAlias(&_sm_expr16, self, _sm_base20);
     _sm_base22 = &_sm_expr16;
     _sm_base23 = &recv;
@@ -114675,8 +114414,7 @@ void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str
     _sm_expr3 = ns18_semBindTypes(_sm_base22, _sm_base23, _sm_base24, _sm_base26);
     _sm_expr18 = !_sm_expr3;
     if (_sm_expr18) goto L5;
-    _sm_base27 = simse_addressOf(fn->templateParams);
-    _sm_expr11 = simse_lenOf((*_sm_base27));
+    _sm_expr11 = simse_lenOf((*_sm_base25));
     _sm_expr3 = _sm_expr11 > 0;
     if (_sm_expr3) goto L17;
     goto L18;
@@ -114685,17 +114423,14 @@ void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str
     _sm_expr21 = ns18_infer(self, rhsExpr);
     simse_list_append(argTypes, _sm_expr21);
     ns2_xmlEmptyNode(&_sm_expr22);
-    _sm_base29 = simse_addressOf(fn->decl);
-    _sm_base28 = _sm_base29;
+    _sm_base28 = _sm_base14;
     _sm_base30 = &argTypes;
-    _sm_base32 = simse_addressOf(fn->templateParams);
-    _sm_base31 = _sm_base32;
+    _sm_base31 = _sm_base25;
     _sm_base33 = &bindings;
     ns18_semBindCallArgs(_sm_base28, _sm_expr22, _sm_base30, _sm_base31, _sm_base33);
     L18:;
     _sm_base34 = &bindings;
-    _sm_base36 = simse_addressOf(fn->templateParams);
-    _sm_base35 = _sm_base36;
+    _sm_base35 = _sm_base25;
     ns18_semSubstitute(&result, ret, _sm_base34, _sm_base35);
     _sm_base37 = &result;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base37);
@@ -114717,18 +114452,18 @@ void ns18_operatorBinaryReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, Str
 void ns18_memberReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlNode* callee, List<ns3_AstXmlNode>* argNodes) {
     ns3_AstNodeKind _sm_base1, _sm_base16, _sm_base68, _sm_base77, _sm_base82, _sm_base117;
     ns3_AstXmlNode* _sm_base2, * _sm_base3, * _sm_base4, * _sm_base12, * _sm_base13, * _sm_base14,
-        * _sm_base15, * _sm_base17, * _sm_base18, * _sm_base19, * _sm_base20, * _sm_base25, * _sm_base26,
-        * _sm_base27, * _sm_base35, * _sm_base36, * _sm_base38, * _sm_base39, * _sm_base44, * _sm_base45,
-        * _sm_base46, * _sm_base47, * _sm_base48, * _sm_base49, * _sm_base50, * _sm_base51, * _sm_base55,
-        * _sm_base56, * _sm_base60, * _sm_base61, * _sm_base66, * _sm_base67, * _sm_base69, * _sm_base96,
-        * _sm_base98, * _sm_base107, * _sm_base108, * _sm_base118, * _sm_expr1, * ret;
+        * _sm_base15, * _sm_base17, * _sm_base19, * _sm_base20, * _sm_base25, * _sm_base26, * _sm_base27,
+        * _sm_base35, * _sm_base36, * _sm_base38, * _sm_base39, * _sm_base44, * _sm_base45, * _sm_base46,
+        * _sm_base47, * _sm_base48, * _sm_base50, * _sm_base51, * _sm_base55, * _sm_base60, * _sm_base61,
+        * _sm_base66, * _sm_base67, * _sm_base69, * _sm_base96, * _sm_base98, * _sm_base107, * _sm_base108,
+        * _sm_base118, * _sm_expr1, * ret;
     ns3_AstNodeAttributeKind _sm_base5, _sm_base70, _sm_base99, _sm_base109;
     Dictionary<Str, List<Int>>* _sm_base6;
     ns18_SemFacts* _sm_base7, * _sm_base11, * _sm_base41, * _sm_base111;
     ns18_SemFnFact* _sm_base9, * fn;
     List<ns18_SemFnFact>* _sm_base10;
-    List<Str>* _sm_base21, * _sm_base22, * _sm_base24, * _sm_base29, * _sm_base30, * _sm_base33,
-        * _sm_base34, * _sm_base52, * _sm_base53, * _sm_base58, * _sm_base59;
+    List<Str>* _sm_base21, * _sm_base22, * _sm_base29, * _sm_base30, * _sm_base33, * _sm_base34,
+        * _sm_base52, * _sm_base53, * _sm_base58;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base23, * _sm_base31, * _sm_base32, * _sm_base37, * _sm_base54,
         * _sm_base57;
     List<ns3_AstXmlNode>* _sm_base28;
@@ -114805,8 +114540,7 @@ void ns18_memberReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlN
     _sm_expr3 = ns2_xmlIsEmpty(ret);
     if (_sm_expr3) goto L5;
     bindings = Dictionary<Str, ns3_AstXmlNode>();
-    _sm_base18 = simse_addressOf(fn->receiver);
-    _sm_base17 = _sm_base18;
+    _sm_base17 = _sm_base13;
     ns18_resolveAlias(&_sm_expr11, self, _sm_base17);
     _sm_base19 = &_sm_expr11;
     _sm_base20 = &recv;
@@ -114816,8 +114550,7 @@ void ns18_memberReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlN
     _sm_expr3 = ns18_semBindTypes(_sm_base19, _sm_base20, _sm_base21, _sm_base23);
     _sm_expr13 = !_sm_expr3;
     if (_sm_expr13) goto L5;
-    _sm_base24 = simse_addressOf(fn->templateParams);
-    _sm_expr14 = simse_lenOf((*_sm_base24));
+    _sm_expr14 = simse_lenOf((*_sm_base22));
     _sm_expr3 = _sm_expr14 > 0;
     if (_sm_expr3) goto L14;
     goto L15;
@@ -114901,8 +114634,7 @@ void ns18_memberReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlN
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base46);
     if (_sm_expr3) goto L28;
     _sm_bindings_2 = Dictionary<Str, ns3_AstXmlNode>();
-    _sm_base49 = simse_addressOf(ext->receiver);
-    _sm_base48 = _sm_base49;
+    _sm_base48 = _sm_base45;
     ns18_resolveAlias(&_sm_expr30, self, _sm_base48);
     _sm_base50 = &_sm_expr30;
     _sm_base51 = &recv;
@@ -114912,11 +114644,9 @@ void ns18_memberReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlN
     _sm_expr3 = ns18_semBindTypes(_sm_base50, _sm_base51, _sm_base52, _sm_base54);
     _sm_expr13 = !_sm_expr3;
     if (_sm_expr13) goto L28;
-    _sm_base56 = simse_addressOf(ext->returnType);
-    _sm_base55 = _sm_base56;
+    _sm_base55 = _sm_base47;
     _sm_base57 = &_sm_bindings_2;
-    _sm_base59 = simse_addressOf(ext->typeParams);
-    _sm_base58 = _sm_base59;
+    _sm_base58 = _sm_base53;
     ns18_semSubstitute(&_sm_result_2, _sm_base55, _sm_base57, _sm_base58);
     _sm_base60 = &_sm_result_2;
     _sm_expr3 = ns2_xmlIsEmpty(_sm_base60);
@@ -115585,13 +115315,13 @@ void ns18_callableReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXm
 void ns18_implicitThisReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlNode* callee, List<ns3_AstXmlNode>* argNodes) {
     ns3_AstNodeAttributeKind _sm_base1, _sm_base21, _sm_base25;
     ns18_SemBody* _sm_base2;
-    ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base14,
-        * _sm_base15, * _sm_base28, * _sm_base32, * _sm_base33, * ret;
+    ns3_AstXmlNode* _sm_base3, * _sm_base4, * _sm_base11, * _sm_base12, * _sm_base13, * _sm_base15,
+        * _sm_base28, * _sm_base32, * _sm_base33, * ret;
     Dictionary<Str, List<Int>>* _sm_base5;
     ns18_SemFacts* _sm_base6, * _sm_base10;
     ns18_SemFnFact* _sm_base8, * fn;
     List<ns18_SemFnFact>* _sm_base9;
-    List<Str>* _sm_base16, * _sm_base17, * _sm_base36, * _sm_base37;
+    List<Str>* _sm_base16, * _sm_base17, * _sm_base36;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base18, * _sm_base35;
     ns3_AstNodeKind _sm_base19, _sm_base23, _sm_base27, _sm_base34;
     ns3_AstNodeCategory _sm_base20, _sm_base24, _sm_base29;
@@ -115660,8 +115390,7 @@ void ns18_implicitThisReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_A
     _sm_expr1 = paramCount != _sm_expr10;
     if (_sm_expr1) goto L7;
     bindings = Dictionary<Str, ns3_AstXmlNode>();
-    _sm_base14 = simse_addressOf(fn->receiver);
-    _sm_base13 = _sm_base14;
+    _sm_base13 = _sm_base12;
     _sm_base15 = &recv;
     _sm_base17 = simse_addressOf(fn->templateParams);
     _sm_base16 = _sm_base17;
@@ -115711,8 +115440,7 @@ void ns18_implicitThisReturn(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_A
     return;
     L16:;
     _sm_base35 = &bindings;
-    _sm_base37 = simse_addressOf(fn->templateParams);
-    _sm_base36 = _sm_base37;
+    _sm_base36 = _sm_base17;
     ns18_semSubstitute(&_sm_expr2, ret, _sm_base35, _sm_base36);
     *_sm_out = _sm_expr2;
     return;
@@ -116680,7 +116408,7 @@ void ns18_typeOf(ns3_AstXmlNode* _sm_out, ns18_SemInfer* self, ns3_AstXmlNode* e
 }
 // src/sema/TypeInferExpr.kt
 void ns18_mark(ns18_SemInfer* self, Str* name, ns3_AstXmlNode* typeNode) {
-    List<Dictionary<Str, ns3_AstXmlNode>>* _sm_base1, * _sm_base2;
+    List<Dictionary<Str, ns3_AstXmlNode>>* _sm_base1;
     Dictionary<Str, ns3_AstXmlNode>* _sm_base3, * _sm_base7;
     Str _sm_base5, _sm_base8;
     ns3_AstXmlNode _sm_base6, _sm_base9;
@@ -116694,10 +116422,9 @@ void ns18_mark(ns18_SemInfer* self, Str* name, ns3_AstXmlNode* typeNode) {
     L1:;
     return;
     L2:;
-    _sm_base2 = simse_addressOf(self->scopes);
-    _sm_expr1 = simse_lenOf((*_sm_base2));
+    _sm_expr1 = simse_lenOf((*_sm_base1));
     _sm_expr4 = _sm_expr1 - 1;
-    _sm_base3 = simse_addressOf((*_sm_base2)[_sm_expr4]);
+    _sm_base3 = simse_addressOf((*_sm_base1)[_sm_expr4]);
     _sm_base5 = *(name);
     _sm_base6 = *(typeNode);
     simse_dict_insert((*_sm_base3), _sm_base5, _sm_base6);
