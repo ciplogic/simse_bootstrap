@@ -57235,17 +57235,9 @@ void ns11_ilNamedTypeNode(ns3_AstXmlNode* _sm_out, Str* name) {
 }
 // src/linear/LinearFormPrint.kt
 void ns11_ilReceiverTypeNode(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* typeNode) {
-    Str* _sm_base2;
-    List<ns3_AstNodeAttribute>* _sm_base6;
-    ns3_AstXmlNode* _sm_base9;
     ns3_AstNodeCategory kind, _sm_expr1;
     Bool _sm_expr2;
-    Str protocolName;
-    Span<Char> _sm_expr7;
-    List<ns3_AstNodeAttribute> _sm_expr9;
-    Array<ns3_AstXmlNode> _sm_expr10;
-    ns3_AstXmlNode named, element, _sm_expr12;
-    ns3_AstNodeAttribute _sm_expr11;
+    ns3_AstXmlNode _sm_expr5;
     ns2_xmlKind(&kind, typeNode);
     _sm_expr1 = ns3_AstNodeCategory::TypeReference;
     _sm_expr2 = kind == _sm_expr1;
@@ -57258,33 +57250,8 @@ void ns11_ilReceiverTypeNode(ns3_AstXmlNode* _sm_out, ns3_AstXmlNode* typeNode) 
     *_sm_out = *(typeNode);
     return;
     L2:;
-    _sm_expr1 = ns3_AstNodeCategory::TypeYield;
-    _sm_expr2 = kind == _sm_expr1;
-    if (_sm_expr2) goto L4;
-    goto L7;
-    L4:;
-    protocolName = *(ns2_xmlAttr(typeNode, ns3_AstNodeAttributeKind::MachineProtocol));
-    _sm_base2 = &protocolName;
-    _sm_expr7 = simse_spanOfStr(_sm_base2);
-    _sm_expr2 = (!equals(simse_addressOf(_sm_expr7), __sm_stringTable[1479]));
-    if (_sm_expr2) goto L6;
-    goto L7;
-    L6:;
-    _sm_expr9 = List<ns3_AstNodeAttribute>();
-    _sm_expr10 = Array<ns3_AstXmlNode>();
-    named = ns3_AstXmlNode{ns3_AstNodeKind::Type, ns3_AstNodeCategory::TypeGeneric, _sm_expr9, _sm_expr10};
-    _sm_expr11 = ns3_AstNodeAttribute{ns3_AstNodeAttributeKind::Name, protocolName};
-    _sm_base6 = simse_addressOf(named.attributes);
-    simse_list_append((*_sm_base6), _sm_expr11);
-    ns2_xmlChild(&element, typeNode, ns3_AstNodeKind::Inner);
-    element.name = ns3_AstNodeKind::TypeArg;
-    _sm_base9 = &named;
-    ns2_xmlAddChild(_sm_base9, element);
-    *_sm_out = named;
-    return;
-    L7:;
-    ns11_ilPointerNode(&_sm_expr12, typeNode);
-    *_sm_out = _sm_expr12;
+    ns11_ilPointerNode(&_sm_expr5, typeNode);
+    *_sm_out = _sm_expr5;
     return;
 }
 // src/linear/LinearFormPrint.kt
